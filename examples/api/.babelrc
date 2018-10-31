@@ -1,0 +1,13 @@
+{
+  "plugins": [
+    "transform-object-rest-spread",
+    "syntax-dynamic-import",
+    [
+      "transform-runtime",
+      {
+        "polyfill": false,
+        "regenerator": true
+      }
+    ]
+  ]
+}
