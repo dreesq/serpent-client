@@ -3,12 +3,9 @@ import client from "./client";
 
 window.client = client;
 
-client.ready(async () => {
-     const d = window.d = (...args) => {
-          const el = document.getElementById('output');
-          el.innerHTML += "\n" + "=== MESSAGE ===  \n" + JSON.stringify(args, null, 2); + "\n";
-     };
+const {d} = client._utils;
 
+client.ready(async () => {
      window.login = async () => {
           if (localStorage.getItem('token')) {
                return d('Already logged in');
