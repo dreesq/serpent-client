@@ -57,9 +57,9 @@ export default class Serpent {
                }
           });
 
+          this._auth = new Auth(this);
           new Actions(this);
           new Socket(this);
-          this._auth = new Auth(this);
           this._validator = new Validator();
 
           this._utils = Utils;
