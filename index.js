@@ -28,6 +28,7 @@ export default class Serpent {
                throw new Error('Missing required parameter `path`.')
           }
 
+          this.loaded = 0;
           this.opts = {
                ...defaults,
                ...opts,
@@ -45,15 +46,24 @@ export default class Serpent {
       */
 
      async setup() {
+          this._event = new Event();
+
+          this._event.on('loaded', () => {
+               ++this.loaded;
+
+               if (this.loaded === 2) {
+                    Utils.d('Client successfully loaded.', this.onReady);
+                    typeof this.onReady === 'function' && this.onReady();
+               }
+          });
+
           new Actions(this);
           new Socket(this);
           this._auth = new Auth(this);
           this._validator = new Validator();
-          this._event = new Event();
+
           this._utils = Utils;
           this._config = Config;
-
-          typeof this.onReady === 'function' && this.onReady();
      }
 
      /**
