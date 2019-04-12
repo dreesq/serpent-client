@@ -16,15 +16,17 @@ const defaults = {
      socket: false,
      actions: '/',
      handler: '/',
+     refresh: true,
+     authFailed: false,
      tokenHandler: {
-          get() {
-               return localStorage.getItem('token');
+          get(key) {
+               return localStorage.getItem(key);
           },
-          set(token) {
-               localStorage.setItem('token', token);
+          set(key, token) {
+               localStorage.setItem(key, token);
           },
-          remove() {
-               localStorage.removeItem('token');
+          remove(key) {
+               localStorage.removeItem(key);
           }
      }
 };
@@ -63,13 +65,13 @@ export default class Serpent {
                ++this.loaded;
 
                if (this.loaded === 2) {
-                    Utils.d('Client successfully loaded.', this.onReady);
+                    Utils.d('Client successfully loaded. Running onReady hook if it exists.');
                     typeof this.onReady === 'function' && this.onReady();
                }
           });
 
           this._auth = new Auth(this);
-          new Actions(this);
+          this._actions = new Actions(this);
           new Socket(this);
           this._validator = new Validator();
 

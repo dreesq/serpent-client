@@ -12,9 +12,9 @@ client.ready(async () => {
           }
 
           d('Logging in.');
-          const {errors, data} = await client.login({
+          const {errors, data} = await client._auth.login({
                provider: 'local',
-               email: 'mail@mail.com',
+               email: 'me@me.com',
                password: 'password'
           });
 
@@ -24,7 +24,6 @@ client.ready(async () => {
 
           d('Logged in', data);
      };
-
 
      login();
 });
