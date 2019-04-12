@@ -15,7 +15,18 @@ const defaults = {
      debug: false,
      socket: false,
      actions: '/',
-     handler: '/'
+     handler: '/',
+     tokenHandler: {
+          get() {
+               return localStorage.getItem('token');
+          },
+          set(token) {
+               localStorage.setItem('token', token);
+          },
+          remove() {
+               localStorage.removeItem('token');
+          }
+     }
 };
 
 /**
