@@ -8,10 +8,10 @@ const {d, debugPanel} = client._utils;
 client.ready(async () => {
      window.login = async () => {
           if (localStorage.getItem('token')) {
-               return d('Already logged in');
+               return d('info', 'Already logged in');
           }
 
-          d('Logging in.');
+          d('info', 'Logging in.');
           const {errors, data} = await client._auth.login({
                provider: 'local',
                email: 'me@me.com',
@@ -19,13 +19,13 @@ client.ready(async () => {
           });
 
           if (errors) {
-               return d('Error', errors);
+               return d('error', 'Error', errors);
           }
 
-          d('Logged in', data);
+          d('info', 'Logged in', data);
      };
 
      login();
 });
 
-debugPanel('#logs');
+debugPanel();

@@ -5,8 +5,6 @@
 //
 // anything defined in a previous bundle is accessed via the
 // orig method which is the require for previous bundles
-
-// eslint-disable-next-line no-global-assign
 parcelRequire = (function (modules, cache, entry, globalName) {
   // Save the require from previous bundle to this closure if any
   var previousRequire = typeof parcelRequire === 'function' && parcelRequire;
@@ -77,8 +75,16 @@ parcelRequire = (function (modules, cache, entry, globalName) {
     }, {}];
   };
 
+  var error;
   for (var i = 0; i < entry.length; i++) {
-    newRequire(entry[i]);
+    try {
+      newRequire(entry[i]);
+    } catch (e) {
+      // Save first error but execute all entries
+      if (!error) {
+        error = e;
+      }
+    }
   }
 
   if (entry.length) {
@@ -103,6 +109,13 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   // Override the current require with this new one
+  parcelRequire = newRequire;
+
+  if (error) {
+    // throw error from earlier, _after updating parcelRequire_
+    throw error;
+  }
+
   return newRequire;
 })({"node_modules/core-js/modules/_global.js":[function(require,module,exports) {
 
@@ -8494,7 +8507,7 @@ function coerce(val) {
   return val;
 }
 
-},{"ms":"../../node_modules/ms/index.js"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
+},{"ms":"../../node_modules/ms/index.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel/node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -8666,7 +8679,6 @@ Item.prototype.run = function () {
 };
 
 process.title = 'browser';
-process.browser = true;
 process.env = {};
 process.argv = [];
 process.version = ''; // empty string to avoid regexp issues
@@ -8868,7 +8880,7 @@ function localstorage() {
     return window.localStorage;
   } catch (e) {}
 }
-},{"./debug":"../../node_modules/debug/src/debug.js","process":"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/socket.io-client/lib/url.js":[function(require,module,exports) {
+},{"./debug":"../../node_modules/debug/src/debug.js","process":"../../../../AppData/Roaming/npm/node_modules/parcel/node_modules/process/browser.js"}],"../../node_modules/socket.io-client/lib/url.js":[function(require,module,exports) {
 
 /**
  * Module dependencies.
@@ -9117,7 +9129,7 @@ module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/base64-js/index.js":[function(require,module,exports) {
+},{}],"../../../../AppData/Roaming/npm/node_modules/parcel/node_modules/base64-js/index.js":[function(require,module,exports) {
 'use strict'
 
 exports.byteLength = byteLength
@@ -9270,7 +9282,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/ieee754/index.js":[function(require,module,exports) {
+},{}],"../../../../AppData/Roaming/npm/node_modules/parcel/node_modules/ieee754/index.js":[function(require,module,exports) {
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = (nBytes * 8) - mLen - 1
@@ -9356,14 +9368,14 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/isarray/index.js":[function(require,module,exports) {
+},{}],"../../../../AppData/Roaming/npm/node_modules/parcel/node_modules/isarray/index.js":[function(require,module,exports) {
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/buffer/index.js":[function(require,module,exports) {
+},{}],"../../../../AppData/Roaming/npm/node_modules/parcel/node_modules/buffer/index.js":[function(require,module,exports) {
 
 var global = arguments[3];
 /*!
@@ -11156,7 +11168,7 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/base64-js/index.js","ieee754":"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/ieee754/index.js","isarray":"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/isarray/index.js","buffer":"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/buffer/index.js"}],"../../node_modules/socket.io-parser/is-buffer.js":[function(require,module,exports) {
+},{"base64-js":"../../../../AppData/Roaming/npm/node_modules/parcel/node_modules/base64-js/index.js","ieee754":"../../../../AppData/Roaming/npm/node_modules/parcel/node_modules/ieee754/index.js","isarray":"../../../../AppData/Roaming/npm/node_modules/parcel/node_modules/isarray/index.js","buffer":"../../../../AppData/Roaming/npm/node_modules/parcel/node_modules/buffer/index.js"}],"../../node_modules/socket.io-parser/is-buffer.js":[function(require,module,exports) {
 var Buffer = require("buffer").Buffer;
 
 module.exports = isBuf;
@@ -11179,7 +11191,7 @@ function isBuf(obj) {
           (withNativeArrayBuffer && (obj instanceof ArrayBuffer || isView(obj)));
 }
 
-},{"buffer":"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/buffer/index.js"}],"../../node_modules/socket.io-parser/binary.js":[function(require,module,exports) {
+},{"buffer":"../../../../AppData/Roaming/npm/node_modules/parcel/node_modules/buffer/index.js"}],"../../node_modules/socket.io-parser/binary.js":[function(require,module,exports) {
 /*global Blob,File*/
 
 /**
@@ -11885,7 +11897,7 @@ function hasBinary (obj) {
   return false;
 }
 
-},{"isarray":"../../node_modules/isarray/index.js","buffer":"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/buffer/index.js"}],"../../node_modules/arraybuffer.slice/index.js":[function(require,module,exports) {
+},{"isarray":"../../node_modules/isarray/index.js","buffer":"../../../../AppData/Roaming/npm/node_modules/parcel/node_modules/buffer/index.js"}],"../../node_modules/arraybuffer.slice/index.js":[function(require,module,exports) {
 /**
  * An abstraction for slicing an arraybuffer even when
  * ArrayBuffer.prototype.slice is not supported
@@ -14127,7 +14139,7 @@ JSONPPolling.prototype.doWrite = function (data, fn) {
   }
 };
 
-},{"./polling":"../../node_modules/engine.io-client/lib/transports/polling.js","component-inherit":"../../node_modules/component-inherit/index.js"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
+},{"./polling":"../../node_modules/engine.io-client/lib/transports/polling.js","component-inherit":"../../node_modules/component-inherit/index.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel/src/builtins/_empty.js":[function(require,module,exports) {
 
 },{}],"../../node_modules/engine.io-client/lib/transports/websocket.js":[function(require,module,exports) {
 var Buffer = require("buffer").Buffer;
@@ -14425,7 +14437,7 @@ WS.prototype.check = function () {
   return !!WebSocketImpl && !('__initialize' in WebSocketImpl && this.name === WS.prototype.name);
 };
 
-},{"../transport":"../../node_modules/engine.io-client/lib/transport.js","engine.io-parser":"../../node_modules/engine.io-parser/lib/browser.js","parseqs":"../../node_modules/parseqs/index.js","component-inherit":"../../node_modules/component-inherit/index.js","yeast":"../../node_modules/yeast/index.js","debug":"../../node_modules/debug/src/browser.js","ws":"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js","buffer":"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/buffer/index.js"}],"../../node_modules/engine.io-client/lib/transports/index.js":[function(require,module,exports) {
+},{"../transport":"../../node_modules/engine.io-client/lib/transport.js","engine.io-parser":"../../node_modules/engine.io-parser/lib/browser.js","parseqs":"../../node_modules/parseqs/index.js","component-inherit":"../../node_modules/component-inherit/index.js","yeast":"../../node_modules/yeast/index.js","debug":"../../node_modules/debug/src/browser.js","ws":"../../../../AppData/Roaming/npm/node_modules/parcel/src/builtins/_empty.js","buffer":"../../../../AppData/Roaming/npm/node_modules/parcel/node_modules/buffer/index.js"}],"../../node_modules/engine.io-client/lib/transports/index.js":[function(require,module,exports) {
 /**
  * Module dependencies
  */
@@ -16529,6 +16541,14 @@ var _this = void 0;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 /**
@@ -16546,98 +16566,125 @@ var get = function get(obj, path) {
   return typeof value !== 'undefined' ? value : defaultValue;
 };
 /**
- * Colorize log helper
- * @param data
+ * Debug helper
+ * @param type
+ * @param args
  */
 
 
 exports.get = get;
 
-var colorize = function colorize(data) {
-  if (typeof data != 'string') {
-    data = JSON.stringify(data, undefined, '\t');
-  }
-
-  var styles = {
-    string: 'color:#55c149',
-    number: 'color:#b66bb2',
-    boolean: 'color:#ff82a4',
-    null: 'color:#ff7477',
-    key: 'color:#619bab'
-  };
-  var result = [];
-  data = data.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-    var type = 'number';
-
-    if (/^"/.test(match)) {
-      if (/:$/.test(match)) {
-        type = 'key';
-      } else {
-        type = 'string';
-      }
-    } else if (/true|false/.test(match)) {
-      type = 'boolean';
-    } else if (/null/.test(match)) {
-      type = 'null';
-    }
-
-    result.push(styles[type], '');
-    return "%c".concat(match, "%c");
-  });
-  result.unshift(data);
-  console.log.apply(console, result);
-};
-/**
- * Debug helper
- * @param args
- */
-
-
-var d = function d() {
+var d = function d(type) {
   if (!_config.default.get('debug')) {
     return;
   }
 
-  for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
+  for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    args[_key - 1] = arguments[_key];
   }
 
   if (args.length === 1) {
-    return console.log.apply(_this, args);
+    return console[type].apply(_this, args);
   }
 
-  console.log('|| Start');
+  console[type]('|| Start');
 
   for (var arg in args) {
     var current = args[arg];
-
-    if (Array.isArray(current) || _typeof(current) === 'object') {
-      colorize(current);
-      continue;
-    }
-
-    console.log(current);
+    console[type](current);
   }
 
-  console.log('|| End');
+  console[type]('|| End');
 };
 /**
  * Shows a debug panel in DOM
- * @param selector
  */
 
 
 exports.d = d;
 
-var debugPanel = function debugPanel(selector) {
-  var el = document.querySelector(selector);
+var debugPanel = function debugPanel() {
+  /**
+   * Colorize helper
+   * @param data
+   * @param location
+   * @returns {Array}
+   */
+  var colorize = function colorize(data) {
+    var location = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'console';
+
+    if (typeof data != 'string') {
+      data = JSON.stringify(data, undefined, '\t');
+    }
+
+    var result = [];
+    var styles = {
+      string: 'color:#55c149',
+      number: 'color:#b66bb2',
+      boolean: 'color:#ff82a4',
+      null: 'color:#ff7477',
+      key: 'color:#619bab'
+    };
+    data = data.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+      var type = 'number';
+
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) {
+          type = 'key';
+        } else {
+          type = 'string';
+        }
+      } else if (/true|false/.test(match)) {
+        type = 'boolean';
+      } else if (/null/.test(match)) {
+        type = 'null';
+      }
+
+      location === 'console' && result.push(styles[type], '');
+      return location === 'console' ? "%c".concat(match, "%c") : "<span class=\"".concat(type, "\">").concat(match, "</span>");
+    });
+    result.unshift(data);
+    return result;
+  };
+
+  var el = document.createElement('pre');
+  el.id = 'debugPanel';
+  document.body.appendChild(el);
   var hooks = ['log', 'error', 'info', 'warn'];
   var style = document.createElement('style');
-  style.innerHTML = "\n        ".concat(selector, " {\n            background: #353535;\n            position: absolute;\n            width: 460px;\n            padding: 20px;\n            -webkit-user-drag: element;\n            overflow: auto;\n            word-wrap: normal;\n            white-space: pre;\n            color: #fff;\n            max-height: 450px;\n            overflow: scroll;\n        }\n    ");
+  var pref = JSON.parse(localStorage.getItem('debugPanel') || '{}');
+  style.innerHTML = "\n        #debugPanel {\n            background: #353535;\n            position: absolute;\n            width: 460px;\n            padding: 20px;\n            overflow: auto;\n            word-wrap: normal;\n            color: #fff;\n            height: 250px;\n            overflow-y: auto;\n            overflow-x: hidden;\n            cursor: grab;\n            left: ".concat(pref.left || '20px', ";\n            top: ").concat(pref.top || '20px', ";\n            box-shadow: 0px 0px 8px 1px #000;\n        }\n        \n        #debugPanel .number {\n            color:#b66bb2\n        }\n        \n        #debugPanel .key {\n            color: #619bab;\n        }\n        \n        #debugPanel .string {\n            color:#55c149\n        }\n        \n        #debugPanel .boolean {\n            color:#ff82a4;\n        }\n        \n        #debugPanel .null {\n            color:#ff7477;\n        }\n        \n        #debugPanel::-webkit-scrollbar {\n          width: 5px;\n          height: 12px;\n        }\n        \n        #debugPanel::-webkit-scrollbar-track {\n          background: rgba(0, 0, 0, 0.1);\n        }\n        \n        #debugPanel::-webkit-scrollbar-thumb {\n          background: #ffd457;\n        }\n        \n        #debugPanel .message {\n            display: block;\n            padding: 2px 0;\n            font: 13px Verdana, Arial, sans-serif;\n        }\n        \n        #debugPanel .info {\n            color: #60f6ff;\n        }\n        \n        #debugPanel .error {\n            color: #ff6b6b;\n        }\n        \n        #debugPanel .log {\n            color: #4cff85;\n        }\n        \n        #debugPanel .object {\n            color: #619bab;\n        }\n    ");
   document.head.append(style);
+  var offset, mousePosition;
+  var isDown = false;
+  el.addEventListener('mousedown', function (e) {
+    isDown = true;
+    offset = [el.offsetLeft - e.clientX, el.offsetTop - e.clientY];
+  }, true);
+  document.addEventListener('mouseup', function () {
+    isDown = false;
+  }, true);
+  document.addEventListener('mousemove', function (event) {
+    event.preventDefault();
+
+    if (isDown) {
+      mousePosition = {
+        x: event.clientX,
+        y: event.clientY
+      };
+      var left = mousePosition.x + offset[0] + 'px';
+      var top = mousePosition.y + offset[1] + 'px';
+      el.style.left = left;
+      el.style.top = top;
+      localStorage.setItem('debugPanel', JSON.stringify({
+        left: left,
+        top: top
+      }));
+    }
+  });
 
   var _loop = function _loop() {
-    var hook = hooks[_i];
+    var hook = _hooks[_i];
     var logger = console[hook];
 
     console[hook] = function () {
@@ -16645,12 +16692,41 @@ var debugPanel = function debugPanel(selector) {
         args[_key2] = arguments[_key2];
       }
 
-      logger.apply(void 0, args);
-      el.innerHTML += "".concat(JSON.stringify(args), "<br/>");
+      var clonedArgs = [].concat(args);
+      var consoleResult = [];
+
+      for (var arg in clonedArgs) {
+        if (_typeof(clonedArgs[arg]) === 'object' || Array.isArray(clonedArgs[arg])) {
+          consoleResult.push.apply(consoleResult, _toConsumableArray(colorize(clonedArgs[arg])));
+          continue;
+        }
+
+        consoleResult.push(clonedArgs[arg]);
+      }
+
+      logger.apply(void 0, consoleResult);
+      var message = "<span class=\"message ".concat(hook, "\">");
+
+      for (var _i2 = 0, _args = args; _i2 < _args.length; _i2++) {
+        var _arg = _args[_i2];
+
+        if (_typeof(_arg) === 'object' || Array.isArray(_arg)) {
+          message += '<span class="object">';
+          message += colorize(_arg, 'panel');
+          message += '</span>';
+          continue;
+        }
+
+        message += _arg;
+      }
+
+      message += "</span>";
+      el.innerHTML += message;
+      el.scrollTop = el.scrollHeight;
     };
   };
 
-  for (var _i = 0; _i < hooks.length; _i++) {
+  for (var _i = 0, _hooks = hooks; _i < _hooks.length; _i++) {
     _loop();
   }
 
@@ -16753,17 +16829,17 @@ function () {
       var token = tokenHandler.get('token');
 
       if (token) {
-        (0, _utils.d)('Authenticating socket.');
+        (0, _utils.d)('info', 'Authenticating socket.');
         this.socket.emit('login', token);
       }
 
       this.socket.on('reconnect', function () {
-        (0, _utils.d)('Socket has reconnected');
+        (0, _utils.d)('info', 'Socket has reconnected');
 
         _this.socket.emit('login', token);
       });
       this.socket.on('login', function () {
-        (0, _utils.d)('Socket has logged in');
+        (0, _utils.d)('info', 'Socket has logged in');
       });
 
       this.parent._event.emit('loaded');
@@ -17766,7 +17842,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../../../usr/local/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/InterceptorManager.js":[function(require,module,exports) {
+},{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../../node_modules/axios/lib/adapters/xhr.js","process":"../../../../AppData/Roaming/npm/node_modules/parcel/node_modules/process/browser.js"}],"../../node_modules/axios/lib/core/InterceptorManager.js":[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -18332,7 +18408,7 @@ function () {
                     break;
                   }
 
-                  (0, _utils.d)('Attempting token refresh');
+                  (0, _utils.d)('info', 'Attempting token refresh');
                   _context.next = 6;
                   return _this.parent.refreshToken({
                     token: refreshToken
@@ -18355,7 +18431,7 @@ function () {
                   /**
                    * Update the tokens
                    */
-                  (0, _utils.d)('Successfully refreshed token, retrying request.');
+                  (0, _utils.d)('info', 'Successfully refreshed token, retrying request.');
                   tokenHandler.set('token', data.token);
                   tokenHandler.set('refresh', data.refresh);
                   _this.parent.http.defaults.headers.Authorization = data.token;
@@ -18377,7 +18453,7 @@ function () {
                   return _context.stop();
               }
             }
-          }, _callee, this);
+          }, _callee);
         }));
 
         return function (_x) {
@@ -18419,15 +18495,17 @@ function () {
                 _ref3 = _context3.sent;
                 actions = _ref3.data;
                 data = actions;
-                _context3.next = 15;
+                _context3.next = 16;
                 break;
 
               case 12:
                 _context3.prev = 12;
                 _context3.t0 = _context3["catch"](4);
-                (0, _utils.d)('Could not load actions list');
+                (0, _utils.d)('error', 'Could not load actions list.');
 
-              case 15:
+                this.parent._event.emit('error', ['init', _context3.t0]);
+
+              case 16:
                 Actions.actions = data;
 
                 _loop = function _loop(key) {
@@ -18436,7 +18514,7 @@ function () {
                   }
 
                   if (_this2.hasOwnProperty(key)) {
-                    (0, _utils.d)("Could not register ".concat(key, " as it is already being used."));
+                    (0, _utils.d)('warn', "Could not register ".concat(key, " as it is already being used."));
                     return "continue";
                   }
 
@@ -18494,7 +18572,7 @@ function () {
                               return _context2.stop();
                           }
                         }
-                      }, _callee2, this);
+                      }, _callee2);
                     }));
 
                     return function (_x2) {
@@ -18505,9 +18583,9 @@ function () {
 
                 _context3.t1 = regeneratorRuntime.keys(data);
 
-              case 18:
+              case 19:
                 if ((_context3.t2 = _context3.t1()).done) {
-                  _context3.next = 25;
+                  _context3.next = 26;
                   break;
                 }
 
@@ -18515,20 +18593,20 @@ function () {
                 _ret = _loop(key);
 
                 if (!(_ret === "continue")) {
-                  _context3.next = 23;
+                  _context3.next = 24;
                   break;
                 }
 
-                return _context3.abrupt("continue", 18);
+                return _context3.abrupt("continue", 19);
 
-              case 23:
-                _context3.next = 18;
+              case 24:
+                _context3.next = 19;
                 break;
 
-              case 25:
+              case 26:
                 this.parent._event.emit('loaded');
 
-              case 26:
+              case 27:
               case "end":
                 return _context3.stop();
             }
@@ -18574,7 +18652,7 @@ function () {
                   data: false
                 };
                 start = +new Date();
-                (0, _utils.d)("Doing action ".concat(action, ", sent payload:"), payload);
+                (0, _utils.d)('info', "Doing action ".concat(action, ", sent payload:"), payload);
                 /**
                  * Do client side validation
                  */
@@ -18596,7 +18674,7 @@ function () {
                 }
 
                 result.errors = errors;
-                (0, _utils.d)("Local validation failed for ".concat(action, ", errors:"), errors);
+                (0, _utils.d)('info', "Local validation failed for ".concat(action, ", errors:"), errors);
 
                 this.parent._event.emit('error', [action, errors, payload]);
 
@@ -18634,7 +18712,7 @@ function () {
                 }
 
                 end = +new Date();
-                (0, _utils.d)("Finished doing action [".concat(action, "] in [").concat(end - start, " ms], result:"), result);
+                (0, _utils.d)('info', "Finished doing action [".concat(action, "] in [").concat(end - start, " ms], result:"), result);
                 return _context4.abrupt("return", result);
 
               case 29:
@@ -18829,7 +18907,7 @@ function () {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                (0, _utils.d)('Attempting to logout');
+                (0, _utils.d)('info', 'Attempting to logout');
                 tokenHandler = _config.default.get('tokenHandler');
                 _context3.next = 4;
                 return this.parent.logout();
@@ -18841,7 +18919,7 @@ function () {
                 this.user = false;
                 tokenHandler.remove('token');
                 tokenHandler.remove('refresh');
-                (0, _utils.d)('User has logout');
+                (0, _utils.d)('info', 'User has logout');
 
               case 11:
               case "end":
@@ -18918,7 +18996,7 @@ function () {
       }
 
       this.events[event].push(listener);
-      (0, _utils.d)("Registering event ".concat(event));
+      (0, _utils.d)('info', "Registering event ".concat(event));
       return function () {
         return _this.removeListener(event, listener);
       };
@@ -18947,7 +19025,7 @@ function () {
 
       if (_typeof(this.events[event]) === 'object') {
         this.events[event].forEach(function (listener) {
-          (0, _utils.d)("Calling event ".concat(event), args);
+          (0, _utils.d)('info', "Calling event [".concat(event, "], payload:"), args);
           listener.apply(_this2, args);
         });
       }
@@ -19132,7 +19210,7 @@ var allRules = {
               return _context.stop();
           }
         }
-      }, _callee, this, [[5, 9, 13, 21], [14,, 16, 20]]);
+      }, _callee, null, [[5, 9, 13, 21], [14,, 16, 20]]);
     }));
 
     function file(_x) {
@@ -19227,7 +19305,7 @@ var allRules = {
               return _context2.stop();
           }
         }
-      }, _callee2, this, [[10, 14, 18, 26], [19,, 21, 25]]);
+      }, _callee2, null, [[10, 14, 18, 26], [19,, 21, 25]]);
     }));
 
     function ext(_x2, _x3, _x4) {
@@ -19296,7 +19374,7 @@ function () {
                 return _context3.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee3);
       }));
 
       function validateField(_x5, _x6, _x7, _x8) {
@@ -19486,7 +19564,7 @@ function () {
                   ++_this.loaded;
 
                   if (_this.loaded === 2) {
-                    Utils.d('Client successfully loaded. Running onReady hook if it exists.');
+                    Utils.d('info', 'Client successfully loaded. Running onReady hook if it exists.');
                     typeof _this.onReady === 'function' && _this.onReady();
                   }
                 });
@@ -19521,6 +19599,18 @@ function () {
     key: "ready",
     value: function ready(handler) {
       this.onReady = handler;
+    }
+    /**
+     * Call action shortcut
+     * @param action
+     * @param payload
+     * @returns {Promise<function(*=): void>}
+     */
+
+  }, {
+    key: "call",
+    value: function call(action, payload) {
+      return this._actions._call(action, payload);
     }
   }]);
 
@@ -19599,10 +19689,10 @@ regeneratorRuntime.mark(function _callee2() {
                       break;
                     }
 
-                    return _context.abrupt("return", d('Already logged in'));
+                    return _context.abrupt("return", d('info', 'Already logged in'));
 
                   case 2:
-                    d('Logging in.');
+                    d('info', 'Logging in.');
                     _context.next = 5;
                     return _client.default._auth.login({
                       provider: 'local',
@@ -19620,17 +19710,17 @@ regeneratorRuntime.mark(function _callee2() {
                       break;
                     }
 
-                    return _context.abrupt("return", d('Error', errors));
+                    return _context.abrupt("return", d('error', 'Error', errors));
 
                   case 10:
-                    d('Logged in', data);
+                    d('info', 'Logged in', data);
 
                   case 11:
                   case "end":
                     return _context.stop();
                 }
               }
-            }, _callee, this);
+            }, _callee);
           }));
           login();
 
@@ -19639,11 +19729,11 @@ regeneratorRuntime.mark(function _callee2() {
           return _context2.stop();
       }
     }
-  }, _callee2, this);
+  }, _callee2);
 })));
 
-debugPanel('#logs');
-},{"babel-polyfill":"node_modules/babel-polyfill/lib/index.js","./client":"client.js"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+debugPanel();
+},{"babel-polyfill":"node_modules/babel-polyfill/lib/index.js","./client":"client.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -19665,26 +19755,46 @@ function Module(moduleName) {
 }
 
 module.bundle.Module = Module;
+var checkedAssets, assetsToAccept;
 var parent = module.bundle.parent;
 
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63692" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "13355" + '/');
 
   ws.onmessage = function (event) {
+    checkedAssets = {};
+    assetsToAccept = [];
     var data = JSON.parse(event.data);
 
     if (data.type === 'update') {
-      console.clear();
-      data.assets.forEach(function (asset) {
-        hmrApply(global.parcelRequire, asset);
-      });
+      var handled = false;
       data.assets.forEach(function (asset) {
         if (!asset.isNew) {
-          hmrAccept(global.parcelRequire, asset.id);
+          var didAccept = hmrAcceptCheck(global.parcelRequire, asset.id);
+
+          if (didAccept) {
+            handled = true;
+          }
         }
+      }); // Enable HMR for CSS by default.
+
+      handled = handled || data.assets.every(function (asset) {
+        return asset.type === 'css' && asset.generated.js;
       });
+
+      if (handled) {
+        console.clear();
+        data.assets.forEach(function (asset) {
+          hmrApply(global.parcelRequire, asset);
+        });
+        assetsToAccept.forEach(function (v) {
+          hmrAcceptRun(v[0], v[1]);
+        });
+      } else {
+        window.location.reload();
+      }
     }
 
     if (data.type === 'reload') {
@@ -19772,7 +19882,7 @@ function hmrApply(bundle, asset) {
   }
 }
 
-function hmrAccept(bundle, id) {
+function hmrAcceptCheck(bundle, id) {
   var modules = bundle.modules;
 
   if (!modules) {
@@ -19780,9 +19890,27 @@ function hmrAccept(bundle, id) {
   }
 
   if (!modules[id] && bundle.parent) {
-    return hmrAccept(bundle.parent, id);
+    return hmrAcceptCheck(bundle.parent, id);
   }
 
+  if (checkedAssets[id]) {
+    return;
+  }
+
+  checkedAssets[id] = true;
+  var cached = bundle.cache[id];
+  assetsToAccept.push([bundle, id]);
+
+  if (cached && cached.hot && cached.hot._acceptCallbacks.length) {
+    return true;
+  }
+
+  return getParents(global.parcelRequire, id).some(function (id) {
+    return hmrAcceptCheck(global.parcelRequire, id);
+  });
+}
+
+function hmrAcceptRun(bundle, id) {
   var cached = bundle.cache[id];
   bundle.hotData = {};
 
@@ -19807,10 +19935,6 @@ function hmrAccept(bundle, id) {
 
     return true;
   }
-
-  return getParents(global.parcelRequire, id).some(function (id) {
-    return hmrAccept(global.parcelRequire, id);
-  });
 }
-},{}]},{},["../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","index.js"], null)
-//# sourceMappingURL=/api.e31bb0bc.map
+},{}]},{},["../../../../AppData/Roaming/npm/node_modules/parcel/src/builtins/hmr-runtime.js","index.js"], null)
+//# sourceMappingURL=/api.e31bb0bc.js.map

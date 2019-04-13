@@ -65,7 +65,7 @@ export default class Serpent {
                ++this.loaded;
 
                if (this.loaded === 2) {
-                    Utils.d('Client successfully loaded. Running onReady hook if it exists.');
+                    Utils.d('info', 'Client successfully loaded. Running onReady hook if it exists.');
                     typeof this.onReady === 'function' && this.onReady();
                }
           });
@@ -86,6 +86,17 @@ export default class Serpent {
 
      ready(handler) {
           this.onReady = handler;
+     }
+
+     /**
+      * Call action shortcut
+      * @param action
+      * @param payload
+      * @returns {Promise<function(*=): void>}
+      */
+
+     call(action, payload) {
+          return this._actions._call(action, payload);
      }
 }
 

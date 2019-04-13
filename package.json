@@ -12,7 +12,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "example": "parcel run ./examples/api/index.html"
+    "example": "parcel run ./examples/api/index.html",
+    "build": "parcel build index.js"
   },
   "repository": {
     "type": "git",
