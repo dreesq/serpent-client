@@ -3,7 +3,7 @@ import client from "./client";
 
 window.client = client;
 
-const {d} = client._utils;
+const {d, debugPanel} = client._utils;
 
 client.ready(async () => {
      window.login = async () => {
@@ -28,3 +28,4 @@ client.ready(async () => {
      login();
 });
 
+debugPanel('#logs');
