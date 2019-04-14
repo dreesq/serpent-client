@@ -114,8 +114,24 @@
     return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
   }
 
+  function _toConsumableArray(arr) {
+    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+  }
+
+  function _arrayWithoutHoles(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+      return arr2;
+    }
+  }
+
   function _arrayWithHoles(arr) {
     if (Array.isArray(arr)) return arr;
+  }
+
+  function _iterableToArray(iter) {
+    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
   }
 
   function _iterableToArrayLimit(arr, i) {
@@ -142,6 +158,10 @@
     }
 
     return _arr;
+  }
+
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance");
   }
 
   function _nonIterableRest() {
@@ -193,89 +213,116 @@
     return typeof value !== 'undefined' ? value : defaultValue;
   };
   /**
-   * Colorize log helper
-   * @param data
-   */
-
-  var colorize = function colorize(data) {
-    if (typeof data != 'string') {
-      data = JSON.stringify(data, undefined, '\t');
-    }
-
-    var styles = {
-      string: 'color:#55c149',
-      number: 'color:#b66bb2',
-      "boolean": 'color:#ff82a4',
-      "null": 'color:#ff7477',
-      key: 'color:#619bab'
-    };
-    var result = [];
-    data = data.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-      var type = 'number';
-
-      if (/^"/.test(match)) {
-        if (/:$/.test(match)) {
-          type = 'key';
-        } else {
-          type = 'string';
-        }
-      } else if (/true|false/.test(match)) {
-        type = 'boolean';
-      } else if (/null/.test(match)) {
-        type = 'null';
-      }
-
-      result.push(styles[type], '');
-      return "%c".concat(match, "%c");
-    });
-    result.unshift(data);
-    console.log.apply(console, result);
-  };
-  /**
    * Debug helper
+   * @param type
    * @param args
    */
 
-
-  var d = function d() {
+  var d = function d(type) {
     if (!Config$1.get('debug')) {
       return;
     }
 
-    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
+    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
     }
 
     if (args.length === 1) {
-      return console.log.apply(console, args);
+      return console[type].apply(console, args);
     }
 
-    console.log('|| Start');
+    console[type]('|| Start');
 
     for (var arg in args) {
       var current = args[arg];
-
-      if (Array.isArray(current) || _typeof(current) === 'object') {
-        colorize(current);
-        continue;
-      }
-
-      console.log(current);
+      console[type](current);
     }
 
-    console.log('|| End');
+    console[type]('|| End');
   };
   /**
    * Shows a debug panel in DOM
-   * @param selector
    */
 
-  var debugPanel = function debugPanel(selector) {
-    var el = document.querySelector(selector);
+  var debugPanel = function debugPanel() {
+    /**
+     * Colorize helper
+     * @param data
+     * @param location
+     * @returns {Array}
+     */
+    var colorize = function colorize(data) {
+      var location = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'console';
+
+      if (typeof data != 'string') {
+        data = JSON.stringify(data, undefined, '\t');
+      }
+
+      var result = [];
+      var styles = {
+        string: 'color:#55c149',
+        number: 'color:#b66bb2',
+        "boolean": 'color:#ff82a4',
+        "null": 'color:#ff7477',
+        key: 'color:#619bab'
+      };
+      data = data.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        var type = 'number';
+
+        if (/^"/.test(match)) {
+          if (/:$/.test(match)) {
+            type = 'key';
+          } else {
+            type = 'string';
+          }
+        } else if (/true|false/.test(match)) {
+          type = 'boolean';
+        } else if (/null/.test(match)) {
+          type = 'null';
+        }
+
+        location === 'console' && result.push(styles[type], '');
+        return location === 'console' ? "%c".concat(match, "%c") : "<span class=\"".concat(type, "\">").concat(match, "</span>");
+      });
+      result.unshift(data);
+      return result;
+    };
+
+    var el = document.createElement('pre');
+    el.id = 'debugPanel';
+    document.body.appendChild(el);
     var hooks = ['log', 'error', 'info', 'warn'];
     var style = document.createElement('style');
-    style.innerHTML = "\n        ".concat(selector, " {\n            background: #353535;\n            position: absolute;\n            width: 460px;\n            padding: 20px;\n            -webkit-user-drag: element;\n            overflow: auto;\n            word-wrap: normal;\n            white-space: pre;\n            color: #fff;\n            max-height: 450px;\n            overflow: scroll;\n        }\n    ");
+    var pref = JSON.parse(localStorage.getItem('debugPanel') || '{}');
+    style.innerHTML = "\n        #debugPanel {\n            background: #353535;\n            position: absolute;\n            width: 460px;\n            padding: 20px;\n            overflow: auto;\n            word-wrap: normal;\n            color: #fff;\n            height: 250px;\n            overflow-y: auto;\n            overflow-x: hidden;\n            cursor: grab;\n            left: ".concat(pref.left || '20px', ";\n            top: ").concat(pref.top || '20px', ";\n            box-shadow: 0px 0px 8px 1px #000;\n        }\n        \n        #debugPanel .number {\n            color:#b66bb2\n        }\n        \n        #debugPanel .key {\n            color: #619bab;\n        }\n        \n        #debugPanel .string {\n            color:#55c149\n        }\n        \n        #debugPanel .boolean {\n            color:#ff82a4;\n        }\n        \n        #debugPanel .null {\n            color:#ff7477;\n        }\n        \n        #debugPanel::-webkit-scrollbar {\n          width: 5px;\n          height: 12px;\n        }\n        \n        #debugPanel::-webkit-scrollbar-track {\n          background: rgba(0, 0, 0, 0.1);\n        }\n        \n        #debugPanel::-webkit-scrollbar-thumb {\n          background: #ffd457;\n        }\n        \n        #debugPanel .message {\n            display: block;\n            padding: 2px 0;\n            font: 13px Verdana, Arial, sans-serif;\n        }\n        \n        #debugPanel .info {\n            color: #60f6ff;\n        }\n        \n        #debugPanel .error {\n            color: #ff6b6b;\n        }\n        \n        #debugPanel .log {\n            color: #4cff85;\n        }\n        \n        #debugPanel .object {\n            color: #619bab;\n        }\n    ");
     document.head.append(style);
+    var offset, mousePosition;
+    var isDown = false;
+    el.addEventListener('mousedown', function (e) {
+      isDown = true;
+      offset = [el.offsetLeft - e.clientX, el.offsetTop - e.clientY];
+    }, true);
+    document.addEventListener('mouseup', function () {
+      isDown = false;
+    }, true);
+    document.addEventListener('mousemove', function (event) {
+      event.preventDefault();
+
+      if (isDown) {
+        mousePosition = {
+          x: event.clientX,
+          y: event.clientY
+        };
+        var left = mousePosition.x + offset[0] + 'px';
+        var top = mousePosition.y + offset[1] + 'px';
+        el.style.left = left;
+        el.style.top = top;
+        localStorage.setItem('debugPanel', JSON.stringify({
+          left: left,
+          top: top
+        }));
+      }
+    });
 
     var _loop = function _loop() {
       var hook = _hooks[_i];
@@ -286,8 +333,37 @@
           args[_key2] = arguments[_key2];
         }
 
-        logger.apply(void 0, args);
-        el.innerHTML += "".concat(JSON.stringify(args), "<br/>");
+        var clonedArgs = [].concat(args);
+        var consoleResult = [];
+
+        for (var arg in clonedArgs) {
+          if (_typeof(clonedArgs[arg]) === 'object' || Array.isArray(clonedArgs[arg])) {
+            consoleResult.push.apply(consoleResult, _toConsumableArray(colorize(clonedArgs[arg])));
+            continue;
+          }
+
+          consoleResult.push(clonedArgs[arg]);
+        }
+
+        logger.apply(void 0, consoleResult);
+        var message = "<span class=\"message ".concat(hook, "\">");
+
+        for (var _i2 = 0, _args = args; _i2 < _args.length; _i2++) {
+          var _arg = _args[_i2];
+
+          if (_typeof(_arg) === 'object' || Array.isArray(_arg)) {
+            message += '<span class="object">';
+            message += colorize(_arg, 'panel');
+            message += '</span>';
+            continue;
+          }
+
+          message += _arg;
+        }
+
+        message += "</span>";
+        el.innerHTML += message;
+        el.scrollTop = el.scrollHeight;
       };
     };
 
@@ -332,17 +408,17 @@
         var token = tokenHandler.get('token');
 
         if (token) {
-          d('Authenticating socket.');
+          d('info', 'Authenticating socket.');
           this.socket.emit('login', token);
         }
 
         this.socket.on('reconnect', function () {
-          d('Socket has reconnected');
+          d('info', 'Socket has reconnected');
 
           _this.socket.emit('login', token);
         });
         this.socket.on('login', function () {
-          d('Socket has logged in');
+          d('info', 'Socket has logged in');
         });
 
         this.parent._event.emit('loaded');
@@ -438,7 +514,7 @@
                       break;
                     }
 
-                    d('Attempting token refresh');
+                    d('info', 'Attempting token refresh');
                     _context.next = 6;
                     return _this.parent.refreshToken({
                       token: refreshToken
@@ -461,7 +537,7 @@
                     /**
                      * Update the tokens
                      */
-                    d('Successfully refreshed token, retrying request.');
+                    d('info', 'Successfully refreshed token, retrying request.');
                     tokenHandler.set('token', data.token);
                     tokenHandler.set('refresh', data.refresh);
                     _this.parent.http.defaults.headers.Authorization = data.token;
@@ -525,15 +601,17 @@
                   _ref3 = _context3.sent;
                   actions = _ref3.data;
                   data = actions;
-                  _context3.next = 15;
+                  _context3.next = 16;
                   break;
 
                 case 12:
                   _context3.prev = 12;
                   _context3.t0 = _context3["catch"](4);
-                  d('Could not load actions list');
+                  d('error', 'Could not load actions list.');
 
-                case 15:
+                  this.parent._event.emit('error', ['init', _context3.t0]);
+
+                case 16:
                   Actions.actions = data;
 
                   _loop = function _loop(key) {
@@ -542,7 +620,7 @@
                     }
 
                     if (_this2.hasOwnProperty(key)) {
-                      d("Could not register ".concat(key, " as it is already being used."));
+                      d('warn', "Could not register ".concat(key, " as it is already being used."));
                       return "continue";
                     }
 
@@ -611,9 +689,9 @@
 
                   _context3.t1 = regeneratorRuntime.keys(data);
 
-                case 18:
+                case 19:
                   if ((_context3.t2 = _context3.t1()).done) {
-                    _context3.next = 25;
+                    _context3.next = 26;
                     break;
                   }
 
@@ -621,20 +699,20 @@
                   _ret = _loop(key);
 
                   if (!(_ret === "continue")) {
-                    _context3.next = 23;
+                    _context3.next = 24;
                     break;
                   }
 
-                  return _context3.abrupt("continue", 18);
+                  return _context3.abrupt("continue", 19);
 
-                case 23:
-                  _context3.next = 18;
+                case 24:
+                  _context3.next = 19;
                   break;
 
-                case 25:
+                case 26:
                   this.parent._event.emit('loaded');
 
-                case 26:
+                case 27:
                 case "end":
                   return _context3.stop();
               }
@@ -680,7 +758,7 @@
                     data: false
                   };
                   start = +new Date();
-                  d("Doing action ".concat(action, ", sent payload:"), payload);
+                  d('info', "Doing action [".concat(action, "], sent payload:"), payload);
                   /**
                    * Do client side validation
                    */
@@ -702,7 +780,7 @@
                   }
 
                   result.errors = errors;
-                  d("Local validation failed for ".concat(action, ", errors:"), errors);
+                  d('info', "Local validation failed for [".concat(action, "], errors:"), errors);
 
                   this.parent._event.emit('error', [action, errors, payload]);
 
@@ -740,7 +818,7 @@
                   }
 
                   end = +new Date();
-                  d("Finished doing action [".concat(action, "] in [").concat(end - start, " ms], result:"), result);
+                  d('info', "Finished doing action [".concat(action, "] in [").concat(end - start, " ms], result:"), result);
                   return _context4.abrupt("return", result);
 
                 case 29:
@@ -906,7 +984,7 @@
             while (1) {
               switch (_context3.prev = _context3.next) {
                 case 0:
-                  d('Attempting to logout');
+                  d('info', 'Attempting to logout');
                   tokenHandler = Config$1.get('tokenHandler');
                   _context3.next = 4;
                   return this.parent.logout();
@@ -918,7 +996,7 @@
                   this.user = false;
                   tokenHandler.remove('token');
                   tokenHandler.remove('refresh');
-                  d('User has logout');
+                  d('info', 'User has logout');
 
                 case 11:
                 case "end":
@@ -976,7 +1054,7 @@
         }
 
         this.events[event].push(listener);
-        d("Registering event ".concat(event));
+        d('info', "Registering event ".concat(event));
         return function () {
           return _this.removeListener(event, listener);
         };
@@ -1005,7 +1083,7 @@
 
         if (_typeof(this.events[event]) === 'object') {
           this.events[event].forEach(function (listener) {
-            d("Calling event ".concat(event), args);
+            d('info', "Calling event [".concat(event, "], payload:"), args);
             listener.apply(_this2, args);
           });
         }
@@ -1474,7 +1552,7 @@
                     ++_this.loaded;
 
                     if (_this.loaded === 2) {
-                      d('Client successfully loaded. Running onReady hook if it exists.');
+                      d('info', 'Client successfully loaded. Running onReady hook if it exists.');
                       typeof _this.onReady === 'function' && _this.onReady();
                     }
                   });
@@ -1509,6 +1587,18 @@
       key: "ready",
       value: function ready(handler) {
         this.onReady = handler;
+      }
+      /**
+       * Call action shortcut
+       * @param action
+       * @param payload
+       * @returns {Promise<function(*=): void>}
+       */
+
+    }, {
+      key: "call",
+      value: function call(action, payload) {
+        return this._actions._call(action, payload);
       }
     }]);
 
