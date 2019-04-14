@@ -909,7 +909,7 @@
 
 	  for (var arg in args) {
 	    var current = args[arg];
-	    console[type](current);
+	    log(current);
 	  }
 
 	  log('|| End');
