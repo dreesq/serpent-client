@@ -6,13 +6,17 @@
   "directories": {
     "example": "examples"
   },
-  "dependencies": {
-    "axios": "^0.18.0",
-    "socket.io-client": "^2.2.0"
+  "devDependencies": {
+    "@babel/core": "^7.4.3",
+    "@babel/preset-env": "^7.4.3",
+    "rollup": "^1.10.0",
+    "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-livereload": "^1.0.0",
+    "rollup-plugin-serve": "^1.0.1"
   },
-  "devDependencies": {},
   "scripts": {
-    "example": "parcel run ./examples/api/index.html"
+    "build": "rollup -c rollup.config.js",
+    "start": "rollup -c rollup.config.js -w -o dist/index.js"
   },
   "repository": {
     "type": "git",

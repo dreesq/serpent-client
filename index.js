@@ -31,6 +31,8 @@ const defaults = {
      }
 };
 
+alert('x');
+
 /**
  * Client package
  */

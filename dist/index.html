@@ -12,6 +12,43 @@
 
     <pre id="logs"></pre>
 
-    <script src="/api.e31bb0bc.js"></script>
+    <script src="/index.js"></script>
+
+    <script>
+        window.client = new Serpent('http://localhost:3000', {
+            socket: true,
+            debug: true,
+            refresh: true
+        });
+
+        const {d, debugPanel} = client._utils;
+
+        client.ready(async () => {
+            window.login = async () => {
+                if (localStorage.getItem('token')) {
+                    return d('Already logged in');
+                }
+
+                d('Logging in.');
+                const {errors, data} = await client._auth.login({
+                    provider: 'local',
+                    email: 'me@me.com',
+                    password: 'password'
+                });
+
+                if (errors) {
+                    return d('Error', errors);
+                }
+
+                d('Logged in', data);
+            };
+
+            login();
+        });
+
+        debugPanel('#logs');
+
+
+    </script>
 </body>
 </html>
