@@ -1192,7 +1192,6 @@
 
 	    this.parent = parent;
 	    this.httpClient = client;
-	    this.setup();
 	  }
 
 	  createClass(Actions, [{
@@ -2291,31 +2290,24 @@
 	      var _setup = asyncToGenerator(
 	      /*#__PURE__*/
 	      regenerator.mark(function _callee() {
-	        var _this = this;
-
 	        return regenerator.wrap(function _callee$(_context) {
 	          while (1) {
 	            switch (_context.prev = _context.next) {
 	              case 0:
 	                this._event = new Event();
-
-	                this._event.on('loaded', function () {
-	                  ++_this.loaded;
-
-	                  if (_this.loaded === 2) {
-	                    d('info', 'Client successfully loaded. Running onReady hook if it exists.');
-	                    typeof _this.onReady === 'function' && _this.onReady();
-	                  }
-	                });
-
 	                this._auth = new Auth(this);
 	                this._actions = new Actions(this, Config$1.get('axios'));
 	                new Socket(this, Config$1.get('sio'));
 	                this._validator = new Validator();
 	                this._utils = Utils;
 	                this._config = Config$1;
+	                _context.next = 9;
+	                return this._actions.setup();
 
-	              case 8:
+	              case 9:
+	                typeof this.onReady === 'function' && this.onReady();
+
+	              case 10:
 	              case "end":
 	                return _context.stop();
 	            }

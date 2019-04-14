@@ -61,16 +61,6 @@ export default class Serpent {
 
      async setup() {
           this._event = new Event();
-
-          this._event.on('loaded', () => {
-               ++this.loaded;
-
-               if (this.loaded === 2) {
-                    Utils.d('info', 'Client successfully loaded. Running onReady hook if it exists.');
-                    typeof this.onReady === 'function' && this.onReady();
-               }
-          });
-
           this._auth = new Auth(this);
           this._actions = new Actions(this, Config.get('axios'));
           new Socket(this, Config.get('sio'));
@@ -78,6 +68,9 @@ export default class Serpent {
 
           this._utils = Utils;
           this._config = Config;
+
+          await this._actions.setup();
+          typeof this.onReady === 'function' && this.onReady();
      }
 
      /**
