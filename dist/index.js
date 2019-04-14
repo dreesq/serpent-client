@@ -889,27 +889,30 @@
 	 * @param args
 	 */
 
+	var loggers = {};
 	var d = function d(type) {
 	  if (!Config$1.get('debug') || typeof window === 'undefined') {
 	    return;
 	  }
+
+	  var log = loggers[type] || console[type] || console.log;
 
 	  for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
 	    args[_key - 1] = arguments[_key];
 	  }
 
 	  if (args.length === 1) {
-	    return console[type].apply(console, args);
+	    return log(console, args);
 	  }
 
-	  console[type]('|| Start');
+	  log('|| Start');
 
 	  for (var arg in args) {
 	    var current = args[arg];
 	    console[type](current);
 	  }
 
-	  console[type]('|| End');
+	  log('|| End');
 	};
 	/**
 	 * Shows a debug panel in DOM
@@ -973,7 +976,7 @@
 	  var hooks = ['log', 'error', 'info', 'warn'];
 	  var style = document.createElement('style');
 	  var pref = JSON.parse(localStorage.getItem('debugPanel') || '{}');
-	  style.innerHTML = "\n        #debugPanel {\n            background: #353535;\n            position: absolute;\n            width: 460px;\n            padding: 20px;\n            overflow: auto;\n            word-wrap: normal;\n            color: #fff;\n            height: 250px;\n            overflow-y: auto;\n            overflow-x: hidden;\n            cursor: grab;\n            left: ".concat(pref.left || '20px', ";\n            top: ").concat(pref.top || '20px', ";\n            box-shadow: 0px 0px 8px 1px #000;\n        }\n        \n        #debugPanel .number {\n            color:#b66bb2\n        }\n        \n        #debugPanel .key {\n            color: #619bab;\n        }\n        \n        #debugPanel .string {\n            color:#55c149\n        }\n        \n        #debugPanel .boolean {\n            color:#ff82a4;\n        }\n        \n        #debugPanel .null {\n            color:#ff7477;\n        }\n        \n        #debugPanel::-webkit-scrollbar {\n          width: 5px;\n          height: 12px;\n        }\n        \n        #debugPanel::-webkit-scrollbar-track {\n          background: rgba(0, 0, 0, 0.1);\n        }\n        \n        #debugPanel::-webkit-scrollbar-thumb {\n          background: #ffd457;\n        }\n        \n        #debugPanel .message {\n            display: block;\n            padding: 2px 0;\n            font: 13px Verdana, Arial, sans-serif;\n        }\n        \n        #debugPanel .info {\n            color: #60f6ff;\n        }\n        \n        #debugPanel .error {\n            color: #ff6b6b;\n        }\n        \n        #debugPanel .log {\n            color: #4cff85;\n        }\n        \n        #debugPanel .object {\n            color: #619bab;\n        }\n    ");
+	  style.innerHTML = "\n        #debugPanel {\n            background: #353535;\n            position: absolute;\n            width: 460px;\n            padding: 20px;\n            overflow: auto;\n            word-wrap: normal;\n            color: #fff;\n            height: 250px;\n            overflow-y: auto;\n            overflow-x: hidden;\n            cursor: grab;\n            left: ".concat(pref.left || '20px', ";\n            top: ").concat(pref.top || '20px', ";\n            box-shadow: 0px 0px 8px 1px #000;\n        }\n        \n        #debugPanel .number {\n            color:#b66bb2\n        }\n        \n        #debugPanel .key {\n            color: #619bab;\n        }\n        \n        #debugPanel .string {\n            color:#55c149\n        }\n        \n        #debugPanel .boolean {\n            color:#ff82a4;\n        }\n        \n        #debugPanel .null {\n            color:#ff7477;\n        }\n        \n        #debugPanel::-webkit-scrollbar {\n          width: 5px;\n          height: 12px;\n        }\n        \n        #debugPanel::-webkit-scrollbar-track {\n          background: rgba(0, 0, 0, 0.1);\n        }\n        \n        #debugPanel::-webkit-scrollbar-thumb {\n          background: #ffd457;\n        }\n        \n        #debugPanel .message {\n            display: block;\n            padding: 2px 0;\n            font: 13px Verdana, Arial, sans-serif;\n            white-space: pre;\n        }\n        \n        #debugPanel .info {\n            color: #60f6ff;\n        }\n        \n        #debugPanel .error {\n            color: #ff6b6b;\n        }\n        \n        #debugPanel .log {\n            color: #4cff85;\n        }\n        \n        #debugPanel .object {\n            color: #619bab;\n        }\n    ");
 	  document.head.append(style);
 	  var offset, mousePosition;
 	  var isDown = false;
@@ -1007,7 +1010,7 @@
 	    var hook = _hooks[_i];
 	    var logger = console[hook];
 
-	    console[hook] = function () {
+	    loggers[hook] = function () {
 	      for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
 	        args[_key2] = arguments[_key2];
 	      }
@@ -1051,7 +1054,8 @@
 	  }
 
 	  window.onerror = function (message, url, line) {
-	    console.error("Error: ".concat(message, ", ").concat(url, ": ").concat(line));
+	    var logger = loggers.error ? loggers.error : console.error;
+	    logger.error("Error: ".concat(message, ", ").concat(url, ": ").concat(line));
 	  };
 	};
 
