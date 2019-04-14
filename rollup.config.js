@@ -18,6 +18,7 @@ const config = {
         commonjs(),
         resolve(),
         babel({
+            runtimeHelpers: true,
             presets: [
                 ["@babel/env"]
             ]
