@@ -2,6 +2,8 @@
 import babel from 'rollup-plugin-babel';
 import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
+import resolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
 
 const isWatching = process.argv.includes('-w') || process.argv.includes('--watch');
 
@@ -13,6 +15,8 @@ const config = {
         name: 'Serpent'
     },
     plugins: [
+        commonjs(),
+        resolve(),
         babel({
             presets: [
                 ["@babel/env"]

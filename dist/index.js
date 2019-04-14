@@ -168,35 +168,6 @@
     throw new TypeError("Invalid attempt to destructure non-iterable instance");
   }
 
-  var _require = require('./utils'),
-      getValue = _require.get;
-
-  var Config =
-  /*#__PURE__*/
-  function () {
-    function Config() {
-      _classCallCheck(this, Config);
-
-      this.storage = {};
-    }
-
-    _createClass(Config, [{
-      key: "store",
-      value: function store(data) {
-        this.storage = data;
-      }
-    }, {
-      key: "get",
-      value: function get(key, defaultValue) {
-        return getValue(this.storage, key, defaultValue);
-      }
-    }]);
-
-    return Config;
-  }();
-
-  var Config$1 = new Config();
-
   /**
    * Get by key helper
    * @param obj
@@ -381,6 +352,32 @@
     d: d,
     debugPanel: debugPanel
   });
+
+  var Config =
+  /*#__PURE__*/
+  function () {
+    function Config() {
+      _classCallCheck(this, Config);
+
+      this.storage = {};
+    }
+
+    _createClass(Config, [{
+      key: "store",
+      value: function store(data) {
+        this.storage = data;
+      }
+    }, {
+      key: "get",
+      value: function get$1(key, defaultValue) {
+        return get(this.storage, key, defaultValue);
+      }
+    }]);
+
+    return Config;
+  }();
+
+  var Config$1 = new Config();
 
   var Socket =
   /*#__PURE__*/
