@@ -18,6 +18,8 @@ const defaults = {
      handler: '/',
      refresh: true,
      authFailed: false,
+     sio: null,
+     axios: null,
      tokenHandler: {
           get(key) {
                return localStorage.getItem(key);
@@ -30,8 +32,6 @@ const defaults = {
           }
      }
 };
-
-alert('x');
 
 /**
  * Client package
@@ -73,8 +73,8 @@ export default class Serpent {
           });
 
           this._auth = new Auth(this);
-          this._actions = new Actions(this);
-          new Socket(this);
+          this._actions = new Actions(this, Config.get('axios'));
+          new Socket(this, Config.get('sio'));
           this._validator = new Validator();
 
           this._utils = Utils;

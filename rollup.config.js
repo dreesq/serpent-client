@@ -15,12 +15,16 @@ const config = {
         name: 'Serpent'
     },
     plugins: [
-        commonjs(),
         resolve(),
+        commonjs(),
         babel({
             runtimeHelpers: true,
+            plugins: [
+                '@babel/plugin-transform-runtime'
+            ],
             presets: [
-                ["@babel/env"]
+                ["@babel/env"],
+
             ]
         })
     ]
