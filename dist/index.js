@@ -903,7 +903,7 @@
 	 */
 
 	var d = function d(type) {
-	  if (!Config$1.get('debug') && process.browser) {
+	  if (!Config$1.get('debug') || typeof window === 'undefined') {
 	    return;
 	  }
 
@@ -930,11 +930,19 @@
 
 	var debugPanel = function debugPanel() {
 	  /**
+	   * Don't run on server
+	   */
+	  if (typeof window === 'undefined') {
+	    return;
+	  }
+	  /**
 	   * Colorize helper
 	   * @param data
 	   * @param location
 	   * @returns {Array}
 	   */
+
+
 	  var colorize = function colorize(data) {
 	    var location = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'console';
 
