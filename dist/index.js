@@ -9,28 +9,15 @@
 	}
 
 	var _typeof_1 = createCommonjsModule(function (module) {
-	  function _typeof2(obj) {
-	    if (typeof Symbol === "function" && _typeof_1(Symbol.iterator) === "symbol") {
-	      _typeof2 = function _typeof2(obj) {
-	        return _typeof_1(obj);
-	      };
-	    } else {
-	      _typeof2 = function _typeof2(obj) {
-	        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : _typeof_1(obj);
-	      };
-	    }
-
-	    return _typeof2(obj);
-	  }
 
 	  function _typeof(obj) {
-	    if (typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol") {
+	    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
 	      module.exports = _typeof = function _typeof(obj) {
-	        return _typeof2(obj);
+	        return typeof obj;
 	      };
 	    } else {
 	      module.exports = _typeof = function _typeof(obj) {
-	        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : _typeof2(obj);
+	        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 	      };
 	    }
 
@@ -2291,7 +2278,6 @@
 	    });
 	    Config$1.store(this.opts);
 	    this.onReady = false;
-	    this.setup()["catch"](d);
 	  }
 	  /**
 	   * Setup the client

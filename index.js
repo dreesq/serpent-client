@@ -52,7 +52,6 @@ export default class Serpent {
 
           Config.store(this.opts);
           this.onReady = false;
-          this.setup().catch(Utils.d);
      }
 
      /**
