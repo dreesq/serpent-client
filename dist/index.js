@@ -970,7 +970,7 @@
 	    return result;
 	  };
 
-	  var el = document.createElement('pre');
+	  var el = document.createElement('div');
 	  el.id = 'debugPanel';
 	  document.body.appendChild(el);
 	  var hooks = ['log', 'error', 'info', 'warn'];
@@ -1016,6 +1016,7 @@
 	      }
 
 	      var clonedArgs = [].concat(args);
+	      clonedArgs.splice(0, 1);
 	      var consoleResult = [];
 
 	      for (var arg in clonedArgs) {
@@ -1029,18 +1030,36 @@
 
 	      logger.apply(void 0, consoleResult);
 	      var message = "<span class=\"message ".concat(hook, "\">");
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
 
-	      for (var _i2 = 0, _args = args; _i2 < _args.length; _i2++) {
-	        var _arg = _args[_i2];
+	      try {
+	        for (var _iterator = clonedArgs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var _arg = _step.value;
 
-	        if (_typeof_1(_arg) === 'object' || Array.isArray(_arg)) {
-	          message += '<span class="object">';
-	          message += colorize(_arg, 'panel');
-	          message += '</span>';
-	          continue;
+	          if (_typeof_1(_arg) === 'object' || Array.isArray(_arg)) {
+	            message += '<span class="object">';
+	            message += colorize(_arg, 'panel');
+	            message += '</span>';
+	            continue;
+	          }
+
+	          message += _arg;
 	        }
-
-	        message += _arg;
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+	            _iterator["return"]();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
 	      }
 
 	      message += "</span>";
@@ -2137,7 +2156,7 @@
 	                      _key$split2$ = _key$split2[1],
 	                      opts = _key$split2$ === void 0 ? '' : _key$split2$;
 
-	                  if (!allRules[ruleName] || ['when', 'required'].indexOf(ruleName) === -1 && !inputValue) {
+	                  if (!allRules[ruleName]) {
 	                    return;
 	                  }
 

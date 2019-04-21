@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Client</title>
+</head>
+<body>
+<script src="/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script>
+    window.client = new Serpent('http://localhost:3000/o', {
+        debug: true,
+        axios
+    });
+
+    client.setup().then(() => {
+        client._utils.debugPanel();
+        client._utils.d('info', 'Client loaded.');
+    });
+</script>
+</body>
+</html>
