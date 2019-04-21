@@ -902,7 +902,7 @@
 	  }
 
 	  if (args.length === 1) {
-	    return log(console, args);
+	    return log.apply(void 0, args);
 	  }
 
 	  log('|| Start');
@@ -1016,7 +1016,6 @@
 	      }
 
 	      var clonedArgs = [].concat(args);
-	      clonedArgs.splice(0, 1);
 	      var consoleResult = [];
 
 	      for (var arg in clonedArgs) {
