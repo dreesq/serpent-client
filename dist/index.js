@@ -868,6 +868,52 @@
 
 	var toConsumableArray = _toConsumableArray;
 
+	function _arrayWithHoles(arr) {
+	  if (Array.isArray(arr)) return arr;
+	}
+
+	var arrayWithHoles = _arrayWithHoles;
+
+	function _iterableToArrayLimit(arr, i) {
+	  var _arr = [];
+	  var _n = true;
+	  var _d = false;
+	  var _e = undefined;
+
+	  try {
+	    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+	      _arr.push(_s.value);
+
+	      if (i && _arr.length === i) break;
+	    }
+	  } catch (err) {
+	    _d = true;
+	    _e = err;
+	  } finally {
+	    try {
+	      if (!_n && _i["return"] != null) _i["return"]();
+	    } finally {
+	      if (_d) throw _e;
+	    }
+	  }
+
+	  return _arr;
+	}
+
+	var iterableToArrayLimit = _iterableToArrayLimit;
+
+	function _nonIterableRest() {
+	  throw new TypeError("Invalid attempt to destructure non-iterable instance");
+	}
+
+	var nonIterableRest = _nonIterableRest;
+
+	function _slicedToArray(arr, i) {
+	  return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || nonIterableRest();
+	}
+
+	var slicedToArray = _slicedToArray;
+
 	/**
 	 * Get by key helper
 	 * @param obj
@@ -913,6 +959,45 @@
 	  }
 
 	  log('|| End');
+	};
+	/**
+	 * Parse template helper
+	 * @param string
+	 * @param data
+	 * @returns {Object|void|*}
+	 */
+
+	var parseTemplate = function parseTemplate(string) {
+	  var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+	  if (!string) {
+	    return '[empty string]';
+	  }
+
+	  return string.replace(/{{\s*([^}]*)\s*}}/g, function (match, $1) {
+	    var key = $1.trim();
+	    /**
+	     * Handle pluralization
+	     */
+
+	    if (key.indexOf(':') > -1) {
+	      var _key$split = key.split(':'),
+	          _key$split2 = slicedToArray(_key$split, 2),
+	          newKey = _key$split2[0],
+	          options = _key$split2[1];
+
+	      var value = +get(data, newKey, "[".concat(newKey, "]"));
+	      options = options.split('|');
+	      var index = value === 0 ? 0 : value === 1 ? 1 : value > 1 ? 2 : false;
+
+	      if (!isNaN(index)) {
+	        var result = options[index];
+	        return result.indexOf('_') > -1 ? result.replace(/_/g, value) : result[index];
+	      }
+	    }
+
+	    return get(data, key, "[".concat(key, "]"));
+	  });
 	};
 	/**
 	 * Shows a debug panel in DOM
@@ -1080,6 +1165,7 @@
 	var Utils = /*#__PURE__*/Object.freeze({
 		get: get,
 		d: d,
+		parseTemplate: parseTemplate,
 		debugPanel: debugPanel
 	});
 
@@ -1112,17 +1198,16 @@
 	var Socket =
 	/*#__PURE__*/
 	function () {
-	  function Socket(parent, client) {
+	  function Socket(parent, sio) {
 	    classCallCheck(this, Socket);
 
 	    this.parent = parent;
 
 	    if (!Config$1.get('socket')) {
-	      return parent._event.emit('loaded');
+	      return;
 	    }
 
-	    this.socket = client(Config$1.get('path'));
-	    this.parent.socket = this.socket;
+	    this.client = sio(Config$1.get('path'));
 	    this.setup();
 	  }
 
@@ -1136,75 +1221,27 @@
 
 	      if (token) {
 	        d('info', 'Authenticating socket.');
-	        this.socket.emit('login', token);
+	        this.client.emit('login', token);
 	      }
 
-	      this.socket.on('reconnect', function () {
+	      this.client.on('reconnect', function () {
 	        d('info', 'Socket has reconnected');
 
-	        _this.socket.emit('login', token);
+	        _this.client.emit('login', token);
 	      });
-	      this.socket.on('login', function () {
+	      this.client.on('login', function () {
 	        d('info', 'Socket has logged in');
 	      });
-
-	      this.parent._event.emit('loaded');
 	    }
 	  }, {
 	    key: "logout",
 	    value: function logout() {
-	      this.socket.emit('logout');
+	      this.client.emit('logout');
 	    }
 	  }]);
 
 	  return Socket;
 	}();
-
-	function _arrayWithHoles(arr) {
-	  if (Array.isArray(arr)) return arr;
-	}
-
-	var arrayWithHoles = _arrayWithHoles;
-
-	function _iterableToArrayLimit(arr, i) {
-	  var _arr = [];
-	  var _n = true;
-	  var _d = false;
-	  var _e = undefined;
-
-	  try {
-	    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
-	      _arr.push(_s.value);
-
-	      if (i && _arr.length === i) break;
-	    }
-	  } catch (err) {
-	    _d = true;
-	    _e = err;
-	  } finally {
-	    try {
-	      if (!_n && _i["return"] != null) _i["return"]();
-	    } finally {
-	      if (_d) throw _e;
-	    }
-	  }
-
-	  return _arr;
-	}
-
-	var iterableToArrayLimit = _iterableToArrayLimit;
-
-	function _nonIterableRest() {
-	  throw new TypeError("Invalid attempt to destructure non-iterable instance");
-	}
-
-	var nonIterableRest = _nonIterableRest;
-
-	function _slicedToArray(arr, i) {
-	  return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || nonIterableRest();
-	}
-
-	var slicedToArray = _slicedToArray;
 
 	var Actions =
 	/*#__PURE__*/
@@ -1482,9 +1519,6 @@
 	                break;
 
 	              case 26:
-	                this.parent._event.emit('loaded');
-
-	              case 27:
 	              case "end":
 	                return _context3.stop();
 	            }
@@ -1884,6 +1918,7 @@
 	 * Validator rules
 	 * @type {{}}
 	 */
+
 	var allRules = {
 	  email: function email(value) {
 	    var re = /\S+@\S+\.\S+/;
@@ -2127,8 +2162,10 @@
 	var Validator =
 	/*#__PURE__*/
 	function () {
-	  function Validator() {
+	  function Validator(parent) {
 	    classCallCheck(this, Validator);
+
+	    this.parent = parent;
 	  }
 
 	  createClass(Validator, [{
@@ -2142,7 +2179,9 @@
 	      var _validateField = asyncToGenerator(
 	      /*#__PURE__*/
 	      regenerator.mark(function _callee3(inputValue, inputKey, rules, allInput) {
-	        var split, shouldSkip, validations, messages;
+	        var _this = this;
+
+	        var split, shouldSkip, validations, messages, translate;
 	        return regenerator.wrap(function _callee3$(_context3) {
 	          while (1) {
 	            switch (_context3.prev = _context3.next) {
@@ -2181,11 +2220,20 @@
 
 	              case 7:
 	                messages = _context3.sent;
+
+	                translate = function translate(x) {
+	                  return Config$1.get('i18n') ? _this.parent._i18n.t(x, {
+	                    field: inputKey
+	                  }) : x;
+	                };
+
 	                return _context3.abrupt("return", messages.filter(function (message) {
 	                  return message !== undefined;
+	                }).map(function (x) {
+	                  return translate(x);
 	                }));
 
-	              case 9:
+	              case 10:
 	              case "end":
 	                return _context3.stop();
 	            }
@@ -2266,6 +2314,154 @@
 	  return Validator;
 	}();
 
+	var I18n =
+	/*#__PURE__*/
+	function () {
+	  function I18n(parent) {
+	    classCallCheck(this, I18n);
+
+	    this.parent = parent;
+	    this.translations = {};
+	  }
+
+	  createClass(I18n, [{
+	    key: "setup",
+	    value: function () {
+	      var _setup = asyncToGenerator(
+	      /*#__PURE__*/
+	      regenerator.mark(function _callee() {
+	        var _Config$get, store, load, translations;
+
+	        return regenerator.wrap(function _callee$(_context) {
+	          while (1) {
+	            switch (_context.prev = _context.next) {
+	              case 0:
+	                if (Config$1.get('i18n')) {
+	                  _context.next = 2;
+	                  break;
+	                }
+
+	                return _context.abrupt("return");
+
+	              case 2:
+	                _Config$get = Config$1.get('i18n'), store = _Config$get.store, load = _Config$get.load;
+
+	                if (!(!store || typeof window === 'undefined')) {
+	                  _context.next = 5;
+	                  break;
+	                }
+
+	                return _context.abrupt("return");
+
+	              case 5:
+	                translations = localStorage.getItem('i18n');
+
+	                if (!(!translations && load)) {
+	                  _context.next = 10;
+	                  break;
+	                }
+
+	                _context.next = 9;
+	                return this.getTranslations(load);
+
+	              case 9:
+	                return _context.abrupt("return");
+
+	              case 10:
+	                this.translations = JSON.parse(translations);
+
+	              case 11:
+	              case "end":
+	                return _context.stop();
+	            }
+	          }
+	        }, _callee, this);
+	      }));
+
+	      function setup() {
+	        return _setup.apply(this, arguments);
+	      }
+
+	      return setup;
+	    }()
+	  }, {
+	    key: "t",
+	    value: function t(key, params) {
+	      return parseTemplate(get(this.translations, key, ''), params);
+	    }
+	    /**
+	     * Loads translations from the api
+	     * @param list
+	     * @param locale
+	     * @returns {Promise<void>}
+	     */
+
+	  }, {
+	    key: "getTranslations",
+	    value: function () {
+	      var _getTranslations = asyncToGenerator(
+	      /*#__PURE__*/
+	      regenerator.mark(function _callee2() {
+	        var list,
+	            locale,
+	            _Config$get2,
+	            store,
+	            _ref,
+	            data,
+	            errors,
+	            _args2 = arguments;
+
+	        return regenerator.wrap(function _callee2$(_context2) {
+	          while (1) {
+	            switch (_context2.prev = _context2.next) {
+	              case 0:
+	                list = _args2.length > 0 && _args2[0] !== undefined ? _args2[0] : [];
+	                locale = _args2.length > 1 && _args2[1] !== undefined ? _args2[1] : 'en';
+	                _Config$get2 = Config$1.get('i18n'), store = _Config$get2.store;
+	                _context2.next = 5;
+	                return this.parent.call('getTranslations', {
+	                  list: list,
+	                  locale: locale
+	                });
+
+	              case 5:
+	                _ref = _context2.sent;
+	                data = _ref.data;
+	                errors = _ref.errors;
+
+	                if (!errors) {
+	                  _context2.next = 10;
+	                  break;
+	                }
+
+	                return _context2.abrupt("return");
+
+	              case 10:
+	                this.translations = data;
+
+	                if (store && typeof window !== 'undefined') {
+	                  localStorage.setItem('i18n', JSON.stringify(this.translations));
+	                }
+
+	              case 12:
+	              case "end":
+	                return _context2.stop();
+	            }
+	          }
+	        }, _callee2, this);
+	      }));
+
+	      function getTranslations() {
+	        return _getTranslations.apply(this, arguments);
+	      }
+
+	      return getTranslations;
+	    }()
+	  }]);
+
+	  return I18n;
+	}();
+
 	/**
 	 * Default options
 	 * @type {{}}
@@ -2280,6 +2476,7 @@
 	  authFailed: false,
 	  sio: null,
 	  axios: null,
+	  i18n: false,
 	  tokenHandler: {
 	    get: function get(key) {
 	      return localStorage.getItem(key);
@@ -2308,7 +2505,6 @@
 	      throw new Error('Missing required parameter `path`.');
 	    }
 
-	    this.loaded = 0;
 	    this.opts = objectSpread({}, defaults, opts, {
 	      path: path
 	    });
@@ -2334,17 +2530,22 @@
 	                this._event = new Event();
 	                this._auth = new Auth(this);
 	                this._actions = new Actions(this, Config$1.get('axios'));
-	                new Socket(this, Config$1.get('sio'));
-	                this._validator = new Validator();
+	                this._socket = new Socket(this, Config$1.get('sio'));
+	                this._i18n = new I18n(this);
+	                this._validator = new Validator(this);
 	                this._utils = Utils;
 	                this._config = Config$1;
-	                _context.next = 9;
+	                _context.next = 10;
 	                return this._actions.setup();
 
-	              case 9:
+	              case 10:
+	                _context.next = 12;
+	                return this._i18n.setup();
+
+	              case 12:
 	                typeof this.onReady === 'function' && this.onReady();
 
-	              case 10:
+	              case 13:
 	              case "end":
 	                return _context.stop();
 	            }
