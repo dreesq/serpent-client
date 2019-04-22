@@ -902,7 +902,7 @@
 	  }
 
 	  if (args.length === 1) {
-	    return log(console, args);
+	    return log.apply(void 0, args);
 	  }
 
 	  log('|| Start');
@@ -1016,7 +1016,6 @@
 	      }
 
 	      var clonedArgs = [].concat(args);
-	      clonedArgs.splice(0, 1);
 	      var consoleResult = [];
 
 	      for (var arg in clonedArgs) {
@@ -1934,11 +1933,11 @@
 	    var shouldEqual = field[0] !== '!';
 
 	    if (shouldEqual && allInput[required] && allInput[required] == field) {
-	      return allRules.required.apply(allRules, arguments);
+	      return true;
 	    }
 
 	    if (!shouldEqual && allInput[required] && allInput[required] != field.substring(1, field.length)) {
-	      return allRules.required.apply(allRules, arguments);
+	      return true;
 	    }
 	  },
 	  file: function () {
@@ -2143,12 +2142,13 @@
 	      var _validateField = asyncToGenerator(
 	      /*#__PURE__*/
 	      regenerator.mark(function _callee3(inputValue, inputKey, rules, allInput) {
-	        var split, validations, messages;
+	        var split, shouldSkip, validations, messages;
 	        return regenerator.wrap(function _callee3$(_context3) {
 	          while (1) {
 	            switch (_context3.prev = _context3.next) {
 	              case 0:
 	                split = rules.split('|');
+	                shouldSkip = false;
 	                validations = split.map(function (key) {
 	                  var _key$split = key.split(':'),
 	                      _key$split2 = slicedToArray(_key$split, 2),
@@ -2156,22 +2156,36 @@
 	                      _key$split2$ = _key$split2[1],
 	                      opts = _key$split2$ === void 0 ? '' : _key$split2$;
 
+	                  if (ruleName === 'when') {
+	                    shouldSkip = !allRules.when(inputValue, inputKey, opts.split(','), allInput);
+	                    return;
+	                  }
+
 	                  if (!allRules[ruleName]) {
 	                    return;
 	                  }
 
 	                  return allRules[ruleName](inputValue, inputKey, opts.split(','), allInput);
 	                });
-	                _context3.next = 4;
+
+	                if (!shouldSkip) {
+	                  _context3.next = 5;
+	                  break;
+	                }
+
+	                return _context3.abrupt("return", []);
+
+	              case 5:
+	                _context3.next = 7;
 	                return Promise.all(validations);
 
-	              case 4:
+	              case 7:
 	                messages = _context3.sent;
 	                return _context3.abrupt("return", messages.filter(function (message) {
 	                  return message !== undefined;
 	                }));
 
-	              case 6:
+	              case 9:
 	              case "end":
 	                return _context3.stop();
 	            }
