@@ -2181,7 +2181,7 @@
 	      regenerator.mark(function _callee3(inputValue, inputKey, rules, allInput) {
 	        var _this = this;
 
-	        var split, shouldSkip, validations, messages, translate;
+	        var split, shouldSkip, validations, translate, errors;
 	        return regenerator.wrap(function _callee3$(_context3) {
 	          while (1) {
 	            switch (_context3.prev = _context3.next) {
@@ -2195,8 +2195,10 @@
 	                      _key$split2$ = _key$split2[1],
 	                      opts = _key$split2$ === void 0 ? '' : _key$split2$;
 
+	                  var options = opts.split(',');
+
 	                  if (ruleName === 'when') {
-	                    shouldSkip = !allRules.when(inputValue, inputKey, opts.split(','), allInput);
+	                    shouldSkip = !allRules.when(inputValue, inputKey, options, allInput);
 	                    return;
 	                  }
 
@@ -2204,7 +2206,16 @@
 	                    return;
 	                  }
 
-	                  return allRules[ruleName](inputValue, inputKey, opts.split(','), allInput);
+	                  var message = allRules[ruleName](inputValue, inputKey, options, allInput);
+
+	                  if (!message) {
+	                    return;
+	                  }
+
+	                  return {
+	                    message: message,
+	                    options: options
+	                  };
 	                });
 
 	                if (!shouldSkip) {
@@ -2215,23 +2226,22 @@
 	                return _context3.abrupt("return", []);
 
 	              case 5:
-	                _context3.next = 7;
-	                return Promise.all(validations);
-
-	              case 7:
-	                messages = _context3.sent;
-
 	                translate = function translate(x) {
-	                  return Config$1.get('i18n') ? _this.parent._i18n.t(x, {
-	                    field: inputKey
-	                  }) : x;
+	                  return Config$1.get('i18n') ? _this.parent._i18n.t(x.message, {
+	                    field: inputKey,
+	                    value: inputValue,
+	                    options: x.options
+	                  }) : x.message;
 	                };
 
-	                return _context3.abrupt("return", messages.filter(function (message) {
-	                  return message !== undefined;
-	                }).map(function (x) {
-	                  return translate(x);
-	                }));
+	                _context3.next = 8;
+	                return Promise.all(validations);
+
+	              case 8:
+	                errors = _context3.sent;
+	                return _context3.abrupt("return", errors.filter(function (error) {
+	                  return error !== undefined;
+	                }).map(translate));
 
 	              case 10:
 	              case "end":
