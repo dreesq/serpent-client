@@ -1975,181 +1975,11 @@
 	      return true;
 	    }
 	  },
-	  file: function () {
-	    var _file = asyncToGenerator(
-	    /*#__PURE__*/
-	    regenerator.mark(function _callee(value) {
-	      var items, invalid, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, item;
-
-	      return regenerator.wrap(function _callee$(_context) {
-	        while (1) {
-	          switch (_context.prev = _context.next) {
-	            case 0:
-	              items = Array.isArray(value) ? value : [value];
-	              invalid = false;
-	              _iteratorNormalCompletion = true;
-	              _didIteratorError = false;
-	              _iteratorError = undefined;
-	              _context.prev = 5;
-
-	              for (_iterator = items[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                item = _step.value;
-
-	                if (_typeof_1(item) !== 'object' || !item.isFile) {
-	                  invalid = true;
-	                }
-	              }
-
-	              _context.next = 13;
-	              break;
-
-	            case 9:
-	              _context.prev = 9;
-	              _context.t0 = _context["catch"](5);
-	              _didIteratorError = true;
-	              _iteratorError = _context.t0;
-
-	            case 13:
-	              _context.prev = 13;
-	              _context.prev = 14;
-
-	              if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-	                _iterator["return"]();
-	              }
-
-	            case 16:
-	              _context.prev = 16;
-
-	              if (!_didIteratorError) {
-	                _context.next = 19;
-	                break;
-	              }
-
-	              throw _iteratorError;
-
-	            case 19:
-	              return _context.finish(16);
-
-	            case 20:
-	              return _context.finish(13);
-
-	            case 21:
-	              if (!invalid) {
-	                _context.next = 23;
-	                break;
-	              }
-
-	              return _context.abrupt("return", 'validation.file');
-
-	            case 23:
-	            case "end":
-	              return _context.stop();
-	          }
-	        }
-	      }, _callee, null, [[5, 9, 13, 21], [14,, 16, 20]]);
-	    }));
-
-	    function file(_x) {
-	      return _file.apply(this, arguments);
+	  sameAs: function sameAs(value, field, opts, allInput) {
+	    if (value !== allInput[opts[0]]) {
+	      return 'validation.sameAs';
 	    }
-
-	    return file;
-	  }(),
-	  ext: function () {
-	    var _ext = asyncToGenerator(
-	    /*#__PURE__*/
-	    regenerator.mark(function _callee2(value, key, options) {
-	      var invalidFile, invalid, items, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, item, _ext2;
-
-	      return regenerator.wrap(function _callee2$(_context2) {
-	        while (1) {
-	          switch (_context2.prev = _context2.next) {
-	            case 0:
-	              _context2.next = 2;
-	              return allRules.file(value, key);
-
-	            case 2:
-	              invalidFile = _context2.sent;
-	              invalid = false;
-
-	              if (!invalidFile) {
-	                _context2.next = 6;
-	                break;
-	              }
-
-	              return _context2.abrupt("return", invalidFile);
-
-	            case 6:
-	              items = Array.isArray(value) ? value : [value];
-	              _iteratorNormalCompletion2 = true;
-	              _didIteratorError2 = false;
-	              _iteratorError2 = undefined;
-	              _context2.prev = 10;
-
-	              for (_iterator2 = items[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	                item = _step2.value;
-	                _ext2 = item.filename.substr(item.filename.lastIndexOf('.') + 1);
-
-	                if (options.indexOf(_ext2) === -1) {
-	                  invalid = true;
-	                }
-	              }
-
-	              _context2.next = 18;
-	              break;
-
-	            case 14:
-	              _context2.prev = 14;
-	              _context2.t0 = _context2["catch"](10);
-	              _didIteratorError2 = true;
-	              _iteratorError2 = _context2.t0;
-
-	            case 18:
-	              _context2.prev = 18;
-	              _context2.prev = 19;
-
-	              if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
-	                _iterator2["return"]();
-	              }
-
-	            case 21:
-	              _context2.prev = 21;
-
-	              if (!_didIteratorError2) {
-	                _context2.next = 24;
-	                break;
-	              }
-
-	              throw _iteratorError2;
-
-	            case 24:
-	              return _context2.finish(21);
-
-	            case 25:
-	              return _context2.finish(18);
-
-	            case 26:
-	              if (!invalid) {
-	                _context2.next = 28;
-	                break;
-	              }
-
-	              return _context2.abrupt("return", 'validation.extension');
-
-	            case 28:
-	            case "end":
-	              return _context2.stop();
-	          }
-	        }
-	      }, _callee2, null, [[10, 14, 18, 26], [19,, 21, 25]]);
-	    }));
-
-	    function ext(_x2, _x3, _x4) {
-	      return _ext.apply(this, arguments);
-	    }
-
-	    return ext;
-	  }(),
+	  },
 	  date: function date(value) {
 	    var isValid = new Date(value) !== "Invalid Date" && !isNaN(new Date(value));
 
@@ -2178,13 +2008,13 @@
 	    value: function () {
 	      var _validateField = asyncToGenerator(
 	      /*#__PURE__*/
-	      regenerator.mark(function _callee3(inputValue, inputKey, rules, allInput) {
+	      regenerator.mark(function _callee(inputValue, inputKey, rules, allInput) {
 	        var _this = this;
 
 	        var split, shouldSkip, validations, translate, errors;
-	        return regenerator.wrap(function _callee3$(_context3) {
+	        return regenerator.wrap(function _callee$(_context) {
 	          while (1) {
-	            switch (_context3.prev = _context3.next) {
+	            switch (_context.prev = _context.next) {
 	              case 0:
 	                split = rules.split('|');
 	                shouldSkip = false;
@@ -2219,11 +2049,11 @@
 	                });
 
 	                if (!shouldSkip) {
-	                  _context3.next = 5;
+	                  _context.next = 5;
 	                  break;
 	                }
 
-	                return _context3.abrupt("return", []);
+	                return _context.abrupt("return", []);
 
 	              case 5:
 	                translate = function translate(x) {
@@ -2234,24 +2064,24 @@
 	                  }) : x.message;
 	                };
 
-	                _context3.next = 8;
+	                _context.next = 8;
 	                return Promise.all(validations);
 
 	              case 8:
-	                errors = _context3.sent;
-	                return _context3.abrupt("return", errors.filter(function (error) {
+	                errors = _context.sent;
+	                return _context.abrupt("return", errors.filter(function (error) {
 	                  return error !== undefined;
 	                }).map(translate));
 
 	              case 10:
 	              case "end":
-	                return _context3.stop();
+	                return _context.stop();
 	            }
 	          }
-	        }, _callee3);
+	        }, _callee);
 	      }));
 
-	      function validateField(_x5, _x6, _x7, _x8) {
+	      function validateField(_x, _x2, _x3, _x4) {
 	        return _validateField.apply(this, arguments);
 	      }
 
@@ -2262,58 +2092,58 @@
 	    value: function () {
 	      var _validate = asyncToGenerator(
 	      /*#__PURE__*/
-	      regenerator.mark(function _callee4(values, rules) {
+	      regenerator.mark(function _callee2(values, rules) {
 	        var valid, errors, key, errorsList;
-	        return regenerator.wrap(function _callee4$(_context4) {
+	        return regenerator.wrap(function _callee2$(_context2) {
 	          while (1) {
-	            switch (_context4.prev = _context4.next) {
+	            switch (_context2.prev = _context2.next) {
 	              case 0:
 	                valid = true;
 	                errors = {};
-	                _context4.t0 = regenerator.keys(rules);
+	                _context2.t0 = regenerator.keys(rules);
 
 	              case 3:
-	                if ((_context4.t1 = _context4.t0()).done) {
-	                  _context4.next = 13;
+	                if ((_context2.t1 = _context2.t0()).done) {
+	                  _context2.next = 13;
 	                  break;
 	                }
 
-	                key = _context4.t1.value;
+	                key = _context2.t1.value;
 
 	                if (rules.hasOwnProperty(key)) {
-	                  _context4.next = 7;
+	                  _context2.next = 7;
 	                  break;
 	                }
 
-	                return _context4.abrupt("continue", 3);
+	                return _context2.abrupt("continue", 3);
 
 	              case 7:
-	                _context4.next = 9;
+	                _context2.next = 9;
 	                return this.validateField(values[key], key, rules[key], values);
 
 	              case 9:
-	                errorsList = _context4.sent;
+	                errorsList = _context2.sent;
 
 	                if (errorsList.length) {
 	                  errors[key] = errorsList;
 	                  valid = false;
 	                }
 
-	                _context4.next = 3;
+	                _context2.next = 3;
 	                break;
 
 	              case 13:
-	                return _context4.abrupt("return", valid ? valid : errors);
+	                return _context2.abrupt("return", valid ? valid : errors);
 
 	              case 14:
 	              case "end":
-	                return _context4.stop();
+	                return _context2.stop();
 	            }
 	          }
-	        }, _callee4, this);
+	        }, _callee2, this);
 	      }));
 
-	      function validate(_x9, _x10) {
+	      function validate(_x5, _x6) {
 	        return _validate.apply(this, arguments);
 	      }
 
