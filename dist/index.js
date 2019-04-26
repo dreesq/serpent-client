@@ -1058,7 +1058,6 @@
 	  var el = document.createElement('div');
 	  el.id = 'debugPanel';
 	  document.body.appendChild(el);
-	  var hooks = ['log', 'error', 'info', 'warn'];
 	  var style = document.createElement('style');
 	  var pref = JSON.parse(localStorage.getItem('debugPanel') || '{}');
 	  style.innerHTML = "\n        #debugPanel {\n            background: #353535;\n            position: absolute;\n            width: 460px;\n            padding: 20px;\n            overflow: auto;\n            word-wrap: normal;\n            color: #fff;\n            height: 250px;\n            overflow-y: auto;\n            overflow-x: hidden;\n            cursor: grab;\n            left: ".concat(pref.left || '20px', ";\n            top: ").concat(pref.top || '20px', ";\n            box-shadow: 0px 0px 8px 1px #000;\n        }\n        \n        #debugPanel .number {\n            color:#b66bb2\n        }\n        \n        #debugPanel .key {\n            color: #619bab;\n        }\n        \n        #debugPanel .string {\n            color:#55c149\n        }\n        \n        #debugPanel .boolean {\n            color:#ff82a4;\n        }\n        \n        #debugPanel .null {\n            color:#ff7477;\n        }\n        \n        #debugPanel::-webkit-scrollbar {\n          width: 5px;\n          height: 12px;\n        }\n        \n        #debugPanel::-webkit-scrollbar-track {\n          background: rgba(0, 0, 0, 0.1);\n        }\n        \n        #debugPanel::-webkit-scrollbar-thumb {\n          background: #ffd457;\n        }\n        \n        #debugPanel .message {\n            display: block;\n            padding: 2px 0;\n            font: 13px Verdana, Arial, sans-serif;\n            white-space: pre;\n        }\n        \n        #debugPanel .info {\n            color: #60f6ff;\n        }\n        \n        #debugPanel .error {\n            color: #ff6b6b;\n        }\n        \n        #debugPanel .log {\n            color: #4cff85;\n        }\n        \n        #debugPanel .object {\n            color: #619bab;\n        }\n    ");
@@ -1090,6 +1089,7 @@
 	      }));
 	    }
 	  });
+	  var hooks = ['log', 'error', 'info', 'warn'];
 
 	  var _loop = function _loop() {
 	    var hook = _hooks[_i];
@@ -1544,10 +1544,13 @@
 	      var _call2 = asyncToGenerator(
 	      /*#__PURE__*/
 	      regenerator.mark(function _callee4(action) {
+	        var _this3 = this;
+
 	        var payload,
 	            result,
 	            start,
 	            errors,
+	            config,
 	            _ref6,
 	            data,
 	            _errors,
@@ -1563,6 +1566,9 @@
 	                  errors: false,
 	                  data: false
 	                };
+
+	                this.parent._event.emit('loading:start', [action, payload]);
+
 	                start = +new Date();
 	                d('info', "Doing action [".concat(action, "], sent payload:"), payload);
 	                /**
@@ -1570,34 +1576,52 @@
 	                 */
 
 	                if (!(Actions.actions[action] && Object.keys(Actions.actions[action]).length)) {
-	                  _context4.next = 13;
+	                  _context4.next = 15;
 	                  break;
 	                }
 
-	                _context4.next = 7;
+	                _context4.next = 8;
 	                return this.parent._validator.validate(payload, Actions.actions[action]);
 
-	              case 7:
+	              case 8:
 	                errors = _context4.sent;
 
 	                if (!Object.keys(errors).length) {
-	                  _context4.next = 13;
+	                  _context4.next = 15;
 	                  break;
 	                }
 
 	                result.errors = errors;
 	                d('info', "Local validation failed for [".concat(action, "], errors:"), errors);
 
+	                this.parent._event.emit('loading:end', [action, payload]);
+
 	                this.parent._event.emit('error', [action, errors, payload]);
 
 	                return _context4.abrupt("return", result);
 
-	              case 13:
-	                _context4.prev = 13;
-	                _context4.next = 16;
-	                return this.parent.http.post(Config$1.get('handler'), [action, payload]);
+	              case 15:
+	                _context4.prev = 15;
+	                config = {};
 
-	              case 16:
+	                if (payload instanceof FormData) {
+	                  config.onUploadProgress = function (e) {
+	                    var percent = Math.floor(e.loaded * 100 / e.total);
+
+	                    _this3.parent._event.emit('progress', [action, percent]);
+	                  };
+
+	                  config.onDownloadProgress = function (e) {
+	                    var percent = Math.floor(e.loaded * 100 / e.total);
+
+	                    _this3.parent._event.emit('progress', [action, percent]);
+	                  };
+	                }
+
+	                _context4.next = 20;
+	                return this.parent.http.post(Config$1.get('handler'), [action, payload], config);
+
+	              case 20:
 	                _ref6 = _context4.sent;
 	                data = _ref6.data;
 
@@ -1607,32 +1631,36 @@
 	                  result.data = data;
 	                }
 
-	                _context4.next = 25;
+	                _context4.next = 29;
 	                break;
 
-	              case 21:
-	                _context4.prev = 21;
-	                _context4.t0 = _context4["catch"](13);
+	              case 25:
+	                _context4.prev = 25;
+	                _context4.t0 = _context4["catch"](15);
 	                _errors = get(_context4.t0, 'response.data.errors', false);
 	                result.errors = _errors ? _errors : {
 	                  message: [_context4.t0.response]
 	                };
 
-	              case 25:
+	              case 29:
+	                this.parent._event.emit('loading:end', [action, payload]);
+
 	                if (result.errors) {
 	                  this.parent._event.emit('error', [action, result.errors, payload]);
+	                } else {
+	                  this.parent._event.emit('success', [action, result.data, payload]);
 	                }
 
 	                end = +new Date();
 	                d('info', "Finished doing action [".concat(action, "] in [").concat(end - start, " ms], result:"), result);
 	                return _context4.abrupt("return", result);
 
-	              case 29:
+	              case 34:
 	              case "end":
 	                return _context4.stop();
 	            }
 	          }
-	        }, _callee4, this, [[13, 21]]);
+	        }, _callee4, this, [[15, 25]]);
 	      }));
 
 	      function _call(_x3) {
@@ -1889,7 +1917,6 @@
 
 	      if (_typeof_1(this.events[event]) === 'object') {
 	        this.events[event].forEach(function (listener) {
-	          d('info', "Calling event [".concat(event, "], payload:"), args);
 	          listener.apply(_this2, args);
 	        });
 	      }
@@ -1975,181 +2002,11 @@
 	      return true;
 	    }
 	  },
-	  file: function () {
-	    var _file = asyncToGenerator(
-	    /*#__PURE__*/
-	    regenerator.mark(function _callee(value) {
-	      var items, invalid, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, item;
-
-	      return regenerator.wrap(function _callee$(_context) {
-	        while (1) {
-	          switch (_context.prev = _context.next) {
-	            case 0:
-	              items = Array.isArray(value) ? value : [value];
-	              invalid = false;
-	              _iteratorNormalCompletion = true;
-	              _didIteratorError = false;
-	              _iteratorError = undefined;
-	              _context.prev = 5;
-
-	              for (_iterator = items[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                item = _step.value;
-
-	                if (_typeof_1(item) !== 'object' || !item.isFile) {
-	                  invalid = true;
-	                }
-	              }
-
-	              _context.next = 13;
-	              break;
-
-	            case 9:
-	              _context.prev = 9;
-	              _context.t0 = _context["catch"](5);
-	              _didIteratorError = true;
-	              _iteratorError = _context.t0;
-
-	            case 13:
-	              _context.prev = 13;
-	              _context.prev = 14;
-
-	              if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-	                _iterator["return"]();
-	              }
-
-	            case 16:
-	              _context.prev = 16;
-
-	              if (!_didIteratorError) {
-	                _context.next = 19;
-	                break;
-	              }
-
-	              throw _iteratorError;
-
-	            case 19:
-	              return _context.finish(16);
-
-	            case 20:
-	              return _context.finish(13);
-
-	            case 21:
-	              if (!invalid) {
-	                _context.next = 23;
-	                break;
-	              }
-
-	              return _context.abrupt("return", 'validation.file');
-
-	            case 23:
-	            case "end":
-	              return _context.stop();
-	          }
-	        }
-	      }, _callee, null, [[5, 9, 13, 21], [14,, 16, 20]]);
-	    }));
-
-	    function file(_x) {
-	      return _file.apply(this, arguments);
+	  sameAs: function sameAs(value, field, opts, allInput) {
+	    if (value !== allInput[opts[0]]) {
+	      return 'validation.sameAs';
 	    }
-
-	    return file;
-	  }(),
-	  ext: function () {
-	    var _ext = asyncToGenerator(
-	    /*#__PURE__*/
-	    regenerator.mark(function _callee2(value, key, options) {
-	      var invalidFile, invalid, items, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, item, _ext2;
-
-	      return regenerator.wrap(function _callee2$(_context2) {
-	        while (1) {
-	          switch (_context2.prev = _context2.next) {
-	            case 0:
-	              _context2.next = 2;
-	              return allRules.file(value, key);
-
-	            case 2:
-	              invalidFile = _context2.sent;
-	              invalid = false;
-
-	              if (!invalidFile) {
-	                _context2.next = 6;
-	                break;
-	              }
-
-	              return _context2.abrupt("return", invalidFile);
-
-	            case 6:
-	              items = Array.isArray(value) ? value : [value];
-	              _iteratorNormalCompletion2 = true;
-	              _didIteratorError2 = false;
-	              _iteratorError2 = undefined;
-	              _context2.prev = 10;
-
-	              for (_iterator2 = items[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	                item = _step2.value;
-	                _ext2 = item.filename.substr(item.filename.lastIndexOf('.') + 1);
-
-	                if (options.indexOf(_ext2) === -1) {
-	                  invalid = true;
-	                }
-	              }
-
-	              _context2.next = 18;
-	              break;
-
-	            case 14:
-	              _context2.prev = 14;
-	              _context2.t0 = _context2["catch"](10);
-	              _didIteratorError2 = true;
-	              _iteratorError2 = _context2.t0;
-
-	            case 18:
-	              _context2.prev = 18;
-	              _context2.prev = 19;
-
-	              if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
-	                _iterator2["return"]();
-	              }
-
-	            case 21:
-	              _context2.prev = 21;
-
-	              if (!_didIteratorError2) {
-	                _context2.next = 24;
-	                break;
-	              }
-
-	              throw _iteratorError2;
-
-	            case 24:
-	              return _context2.finish(21);
-
-	            case 25:
-	              return _context2.finish(18);
-
-	            case 26:
-	              if (!invalid) {
-	                _context2.next = 28;
-	                break;
-	              }
-
-	              return _context2.abrupt("return", 'validation.extension');
-
-	            case 28:
-	            case "end":
-	              return _context2.stop();
-	          }
-	        }
-	      }, _callee2, null, [[10, 14, 18, 26], [19,, 21, 25]]);
-	    }));
-
-	    function ext(_x2, _x3, _x4) {
-	      return _ext.apply(this, arguments);
-	    }
-
-	    return ext;
-	  }(),
+	  },
 	  date: function date(value) {
 	    var isValid = new Date(value) !== "Invalid Date" && !isNaN(new Date(value));
 
@@ -2178,13 +2035,13 @@
 	    value: function () {
 	      var _validateField = asyncToGenerator(
 	      /*#__PURE__*/
-	      regenerator.mark(function _callee3(inputValue, inputKey, rules, allInput) {
+	      regenerator.mark(function _callee(inputValue, inputKey, rules, allInput) {
 	        var _this = this;
 
 	        var split, shouldSkip, validations, translate, errors;
-	        return regenerator.wrap(function _callee3$(_context3) {
+	        return regenerator.wrap(function _callee$(_context) {
 	          while (1) {
-	            switch (_context3.prev = _context3.next) {
+	            switch (_context.prev = _context.next) {
 	              case 0:
 	                split = rules.split('|');
 	                shouldSkip = false;
@@ -2219,11 +2076,11 @@
 	                });
 
 	                if (!shouldSkip) {
-	                  _context3.next = 5;
+	                  _context.next = 5;
 	                  break;
 	                }
 
-	                return _context3.abrupt("return", []);
+	                return _context.abrupt("return", []);
 
 	              case 5:
 	                translate = function translate(x) {
@@ -2234,24 +2091,24 @@
 	                  }) : x.message;
 	                };
 
-	                _context3.next = 8;
+	                _context.next = 8;
 	                return Promise.all(validations);
 
 	              case 8:
-	                errors = _context3.sent;
-	                return _context3.abrupt("return", errors.filter(function (error) {
+	                errors = _context.sent;
+	                return _context.abrupt("return", errors.filter(function (error) {
 	                  return error !== undefined;
 	                }).map(translate));
 
 	              case 10:
 	              case "end":
-	                return _context3.stop();
+	                return _context.stop();
 	            }
 	          }
-	        }, _callee3);
+	        }, _callee);
 	      }));
 
-	      function validateField(_x5, _x6, _x7, _x8) {
+	      function validateField(_x, _x2, _x3, _x4) {
 	        return _validateField.apply(this, arguments);
 	      }
 
@@ -2262,58 +2119,58 @@
 	    value: function () {
 	      var _validate = asyncToGenerator(
 	      /*#__PURE__*/
-	      regenerator.mark(function _callee4(values, rules) {
+	      regenerator.mark(function _callee2(values, rules) {
 	        var valid, errors, key, errorsList;
-	        return regenerator.wrap(function _callee4$(_context4) {
+	        return regenerator.wrap(function _callee2$(_context2) {
 	          while (1) {
-	            switch (_context4.prev = _context4.next) {
+	            switch (_context2.prev = _context2.next) {
 	              case 0:
 	                valid = true;
 	                errors = {};
-	                _context4.t0 = regenerator.keys(rules);
+	                _context2.t0 = regenerator.keys(rules);
 
 	              case 3:
-	                if ((_context4.t1 = _context4.t0()).done) {
-	                  _context4.next = 13;
+	                if ((_context2.t1 = _context2.t0()).done) {
+	                  _context2.next = 13;
 	                  break;
 	                }
 
-	                key = _context4.t1.value;
+	                key = _context2.t1.value;
 
 	                if (rules.hasOwnProperty(key)) {
-	                  _context4.next = 7;
+	                  _context2.next = 7;
 	                  break;
 	                }
 
-	                return _context4.abrupt("continue", 3);
+	                return _context2.abrupt("continue", 3);
 
 	              case 7:
-	                _context4.next = 9;
+	                _context2.next = 9;
 	                return this.validateField(values[key], key, rules[key], values);
 
 	              case 9:
-	                errorsList = _context4.sent;
+	                errorsList = _context2.sent;
 
 	                if (errorsList.length) {
 	                  errors[key] = errorsList;
 	                  valid = false;
 	                }
 
-	                _context4.next = 3;
+	                _context2.next = 3;
 	                break;
 
 	              case 13:
-	                return _context4.abrupt("return", valid ? valid : errors);
+	                return _context2.abrupt("return", valid ? valid : errors);
 
 	              case 14:
 	              case "end":
-	                return _context4.stop();
+	                return _context2.stop();
 	            }
 	          }
-	        }, _callee4, this);
+	        }, _callee2, this);
 	      }));
 
-	      function validate(_x9, _x10) {
+	      function validate(_x5, _x6) {
 	        return _validate.apply(this, arguments);
 	      }
 
