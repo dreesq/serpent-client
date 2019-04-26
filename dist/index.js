@@ -1698,9 +1698,7 @@
 	            switch (_context.prev = _context.next) {
 	              case 0:
 	                _context.next = 2;
-	                return this.parent.login(objectSpread({}, payload, {
-	                  refresh: Config$1.get('refresh') ? 1 : 0
-	                }));
+	                return this.parent.login(payload);
 
 	              case 2:
 	                _ref = _context.sent;
