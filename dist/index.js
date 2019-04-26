@@ -1604,7 +1604,7 @@
 	                _context4.prev = 15;
 	                config = {};
 
-	                if (payload instanceof FormData) {
+	                if (typeof FormData !== 'undefined' && payload instanceof FormData) {
 	                  config.onUploadProgress = function (e) {
 	                    var percent = Math.floor(e.loaded * 100 / e.total);
 
