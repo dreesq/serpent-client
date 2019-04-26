@@ -4,6 +4,7 @@ import Config from './lib/config';
 import Auth from './lib/auth';
 import Event from './lib/event';
 import Validator from './lib/validator';
+import I18n from './lib/i18n';
 import * as Utils from './lib/utils';
 
 /**
@@ -20,6 +21,7 @@ const defaults = {
      authFailed: false,
      sio: null,
      axios: null,
+     i18n: false,
      tokenHandler: {
           get(key) {
                return localStorage.getItem(key);
@@ -43,7 +45,6 @@ export default class Serpent {
                throw new Error('Missing required parameter `path`.')
           }
 
-          this.loaded = 0;
           this.opts = {
                ...defaults,
                ...opts,
@@ -63,13 +64,15 @@ export default class Serpent {
           this._event = new Event();
           this._auth = new Auth(this);
           this._actions = new Actions(this, Config.get('axios'));
-          new Socket(this, Config.get('sio'));
-          this._validator = new Validator();
+          this._socket = new Socket(this, Config.get('sio'));
+          this._i18n = new I18n(this);
+          this._validator = new Validator(this);
 
           this._utils = Utils;
           this._config = Config;
 
           await this._actions.setup();
+          await this._i18n.setup();
           typeof this.onReady === 'function' && this.onReady();
      }
 
