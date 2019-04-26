@@ -1058,7 +1058,6 @@
 	  var el = document.createElement('div');
 	  el.id = 'debugPanel';
 	  document.body.appendChild(el);
-	  var hooks = ['log', 'error', 'info', 'warn'];
 	  var style = document.createElement('style');
 	  var pref = JSON.parse(localStorage.getItem('debugPanel') || '{}');
 	  style.innerHTML = "\n        #debugPanel {\n            background: #353535;\n            position: absolute;\n            width: 460px;\n            padding: 20px;\n            overflow: auto;\n            word-wrap: normal;\n            color: #fff;\n            height: 250px;\n            overflow-y: auto;\n            overflow-x: hidden;\n            cursor: grab;\n            left: ".concat(pref.left || '20px', ";\n            top: ").concat(pref.top || '20px', ";\n            box-shadow: 0px 0px 8px 1px #000;\n        }\n        \n        #debugPanel .number {\n            color:#b66bb2\n        }\n        \n        #debugPanel .key {\n            color: #619bab;\n        }\n        \n        #debugPanel .string {\n            color:#55c149\n        }\n        \n        #debugPanel .boolean {\n            color:#ff82a4;\n        }\n        \n        #debugPanel .null {\n            color:#ff7477;\n        }\n        \n        #debugPanel::-webkit-scrollbar {\n          width: 5px;\n          height: 12px;\n        }\n        \n        #debugPanel::-webkit-scrollbar-track {\n          background: rgba(0, 0, 0, 0.1);\n        }\n        \n        #debugPanel::-webkit-scrollbar-thumb {\n          background: #ffd457;\n        }\n        \n        #debugPanel .message {\n            display: block;\n            padding: 2px 0;\n            font: 13px Verdana, Arial, sans-serif;\n            white-space: pre;\n        }\n        \n        #debugPanel .info {\n            color: #60f6ff;\n        }\n        \n        #debugPanel .error {\n            color: #ff6b6b;\n        }\n        \n        #debugPanel .log {\n            color: #4cff85;\n        }\n        \n        #debugPanel .object {\n            color: #619bab;\n        }\n    ");
@@ -1090,6 +1089,7 @@
 	      }));
 	    }
 	  });
+	  var hooks = ['log', 'error', 'info', 'warn'];
 
 	  var _loop = function _loop() {
 	    var hook = _hooks[_i];
@@ -1544,10 +1544,13 @@
 	      var _call2 = asyncToGenerator(
 	      /*#__PURE__*/
 	      regenerator.mark(function _callee4(action) {
+	        var _this3 = this;
+
 	        var payload,
 	            result,
 	            start,
 	            errors,
+	            config,
 	            _ref6,
 	            data,
 	            _errors,
@@ -1563,6 +1566,9 @@
 	                  errors: false,
 	                  data: false
 	                };
+
+	                this.parent._event.emit('loading:start', [action, payload]);
+
 	                start = +new Date();
 	                d('info', "Doing action [".concat(action, "], sent payload:"), payload);
 	                /**
@@ -1570,34 +1576,52 @@
 	                 */
 
 	                if (!(Actions.actions[action] && Object.keys(Actions.actions[action]).length)) {
-	                  _context4.next = 13;
+	                  _context4.next = 15;
 	                  break;
 	                }
 
-	                _context4.next = 7;
+	                _context4.next = 8;
 	                return this.parent._validator.validate(payload, Actions.actions[action]);
 
-	              case 7:
+	              case 8:
 	                errors = _context4.sent;
 
 	                if (!Object.keys(errors).length) {
-	                  _context4.next = 13;
+	                  _context4.next = 15;
 	                  break;
 	                }
 
 	                result.errors = errors;
 	                d('info', "Local validation failed for [".concat(action, "], errors:"), errors);
 
+	                this.parent._event.emit('loading:end', [action, payload]);
+
 	                this.parent._event.emit('error', [action, errors, payload]);
 
 	                return _context4.abrupt("return", result);
 
-	              case 13:
-	                _context4.prev = 13;
-	                _context4.next = 16;
-	                return this.parent.http.post(Config$1.get('handler'), [action, payload]);
+	              case 15:
+	                _context4.prev = 15;
+	                config = {};
 
-	              case 16:
+	                if (payload instanceof FormData) {
+	                  config.onUploadProgress = function (e) {
+	                    var percent = Math.floor(e.loaded * 100 / e.total);
+
+	                    _this3.parent._event.emit('progress', [action, percent]);
+	                  };
+
+	                  config.onDownloadProgress = function (e) {
+	                    var percent = Math.floor(e.loaded * 100 / e.total);
+
+	                    _this3.parent._event.emit('progress', [action, percent]);
+	                  };
+	                }
+
+	                _context4.next = 20;
+	                return this.parent.http.post(Config$1.get('handler'), [action, payload], config);
+
+	              case 20:
 	                _ref6 = _context4.sent;
 	                data = _ref6.data;
 
@@ -1607,32 +1631,36 @@
 	                  result.data = data;
 	                }
 
-	                _context4.next = 25;
+	                _context4.next = 29;
 	                break;
 
-	              case 21:
-	                _context4.prev = 21;
-	                _context4.t0 = _context4["catch"](13);
+	              case 25:
+	                _context4.prev = 25;
+	                _context4.t0 = _context4["catch"](15);
 	                _errors = get(_context4.t0, 'response.data.errors', false);
 	                result.errors = _errors ? _errors : {
 	                  message: [_context4.t0.response]
 	                };
 
-	              case 25:
+	              case 29:
+	                this.parent._event.emit('loading:end', [action, payload]);
+
 	                if (result.errors) {
 	                  this.parent._event.emit('error', [action, result.errors, payload]);
+	                } else {
+	                  this.parent._event.emit('success', [action, result.data, payload]);
 	                }
 
 	                end = +new Date();
 	                d('info', "Finished doing action [".concat(action, "] in [").concat(end - start, " ms], result:"), result);
 	                return _context4.abrupt("return", result);
 
-	              case 29:
+	              case 34:
 	              case "end":
 	                return _context4.stop();
 	            }
 	          }
-	        }, _callee4, this, [[13, 21]]);
+	        }, _callee4, this, [[15, 25]]);
 	      }));
 
 	      function _call(_x3) {
@@ -1889,7 +1917,6 @@
 
 	      if (_typeof_1(this.events[event]) === 'object') {
 	        this.events[event].forEach(function (listener) {
-	          d('info', "Calling event [".concat(event, "], payload:"), args);
 	          listener.apply(_this2, args);
 	        });
 	      }
