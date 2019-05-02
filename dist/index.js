@@ -1243,6 +1243,62 @@
 	  return Socket;
 	}();
 
+	function _objectWithoutPropertiesLoose(source, excluded) {
+	  if (source == null) return {};
+	  var target = {};
+	  var sourceKeys = Object.keys(source);
+	  var key, i;
+
+	  for (i = 0; i < sourceKeys.length; i++) {
+	    key = sourceKeys[i];
+	    if (excluded.indexOf(key) >= 0) continue;
+	    target[key] = source[key];
+	  }
+
+	  return target;
+	}
+
+	var objectWithoutPropertiesLoose = _objectWithoutPropertiesLoose;
+
+	function _objectWithoutProperties(source, excluded) {
+	  if (source == null) return {};
+	  var target = objectWithoutPropertiesLoose(source, excluded);
+	  var key, i;
+
+	  if (Object.getOwnPropertySymbols) {
+	    var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
+
+	    for (i = 0; i < sourceSymbolKeys.length; i++) {
+	      key = sourceSymbolKeys[i];
+	      if (excluded.indexOf(key) >= 0) continue;
+	      if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+	      target[key] = source[key];
+	    }
+	  }
+
+	  return target;
+	}
+
+	var objectWithoutProperties = _objectWithoutProperties;
+
+	/**
+	 * Client constants
+	 * @type {string}
+	 */
+	var LOADING_START = 'loading:start';
+	var LOADING_END = 'loading:end';
+	var ACTION_SUCCESS = 'success';
+	var ACTION_ERROR = 'error';
+	var ACTION_PROGRESS = 'progress';
+
+	var Constants = /*#__PURE__*/Object.freeze({
+		LOADING_START: LOADING_START,
+		LOADING_END: LOADING_END,
+		ACTION_SUCCESS: ACTION_SUCCESS,
+		ACTION_ERROR: ACTION_ERROR,
+		ACTION_PROGRESS: ACTION_PROGRESS
+	});
+
 	var Actions =
 	/*#__PURE__*/
 	function () {
@@ -1418,7 +1474,7 @@
 	                _context3.t0 = _context3["catch"](4);
 	                d('error', 'Could not load actions list.');
 
-	                this.parent._event.emit('error', ['init', _context3.t0]);
+	                this.parent._event.emit(ACTION_ERROR, ['init', _context3.t0]);
 
 	              case 16:
 	                Actions.actions = data;
@@ -1534,7 +1590,7 @@
 	    }()
 	    /**
 	     * Call an action
-	     * @returns {Promise<function(*=): void>}
+	     * @returns
 	     * @private
 	     */
 
@@ -1546,13 +1602,16 @@
 	      regenerator.mark(function _callee4(action) {
 	        var _this3 = this;
 
-	        var payload,
+	        var data,
 	            result,
+	            withProgress,
+	            withLoading,
+	            payload,
 	            start,
 	            errors,
 	            config,
 	            _ref6,
-	            data,
+	            _data,
 	            _errors,
 	            end,
 	            _args4 = arguments;
@@ -1561,13 +1620,16 @@
 	          while (1) {
 	            switch (_context4.prev = _context4.next) {
 	              case 0:
-	                payload = _args4.length > 1 && _args4[1] !== undefined ? _args4[1] : {};
+	                data = _args4.length > 1 && _args4[1] !== undefined ? _args4[1] : {};
 	                result = {
 	                  errors: false,
 	                  data: false
 	                };
+	                withProgress = data.__progress__, withLoading = data.__loading__, payload = objectWithoutProperties(data, ["__progress__", "__loading__"]);
 
-	                this.parent._event.emit('loading:start', [action, payload]);
+	                if (withLoading) {
+	                  this.parent._event.emit(LOADING_START, [action, payload]);
+	                }
 
 	                start = +new Date();
 	                d('info', "Doing action [".concat(action, "], sent payload:"), payload);
@@ -1576,91 +1638,95 @@
 	                 */
 
 	                if (!(Actions.actions[action] && Object.keys(Actions.actions[action]).length)) {
-	                  _context4.next = 15;
+	                  _context4.next = 16;
 	                  break;
 	                }
 
-	                _context4.next = 8;
+	                _context4.next = 9;
 	                return this.parent._validator.validate(payload, Actions.actions[action]);
 
-	              case 8:
+	              case 9:
 	                errors = _context4.sent;
 
 	                if (!Object.keys(errors).length) {
-	                  _context4.next = 15;
+	                  _context4.next = 16;
 	                  break;
 	                }
 
 	                result.errors = errors;
 	                d('info', "Local validation failed for [".concat(action, "], errors:"), errors);
 
-	                this.parent._event.emit('loading:end', [action, payload]);
+	                if (withLoading) {
+	                  this.parent._event.emit(LOADING_END, [action, payload]);
+	                }
 
-	                this.parent._event.emit('error', [action, errors, payload]);
+	                this.parent._event.emit(ACTION_ERROR, [action, errors, payload]);
 
 	                return _context4.abrupt("return", result);
 
-	              case 15:
-	                _context4.prev = 15;
+	              case 16:
+	                _context4.prev = 16;
 	                config = {};
 
-	                if (typeof FormData !== 'undefined' && payload instanceof FormData) {
+	                if (typeof FormData !== 'undefined' && payload instanceof FormData && withProgress) {
 	                  config.onUploadProgress = function (e) {
 	                    var percent = Math.floor(e.loaded * 100 / e.total);
 
-	                    _this3.parent._event.emit('progress', [action, percent]);
+	                    _this3.parent._event.emit(ACTION_PROGRESS, [action, percent]);
 	                  };
 
 	                  config.onDownloadProgress = function (e) {
 	                    var percent = Math.floor(e.loaded * 100 / e.total);
 
-	                    _this3.parent._event.emit('progress', [action, percent]);
+	                    _this3.parent._event.emit(ACTION_PROGRESS, [action, percent]);
 	                  };
 	                }
 
-	                _context4.next = 20;
+	                _context4.next = 21;
 	                return this.parent.http.post(Config$1.get('handler'), [action, payload], config);
 
-	              case 20:
+	              case 21:
 	                _ref6 = _context4.sent;
-	                data = _ref6.data;
+	                _data = _ref6.data;
 
-	                if (data && data.errors) {
-	                  result.errors = data.errors;
+	                if (_data && _data.errors) {
+	                  result.errors = _data.errors;
 	                } else {
-	                  result.data = data;
+	                  result.data = _data;
 	                }
 
-	                _context4.next = 29;
+	                _context4.next = 30;
 	                break;
 
-	              case 25:
-	                _context4.prev = 25;
-	                _context4.t0 = _context4["catch"](15);
+	              case 26:
+	                _context4.prev = 26;
+	                _context4.t0 = _context4["catch"](16);
 	                _errors = get(_context4.t0, 'response.data.errors', false);
 	                result.errors = _errors ? _errors : {
 	                  message: [_context4.t0.response]
 	                };
 
-	              case 29:
-	                this.parent._event.emit('loading:end', [action, payload]);
+	              case 30:
+	                if (withLoading) {
+	                  this.parent._event.emit(LOADING_END, [action, payload]);
+	                }
 
 	                if (result.errors) {
-	                  this.parent._event.emit('error', [action, result.errors, payload]);
+	                  this.parent._event.emit(ACTION_ERROR, [action, result.errors, payload]);
 	                } else {
-	                  this.parent._event.emit('success', [action, result.data, payload]);
+	                  this.parent._event.emit(ACTION_SUCCESS, [action, result.data, payload]);
 	                }
 
 	                end = +new Date();
 	                d('info', "Finished doing action [".concat(action, "] in [").concat(end - start, " ms], result:"), result);
 	                return _context4.abrupt("return", result);
 
-	              case 34:
+	              case 35:
 	              case "end":
 	                return _context4.stop();
 	            }
 	          }
-	        }, _callee4, this, [[15, 25]]);
+	        }, _callee4, this, [[16, 26]]);
 	      }));
 
 	      function _call(_x3) {
@@ -1829,8 +1895,12 @@
 	                tokenHandler.remove('token');
 	                tokenHandler.remove('refresh');
 	                d('info', 'User has logout');
+	                return _context3.abrupt("return", {
+	                  errors: errors,
+	                  data: data
+	                });
 
-	              case 11:
+	              case 12:
 	              case "end":
 	                return _context3.stop();
 	            }
@@ -2451,6 +2521,11 @@
 	  return Serpent;
 	}();
 	Serpent.actions = {};
+	/**
+	 * Attach constants to the global object
+	 */
+
+	Serpent.Constants = Constants;
 
 	return Serpent;
 

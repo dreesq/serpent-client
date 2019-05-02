@@ -6,6 +6,7 @@ import Event from './lib/event';
 import Validator from './lib/validator';
 import I18n from './lib/i18n';
 import * as Utils from './lib/utils';
+import * as Constants from './constants';
 
 /**
  * Default options
@@ -103,3 +104,9 @@ export default class Serpent {
  */
 
 Serpent.actions = {};
+
+/**
+ * Attach constants to the global object
+ */
+
+Serpent.Constants = Constants;
