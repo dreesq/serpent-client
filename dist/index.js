@@ -838,36 +838,6 @@
 
 	var createClass = _createClass;
 
-	function _arrayWithoutHoles(arr) {
-	  if (Array.isArray(arr)) {
-	    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) {
-	      arr2[i] = arr[i];
-	    }
-
-	    return arr2;
-	  }
-	}
-
-	var arrayWithoutHoles = _arrayWithoutHoles;
-
-	function _iterableToArray(iter) {
-	  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
-	}
-
-	var iterableToArray = _iterableToArray;
-
-	function _nonIterableSpread() {
-	  throw new TypeError("Invalid attempt to spread non-iterable instance");
-	}
-
-	var nonIterableSpread = _nonIterableSpread;
-
-	function _toConsumableArray(arr) {
-	  return arrayWithoutHoles(arr) || iterableToArray(arr) || nonIterableSpread();
-	}
-
-	var toConsumableArray = _toConsumableArray;
-
 	function _arrayWithHoles(arr) {
 	  if (Array.isArray(arr)) return arr;
 	}
@@ -1060,7 +1030,7 @@
 	  document.body.appendChild(el);
 	  var style = document.createElement('style');
 	  var pref = JSON.parse(localStorage.getItem('debugPanel') || '{}');
-	  style.innerHTML = "\n        #debugPanel {\n            background: #353535;\n            position: absolute;\n            width: 460px;\n            padding: 20px;\n            overflow: auto;\n            word-wrap: normal;\n            color: #fff;\n            height: 250px;\n            overflow-y: auto;\n            overflow-x: hidden;\n            cursor: grab;\n            left: ".concat(pref.left || '20px', ";\n            top: ").concat(pref.top || '20px', ";\n            box-shadow: 0px 0px 8px 1px #000;\n        }\n        \n        #debugPanel .number {\n            color:#b66bb2\n        }\n        \n        #debugPanel .key {\n            color: #619bab;\n        }\n        \n        #debugPanel .string {\n            color:#55c149\n        }\n        \n        #debugPanel .boolean {\n            color:#ff82a4;\n        }\n        \n        #debugPanel .null {\n            color:#ff7477;\n        }\n        \n        #debugPanel::-webkit-scrollbar {\n          width: 5px;\n          height: 12px;\n        }\n        \n        #debugPanel::-webkit-scrollbar-track {\n          background: rgba(0, 0, 0, 0.1);\n        }\n        \n        #debugPanel::-webkit-scrollbar-thumb {\n          background: #ffd457;\n        }\n        \n        #debugPanel .message {\n            display: block;\n            padding: 2px 0;\n            font: 13px Verdana, Arial, sans-serif;\n            white-space: pre;\n        }\n        \n        #debugPanel .info {\n            color: #60f6ff;\n        }\n        \n        #debugPanel .error {\n            color: #ff6b6b;\n        }\n        \n        #debugPanel .log {\n            color: #4cff85;\n        }\n        \n        #debugPanel .object {\n            color: #619bab;\n        }\n    ");
+	  style.innerHTML = "\n        #debugPanel {\n            background: #353535;\n            position: fixed;\n            width: 460px;\n            padding: 20px;\n            overflow: auto;\n            word-wrap: normal;\n            color: #fff;\n            height: 250px;\n            overflow-y: auto;\n            overflow-x: hidden;\n            cursor: grab;\n            left: ".concat(pref.left || '20px', ";\n            top: ").concat(pref.top || '20px', ";\n            box-shadow: 0px 0px 8px 1px rgba(0, 0, 0, 0.59);\n        }\n        \n        #debugPanel .number {\n            color:#b66bb2\n        }\n        \n        #debugPanel .key {\n            color: #619bab;\n        }\n        \n        #debugPanel .string {\n            color:#55c149\n        }\n        \n        #debugPanel .boolean {\n            color:#ff82a4;\n        }\n        \n        #debugPanel .null {\n            color:#ff7477;\n        }\n        \n        #debugPanel::-webkit-scrollbar {\n          width: 5px;\n          height: 12px;\n        }\n        \n        #debugPanel::-webkit-scrollbar-track {\n          background: rgba(0, 0, 0, 0.1);\n        }\n        \n        #debugPanel::-webkit-scrollbar-thumb {\n          background: #ffd457;\n        }\n        \n        #debugPanel .message {\n            display: block;\n            padding: 2px 0;\n            font: 13px Verdana, Arial, sans-serif;\n            white-space: pre;\n        }\n        \n        #debugPanel .info {\n            color: #60f6ff;\n        }\n        \n        #debugPanel .error {\n            color: #ff6b6b;\n        }\n        \n        #debugPanel .log {\n            color: #4cff85;\n        }\n        \n        #debugPanel .object {\n            color: #619bab;\n        }\n    ");
 	  document.head.append(style);
 	  var offset, mousePosition;
 	  var isDown = false;
@@ -1093,7 +1063,6 @@
 
 	  var _loop = function _loop() {
 	    var hook = _hooks[_i];
-	    var logger = console[hook];
 
 	    loggers[hook] = function () {
 	      for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
@@ -1101,18 +1070,6 @@
 	      }
 
 	      var clonedArgs = [].concat(args);
-	      var consoleResult = [];
-
-	      for (var arg in clonedArgs) {
-	        if (_typeof_1(clonedArgs[arg]) === 'object' || Array.isArray(clonedArgs[arg])) {
-	          consoleResult.push.apply(consoleResult, toConsumableArray(colorize(clonedArgs[arg])));
-	          continue;
-	        }
-
-	        consoleResult.push(clonedArgs[arg]);
-	      }
-
-	      logger.apply(void 0, consoleResult);
 	      var message = "<span class=\"message ".concat(hook, "\">");
 	      var _iteratorNormalCompletion = true;
 	      var _didIteratorError = false;
@@ -1120,16 +1077,16 @@
 
 	      try {
 	        for (var _iterator = clonedArgs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	          var _arg = _step.value;
+	          var arg = _step.value;
 
-	          if (_typeof_1(_arg) === 'object' || Array.isArray(_arg)) {
+	          if (_typeof_1(arg) === 'object' || Array.isArray(arg)) {
 	            message += '<span class="object">';
-	            message += colorize(_arg, 'panel');
+	            message += colorize(arg, 'panel');
 	            message += '</span>';
 	            continue;
 	          }
 
-	          message += _arg;
+	          message += arg;
 	        }
 	      } catch (err) {
 	        _didIteratorError = true;
@@ -1956,7 +1913,7 @@
 	      }
 
 	      this.events[event].push(listener);
-	      d('info', "Registering event ".concat(event));
+	      d('info', "Registering event [".concat(event, "]"));
 	      return function () {
 	        return _this.removeListener(event, listener);
 	      };
