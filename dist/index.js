@@ -1169,6 +1169,16 @@
 	  }
 
 	  createClass(Socket, [{
+	    key: "emit",
+	    value: function emit(event, data) {
+	      this.client.emit(event, data);
+	    }
+	  }, {
+	    key: "on",
+	    value: function on(event, handler) {
+	      this.client.on(event, handler);
+	    }
+	  }, {
 	    key: "setup",
 	    value: function setup() {
 	      var _this = this;
@@ -1304,7 +1314,7 @@
 	      var client = this.httpClient.create(options);
 
 	      var onAuthFailed = function onAuthFailed() {
-	        _this.parent._auth.logout();
+	        _this.parent.auth.logout();
 
 	        var fn = Config$1.get('authFailed');
 	        typeof fn === 'function' && fn();
@@ -1585,7 +1595,7 @@
 	                withProgress = data.__progress__, withLoading = data.__loading__, payload = objectWithoutProperties(data, ["__progress__", "__loading__"]);
 
 	                if (withLoading) {
-	                  this.parent._event.emit(LOADING_START, [action, payload]);
+	                  this.parent.events.emit(LOADING_START, [action, payload]);
 	                }
 
 	                start = +new Date();
@@ -1600,7 +1610,7 @@
 	                }
 
 	                _context4.next = 9;
-	                return this.parent._validator.validate(payload, Actions.actions[action]);
+	                return this.parent.validator.validate(payload, Actions.actions[action]);
 
 	              case 9:
 	                errors = _context4.sent;
@@ -1614,11 +1624,10 @@
 	                d('info', "Local validation failed for [".concat(action, "], errors:"), errors);
 
 	                if (withLoading) {
-	                  this.parent._event.emit(LOADING_END, [action, payload]);
+	                  this.parent.events.emit(LOADING_END, [action, payload]);
 	                }
 
-	                this.parent._event.emit(ACTION_ERROR, [action, errors, payload]);
-
+	                this.parent.events.emit(ACTION_ERROR, [action, errors, payload]);
 	                return _context4.abrupt("return", result);
 
 	              case 16:
@@ -1629,13 +1638,13 @@
 	                  config.onUploadProgress = function (e) {
 	                    var percent = Math.floor(e.loaded * 100 / e.total);
 
-	                    _this3.parent._event.emit(ACTION_PROGRESS, [action, percent]);
+	                    _this3.parent.events.emit(ACTION_PROGRESS, [action, percent]);
 	                  };
 
 	                  config.onDownloadProgress = function (e) {
 	                    var percent = Math.floor(e.loaded * 100 / e.total);
 
-	                    _this3.parent._event.emit(ACTION_PROGRESS, [action, percent]);
+	                    _this3.parent.events.emit(ACTION_PROGRESS, [action, percent]);
 	                  };
 	                }
 
@@ -1665,13 +1674,13 @@
 
 	              case 30:
 	                if (withLoading) {
-	                  this.parent._event.emit(LOADING_END, [action, payload]);
+	                  this.parent.events.emit(LOADING_END, [action, payload]);
 	                }
 
 	                if (result.errors) {
-	                  this.parent._event.emit(ACTION_ERROR, [action, result.errors, payload]);
+	                  this.parent.events.emit(ACTION_ERROR, [action, result.errors, payload]);
 	                } else {
-	                  this.parent._event.emit(ACTION_SUCCESS, [action, result.data, payload]);
+	                  this.parent.events.emit(ACTION_SUCCESS, [action, result.data, payload]);
 	                }
 
 	                end = +new Date();
@@ -1919,16 +1928,38 @@
 	      };
 	    }
 	  }, {
+	    key: "multi",
+	    value: function multi(events) {
+	      var listeners = [];
+
+	      for (var k in events) {
+	        listeners.push(this.on(k, events[k]));
+	      }
+
+	      return {
+	        unbind: function unbind() {
+	          listeners.map(function (remove) {
+	            return remove();
+	          });
+	        }
+	      };
+	    }
+	  }, {
 	    key: "removeListener",
 	    value: function removeListener(event, listener) {
 	      if (_typeof_1(this.events[event]) !== 'object') {
 	        return;
 	      }
 
-	      var idx = this.events[event].indexOf(listener);
+	      if (!listener) {
+	        this.events[event] = [];
+	        return;
+	      }
 
-	      if (idx > -1) {
-	        this.events[event].splice(idx, 1);
+	      var i = this.events[event].indexOf(listener);
+
+	      if (i > -1) {
+	        this.events[event].splice(i, 1);
 	      }
 	    }
 	  }, {
@@ -2109,7 +2140,7 @@
 
 	              case 5:
 	                translate = function translate(x) {
-	                  return Config$1.get('i18n') ? _this.parent._i18n.t(x.message, {
+	                  return Config$1.get('i18n') ? _this.parent.i18n.t(x.message, {
 	                    field: inputKey,
 	                    value: inputValue,
 	                    options: x.options
@@ -2419,20 +2450,20 @@
 	          while (1) {
 	            switch (_context.prev = _context.next) {
 	              case 0:
-	                this._event = new Event();
-	                this._auth = new Auth(this);
-	                this._actions = new Actions(this, Config$1.get('axios'));
-	                this._socket = new Socket(this, Config$1.get('sio'));
-	                this._i18n = new I18n(this);
-	                this._validator = new Validator(this);
-	                this._utils = Utils;
-	                this._config = Config$1;
+	                this.events = new Event();
+	                this.auth = new Auth(this);
+	                this.actions = new Actions(this, Config$1.get('axios'));
+	                this.socket = new Socket(this, Config$1.get('sio'));
+	                this.i18n = new I18n(this);
+	                this.validator = new Validator(this);
+	                this.utils = Utils;
+	                this.config = Config$1;
 	                _context.next = 10;
-	                return this._actions.setup();
+	                return this.actions.setup();
 
 	              case 10:
 	                _context.next = 12;
-	                return this._i18n.setup();
+	                return this.i18n.setup();
 
 	              case 12:
 	                typeof this.onReady === 'function' && this.onReady();
@@ -2471,7 +2502,7 @@
 	  }, {
 	    key: "call",
 	    value: function call(action, payload) {
-	      return this._actions._call(action, payload);
+	      return this.actions._call(action, payload);
 	    }
 	  }]);
 

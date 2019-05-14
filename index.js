@@ -62,18 +62,19 @@ export default class Serpent {
       */
 
      async setup() {
-          this._event = new Event();
-          this._auth = new Auth(this);
-          this._actions = new Actions(this, Config.get('axios'));
-          this._socket = new Socket(this, Config.get('sio'));
-          this._i18n = new I18n(this);
-          this._validator = new Validator(this);
+          this.events = new Event();
+          this.auth = new Auth(this);
+          this.actions = new Actions(this, Config.get('axios'));
+          this.socket = new Socket(this, Config.get('sio'));
+          this.i18n = new I18n(this);
+          this.validator = new Validator(this);
 
-          this._utils = Utils;
-          this._config = Config;
+          this.utils = Utils;
+          this.config = Config;
 
-          await this._actions.setup();
-          await this._i18n.setup();
+          await this.actions.setup();
+          await this.i18n.setup();
+
           typeof this.onReady === 'function' && this.onReady();
      }
 
@@ -94,7 +95,7 @@ export default class Serpent {
       */
 
      call(action, payload) {
-          return this._actions._call(action, payload);
+          return this.actions._call(action, payload);
      }
 }
 
