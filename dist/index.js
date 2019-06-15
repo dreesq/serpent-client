@@ -921,14 +921,14 @@
 	    return log.apply(void 0, args);
 	  }
 
-	  log('|| Start');
+	  loggers.warn('\n');
 
 	  for (var arg in args) {
 	    var current = args[arg];
 	    log(current);
 	  }
 
-	  log('|| End');
+	  loggers.warn('\n');
 	};
 	/**
 	 * Parse template helper
@@ -1030,7 +1030,7 @@
 	  document.body.appendChild(el);
 	  var style = document.createElement('style');
 	  var pref = JSON.parse(localStorage.getItem('debugPanel') || '{}');
-	  style.innerHTML = "\n        #debugPanel {\n            background: #353535;\n            position: fixed;\n            width: 460px;\n            padding: 20px;\n            overflow: auto;\n            word-wrap: normal;\n            color: #fff;\n            height: 250px;\n            overflow-y: auto;\n            overflow-x: hidden;\n            cursor: grab;\n            left: ".concat(pref.left || '20px', ";\n            top: ").concat(pref.top || '20px', ";\n            box-shadow: 0px 0px 8px 1px rgba(0, 0, 0, 0.59);\n        }\n        \n        #debugPanel .number {\n            color:#b66bb2\n        }\n        \n        #debugPanel .key {\n            color: #619bab;\n        }\n        \n        #debugPanel .string {\n            color:#55c149\n        }\n        \n        #debugPanel .boolean {\n            color:#ff82a4;\n        }\n        \n        #debugPanel .null {\n            color:#ff7477;\n        }\n        \n        #debugPanel::-webkit-scrollbar {\n          width: 5px;\n          height: 12px;\n        }\n        \n        #debugPanel::-webkit-scrollbar-track {\n          background: rgba(0, 0, 0, 0.1);\n        }\n        \n        #debugPanel::-webkit-scrollbar-thumb {\n          background: #ffd457;\n        }\n        \n        #debugPanel .message {\n            display: block;\n            padding: 2px 0;\n            font: 13px Verdana, Arial, sans-serif;\n            white-space: pre;\n        }\n        \n        #debugPanel .info {\n            color: #60f6ff;\n        }\n        \n        #debugPanel .error {\n            color: #ff6b6b;\n        }\n        \n        #debugPanel .log {\n            color: #4cff85;\n        }\n        \n        #debugPanel .object {\n            color: #619bab;\n        }\n    ");
+	  style.innerHTML = "\n        #debugPanel {\n            background: #1d1d1d;\n            position: fixed;\n            width: 460px;\n            padding: 20px;\n            overflow: auto;\n            word-wrap: normal;\n            border-radius: 4px;\n            box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);\n            color: #fff;\n            min-height: 120px;\n            max-height: 250px;\n            overflow-y: auto;\n            overflow-x: hidden;\n            cursor: grab;\n            left: ".concat(pref.left || '20px', ";\n            top: ").concat(pref.top || '20px', ";\n            font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n        }\n        \n        #debugPanel .number {\n            color:#b66bb2\n        }\n        \n        #debugPanel .key {\n            color: #619bab;\n        }\n        \n        #debugPanel .string {\n            color:#55c149\n        }\n        \n        #debugPanel .boolean {\n            color:#ff82a4;\n        }\n        \n        #debugPanel .null {\n            color:#ff7477;\n        }\n        \n        #debugPanel::-webkit-scrollbar {\n          width: 5px;\n          height: 12px;\n        }\n        \n        #debugPanel::-webkit-scrollbar-track {\n          background: rgba(0, 0, 0, 0.1);\n        }\n        \n        #debugPanel::-webkit-scrollbar-thumb {\n          background: #ffd457;\n        }\n        \n        #debugPanel .message {\n            display: block;\n            padding: 2px 0;\n            font: 13px Verdana, Arial, sans-serif;\n            white-space: pre-wrap;\n        }\n        \n        #debugPanel .info {\n            color: #00c5b5;\n        }\n        \n        #debugPanel .error {\n            color: #ff6b6b;\n        }\n        \n        #debugPanel .log {\n            color: #4cff85;\n        }\n        \n        #debugPanel .object {\n            color: #619bab;\n        }\n    ");
 	  document.head.append(style);
 	  var offset, mousePosition;
 	  var isDown = false;
@@ -1117,6 +1117,8 @@
 	    var logger = loggers.error ? loggers.error : console.error;
 	    logger.error("Error: ".concat(message, ", ").concat(url, ": ").concat(line));
 	  };
+
+	  d('info', "\uD83D\uDC0D Welcome to (serpent@1.0.1)");
 	};
 
 	var Utils = /*#__PURE__*/Object.freeze({
@@ -1556,6 +1558,270 @@
 	      return setup;
 	    }()
 	    /**
+	     * Calls a batched request
+	     */
+
+	  }, {
+	    key: "batch",
+	    value: function () {
+	      var _batch = asyncToGenerator(
+	      /*#__PURE__*/
+	      regenerator.mark(function _callee4() {
+	        var _this3 = this;
+
+	        var actions,
+	            extra,
+	            result,
+	            names,
+	            start,
+	            form,
+	            withProgress,
+	            withLoading,
+	            finishTransaction,
+	            action,
+	            payload,
+	            errors,
+	            config,
+	            _ref6,
+	            actionResults,
+	            _iteratorNormalCompletion,
+	            _didIteratorError,
+	            _iteratorError,
+	            _iterator,
+	            _step,
+	            actionResult,
+	            _action,
+	            data,
+	            _errors,
+	            _args4 = arguments;
+
+	        return regenerator.wrap(function _callee4$(_context4) {
+	          while (1) {
+	            switch (_context4.prev = _context4.next) {
+	              case 0:
+	                actions = _args4.length > 0 && _args4[0] !== undefined ? _args4[0] : {};
+	                extra = _args4.length > 1 && _args4[1] !== undefined ? _args4[1] : {};
+	                result = {
+	                  errors: false,
+	                  data: false
+	                };
+	                names = Object.keys(actions).join(', ');
+	                start = +new Date();
+	                d('info', "Doing batched action [".concat(names, "]."));
+	                form = [];
+	                withProgress = extra.__progress__, withLoading = extra.__loading__;
+
+	                finishTransaction = function finishTransaction() {
+	                  if (withLoading) {
+	                    _this3.parent.events.emit(LOADING_END, []);
+	                  }
+
+	                  if (result.errors) {
+	                    for (var key in Object.keys(result.errors)) {
+	                      _this3.parent.events.emit(ACTION_ERROR, [key, result.errors[key], actions[key]]);
+	                    }
+	                  } else {
+	                    for (var _key in Object.keys(result.data)) {
+	                      _this3.parent.events.emit(ACTION_ERROR, [_key, result.data[_key], actions[_key]]);
+	                    }
+	                  }
+
+	                  var end = +new Date();
+	                  d('info', "Finished doing batch action [".concat(names, "] in [").concat(end - start, " ms], result:"), result);
+	                  return result;
+	                };
+
+	                _context4.t0 = regenerator.keys(actions);
+
+	              case 10:
+	                if ((_context4.t1 = _context4.t0()).done) {
+	                  _context4.next = 25;
+	                  break;
+	                }
+
+	                action = _context4.t1.value;
+	                payload = actions[action];
+
+	                if (!(Actions.actions[action] && Object.keys(Actions.actions[action]).length)) {
+	                  _context4.next = 22;
+	                  break;
+	                }
+
+	                _context4.next = 16;
+	                return this.parent.validator.validate(payload, Actions.actions[action]);
+
+	              case 16:
+	                errors = _context4.sent;
+
+	                if (!Object.keys(errors).length) {
+	                  _context4.next = 22;
+	                  break;
+	                }
+
+	                if (!result.errors) {
+	                  result.errors = {};
+	                }
+
+	                result.errors[action] = errors;
+	                d('info', "Local validation failed for [".concat(action, "], errors:"), errors);
+	                return _context4.abrupt("continue", 10);
+
+	              case 22:
+	                form.push([action, payload]);
+	                _context4.next = 10;
+	                break;
+
+	              case 25:
+	                if (form.length) {
+	                  _context4.next = 27;
+	                  break;
+	                }
+
+	                return _context4.abrupt("return", finishTransaction());
+
+	              case 27:
+	                _context4.prev = 27;
+	                config = {};
+
+	                if (withProgress) {
+	                  config.onUploadProgress = function (e) {
+	                    var percent = Math.floor(e.loaded * 100 / e.total);
+
+	                    _this3.parent.events.emit(ACTION_PROGRESS, [names, percent]);
+	                  };
+
+	                  config.onDownloadProgress = function (e) {
+	                    var percent = Math.floor(e.loaded * 100 / e.total);
+
+	                    _this3.parent.events.emit(ACTION_PROGRESS, [names, percent]);
+	                  };
+	                }
+
+	                _context4.next = 32;
+	                return this.parent.http.post(Config$1.get('handler'), form, config);
+
+	              case 32:
+	                _ref6 = _context4.sent;
+	                actionResults = _ref6.data;
+
+	                if (Array.isArray(actionResults)) {
+	                  _context4.next = 38;
+	                  break;
+	                }
+
+	                result.errors = {
+	                  message: ['Unexpected API response']
+	                };
+	                _context4.next = 70;
+	                break;
+
+	              case 38:
+	                _iteratorNormalCompletion = true;
+	                _didIteratorError = false;
+	                _iteratorError = undefined;
+	                _context4.prev = 41;
+	                _iterator = actionResults[Symbol.iterator]();
+
+	              case 43:
+	                if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+	                  _context4.next = 56;
+	                  break;
+	                }
+
+	                actionResult = _step.value;
+	                _action = Object.keys(actionResult)[0];
+	                data = actionResult[_action];
+
+	                if (!actionResult[_action].errors) {
+	                  _context4.next = 51;
+	                  break;
+	                }
+
+	                if (!result.errors) {
+	                  result.errors = {};
+	                }
+
+	                result.errors[_action] = actionResult[_action].errors;
+	                return _context4.abrupt("continue", 53);
+
+	              case 51:
+	                if (!result.data) {
+	                  result.data = {};
+	                }
+
+	                result.data[_action] = data;
+
+	              case 53:
+	                _iteratorNormalCompletion = true;
+	                _context4.next = 43;
+	                break;
+
+	              case 56:
+	                _context4.next = 62;
+	                break;
+
+	              case 58:
+	                _context4.prev = 58;
+	                _context4.t2 = _context4["catch"](41);
+	                _didIteratorError = true;
+	                _iteratorError = _context4.t2;
+
+	              case 62:
+	                _context4.prev = 62;
+	                _context4.prev = 63;
+
+	                if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+	                  _iterator["return"]();
+	                }
+
+	              case 65:
+	                _context4.prev = 65;
+
+	                if (!_didIteratorError) {
+	                  _context4.next = 68;
+	                  break;
+	                }
+
+	                throw _iteratorError;
+
+	              case 68:
+	                return _context4.finish(65);
+
+	              case 69:
+	                return _context4.finish(62);
+
+	              case 70:
+	                _context4.next = 76;
+	                break;
+
+	              case 72:
+	                _context4.prev = 72;
+	                _context4.t3 = _context4["catch"](27);
+	                _errors = get(_context4.t3, 'response.data.errors', false);
+	                result.errors = {
+	                  other: _errors ? _errors : {
+	                    message: [_context4.t3.response]
+	                  }
+	                };
+
+	              case 76:
+	                return _context4.abrupt("return", finishTransaction());
+
+	              case 77:
+	              case "end":
+	                return _context4.stop();
+	            }
+	          }
+	        }, _callee4, this, [[27, 72], [41, 58, 62, 70], [63,, 65, 69]]);
+	      }));
+
+	      function batch() {
+	        return _batch.apply(this, arguments);
+	      }
+
+	      return batch;
+	    }()
+	    /**
 	     * Call an action
 	     * @returns
 	     * @private
@@ -1566,8 +1832,8 @@
 	    value: function () {
 	      var _call2 = asyncToGenerator(
 	      /*#__PURE__*/
-	      regenerator.mark(function _callee4(action) {
-	        var _this3 = this;
+	      regenerator.mark(function _callee5(action) {
+	        var _this4 = this;
 
 	        var data,
 	            result,
@@ -1577,17 +1843,17 @@
 	            start,
 	            errors,
 	            config,
-	            _ref6,
+	            _ref7,
 	            _data,
-	            _errors,
+	            _errors2,
 	            end,
-	            _args4 = arguments;
+	            _args5 = arguments;
 
-	        return regenerator.wrap(function _callee4$(_context4) {
+	        return regenerator.wrap(function _callee5$(_context5) {
 	          while (1) {
-	            switch (_context4.prev = _context4.next) {
+	            switch (_context5.prev = _context5.next) {
 	              case 0:
-	                data = _args4.length > 1 && _args4[1] !== undefined ? _args4[1] : {};
+	                data = _args5.length > 1 && _args5[1] !== undefined ? _args5[1] : {};
 	                result = {
 	                  errors: false,
 	                  data: false
@@ -1605,18 +1871,18 @@
 	                 */
 
 	                if (!(Actions.actions[action] && Object.keys(Actions.actions[action]).length)) {
-	                  _context4.next = 16;
+	                  _context5.next = 16;
 	                  break;
 	                }
 
-	                _context4.next = 9;
+	                _context5.next = 9;
 	                return this.parent.validator.validate(payload, Actions.actions[action]);
 
 	              case 9:
-	                errors = _context4.sent;
+	                errors = _context5.sent;
 
 	                if (!Object.keys(errors).length) {
-	                  _context4.next = 16;
+	                  _context5.next = 16;
 	                  break;
 	                }
 
@@ -1628,32 +1894,32 @@
 	                }
 
 	                this.parent.events.emit(ACTION_ERROR, [action, errors, payload]);
-	                return _context4.abrupt("return", result);
+	                return _context5.abrupt("return", result);
 
 	              case 16:
-	                _context4.prev = 16;
+	                _context5.prev = 16;
 	                config = {};
 
 	                if (typeof FormData !== 'undefined' && payload instanceof FormData && withProgress) {
 	                  config.onUploadProgress = function (e) {
 	                    var percent = Math.floor(e.loaded * 100 / e.total);
 
-	                    _this3.parent.events.emit(ACTION_PROGRESS, [action, percent]);
+	                    _this4.parent.events.emit(ACTION_PROGRESS, [action, percent]);
 	                  };
 
 	                  config.onDownloadProgress = function (e) {
 	                    var percent = Math.floor(e.loaded * 100 / e.total);
 
-	                    _this3.parent.events.emit(ACTION_PROGRESS, [action, percent]);
+	                    _this4.parent.events.emit(ACTION_PROGRESS, [action, percent]);
 	                  };
 	                }
 
-	                _context4.next = 21;
+	                _context5.next = 21;
 	                return this.parent.http.post(Config$1.get('handler'), [action, payload], config);
 
 	              case 21:
-	                _ref6 = _context4.sent;
-	                _data = _ref6.data;
+	                _ref7 = _context5.sent;
+	                _data = _ref7.data;
 
 	                if (_data && _data.errors) {
 	                  result.errors = _data.errors;
@@ -1661,15 +1927,15 @@
 	                  result.data = _data;
 	                }
 
-	                _context4.next = 30;
+	                _context5.next = 30;
 	                break;
 
 	              case 26:
-	                _context4.prev = 26;
-	                _context4.t0 = _context4["catch"](16);
-	                _errors = get(_context4.t0, 'response.data.errors', false);
-	                result.errors = _errors ? _errors : {
-	                  message: [_context4.t0.response]
+	                _context5.prev = 26;
+	                _context5.t0 = _context5["catch"](16);
+	                _errors2 = get(_context5.t0, 'response.data.errors', false);
+	                result.errors = _errors2 ? _errors2 : {
+	                  message: [_context5.t0.response]
 	                };
 
 	              case 30:
@@ -1685,14 +1951,14 @@
 
 	                end = +new Date();
 	                d('info', "Finished doing action [".concat(action, "] in [").concat(end - start, " ms], result:"), result);
-	                return _context4.abrupt("return", result);
+	                return _context5.abrupt("return", result);
 
 	              case 35:
 	              case "end":
-	                return _context4.stop();
+	                return _context5.stop();
 	            }
 	          }
-	        }, _callee4, this, [[16, 26]]);
+	        }, _callee5, this, [[16, 26]]);
 	      }));
 
 	      function _call(_x3) {
@@ -1850,10 +2116,24 @@
 	              case 0:
 	                d('info', 'Attempting to logout');
 	                tokenHandler = Config$1.get('tokenHandler');
-	                _context3.next = 4;
-	                return this.parent.logout();
+
+	                if (tokenHandler.get('token')) {
+	                  _context3.next = 4;
+	                  break;
+	                }
+
+	                return _context3.abrupt("return", {
+	                  data: {
+	                    success: true
+	                  },
+	                  errors: false
+	                });
 
 	              case 4:
+	                _context3.next = 6;
+	                return this.parent.logout();
+
+	              case 6:
 	                _ref3 = _context3.sent;
 	                errors = _ref3.errors;
 	                data = _ref3.data;
@@ -1866,7 +2146,7 @@
 	                  data: data
 	                });
 
-	              case 12:
+	              case 14:
 	              case "end":
 	                return _context3.stop();
 	            }
