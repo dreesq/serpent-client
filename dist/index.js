@@ -1442,8 +1442,7 @@
 	                _context3.prev = 12;
 	                _context3.t0 = _context3["catch"](4);
 	                d('error', 'Could not load actions list.');
-
-	                this.parent._event.emit(ACTION_ERROR, ['init', _context3.t0]);
+	                this.parent.events.emit(ACTION_ERROR, ['init', _context3.t0]);
 
 	              case 16:
 	                Actions.actions = data;
@@ -1557,17 +1556,88 @@
 
 	      return setup;
 	    }()
+	  }, {
+	    key: "_configAction",
+	    value: function _configAction() {
+	      var _this3 = this;
+
+	      var withProgress = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+	      var name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+	      var config = {};
+
+	      if (withProgress) {
+	        config.onUploadProgress = function (e) {
+	          var percent = Math.floor(e.loaded * 100 / e.total);
+
+	          _this3.parent.events.emit(ACTION_PROGRESS, [name, percent]);
+	        };
+
+	        config.onDownloadProgress = function (e) {
+	          var percent = Math.floor(e.loaded * 100 / e.total);
+
+	          _this3.parent.events.emit(ACTION_PROGRESS, [name, percent]);
+	        };
+	      }
+
+	      return config;
+	    }
+	  }, {
+	    key: "_validateAction",
+	    value: function () {
+	      var _validateAction2 = asyncToGenerator(
+	      /*#__PURE__*/
+	      regenerator.mark(function _callee4(action, payload) {
+	        var result, errors;
+	        return regenerator.wrap(function _callee4$(_context4) {
+	          while (1) {
+	            switch (_context4.prev = _context4.next) {
+	              case 0:
+	                result = false;
+
+	                if (!(Actions.actions[action] && Object.keys(Actions.actions[action]).length)) {
+	                  _context4.next = 6;
+	                  break;
+	                }
+
+	                _context4.next = 4;
+	                return this.parent.validator.validate(payload, Actions.actions[action]);
+
+	              case 4:
+	                errors = _context4.sent;
+
+	                if (Object.keys(errors).length) {
+	                  result = errors;
+	                  d('info', "Local validation failed for [".concat(action, "], errors:"), errors);
+	                }
+
+	              case 6:
+	                return _context4.abrupt("return", result);
+
+	              case 7:
+	              case "end":
+	                return _context4.stop();
+	            }
+	          }
+	        }, _callee4, this);
+	      }));
+
+	      function _validateAction(_x3, _x4) {
+	        return _validateAction2.apply(this, arguments);
+	      }
+
+	      return _validateAction;
+	    }()
+	  }, {
+	    key: "batch",
+
 	    /**
 	     * Calls a batched request
 	     */
-
-	  }, {
-	    key: "batch",
 	    value: function () {
 	      var _batch = asyncToGenerator(
 	      /*#__PURE__*/
-	      regenerator.mark(function _callee4() {
-	        var _this3 = this;
+	      regenerator.mark(function _callee5() {
+	        var _this4 = this;
 
 	        var actions,
 	            extra,
@@ -1581,7 +1651,6 @@
 	            action,
 	            payload,
 	            errors,
-	            config,
 	            _ref6,
 	            actionResults,
 	            _iteratorNormalCompletion,
@@ -1593,14 +1662,14 @@
 	            _action,
 	            data,
 	            _errors,
-	            _args4 = arguments;
+	            _args5 = arguments;
 
-	        return regenerator.wrap(function _callee4$(_context4) {
+	        return regenerator.wrap(function _callee5$(_context5) {
 	          while (1) {
-	            switch (_context4.prev = _context4.next) {
+	            switch (_context5.prev = _context5.next) {
 	              case 0:
-	                actions = _args4.length > 0 && _args4[0] !== undefined ? _args4[0] : {};
-	                extra = _args4.length > 1 && _args4[1] !== undefined ? _args4[1] : {};
+	                actions = _args5.length > 0 && _args5[0] !== undefined ? _args5[0] : {};
+	                extra = _args5.length > 1 && _args5[1] !== undefined ? _args5[1] : {};
 	                result = {
 	                  errors: false,
 	                  data: false
@@ -1613,16 +1682,16 @@
 
 	                finishTransaction = function finishTransaction() {
 	                  if (withLoading) {
-	                    _this3.parent.events.emit(LOADING_END, []);
+	                    _this4.parent.events.emit(LOADING_END, []);
 	                  }
 
 	                  if (result.errors) {
 	                    for (var key in Object.keys(result.errors)) {
-	                      _this3.parent.events.emit(ACTION_ERROR, [key, result.errors[key], actions[key]]);
+	                      _this4.parent.events.emit(ACTION_ERROR, [key, result.errors[key], actions[key]]);
 	                    }
 	                  } else {
 	                    for (var _key in Object.keys(result.data)) {
-	                      _this3.parent.events.emit(ACTION_ERROR, [_key, result.data[_key], actions[_key]]);
+	                      _this4.parent.events.emit(ACTION_ERROR, [_key, result.data[_key], actions[_key]]);
 	                    }
 	                  }
 
@@ -1631,30 +1700,24 @@
 	                  return result;
 	                };
 
-	                _context4.t0 = regenerator.keys(actions);
+	                _context5.t0 = regenerator.keys(actions);
 
 	              case 10:
-	                if ((_context4.t1 = _context4.t0()).done) {
-	                  _context4.next = 25;
+	                if ((_context5.t1 = _context5.t0()).done) {
+	                  _context5.next = 23;
 	                  break;
 	                }
 
-	                action = _context4.t1.value;
+	                action = _context5.t1.value;
 	                payload = actions[action];
+	                _context5.next = 15;
+	                return this._validateAction(action, payload);
 
-	                if (!(Actions.actions[action] && Object.keys(Actions.actions[action]).length)) {
-	                  _context4.next = 22;
-	                  break;
-	                }
+	              case 15:
+	                errors = _context5.sent;
 
-	                _context4.next = 16;
-	                return this.parent.validator.validate(payload, Actions.actions[action]);
-
-	              case 16:
-	                errors = _context4.sent;
-
-	                if (!Object.keys(errors).length) {
-	                  _context4.next = 22;
+	                if (!errors) {
+	                  _context5.next = 20;
 	                  break;
 	                }
 
@@ -1663,68 +1726,53 @@
 	                }
 
 	                result.errors[action] = errors;
-	                d('info', "Local validation failed for [".concat(action, "], errors:"), errors);
-	                return _context4.abrupt("continue", 10);
+	                return _context5.abrupt("continue", 10);
 
-	              case 22:
+	              case 20:
 	                form.push([action, payload]);
-	                _context4.next = 10;
+	                _context5.next = 10;
 	                break;
 
-	              case 25:
+	              case 23:
 	                if (form.length) {
-	                  _context4.next = 27;
+	                  _context5.next = 25;
 	                  break;
 	                }
 
-	                return _context4.abrupt("return", finishTransaction());
+	                return _context5.abrupt("return", finishTransaction());
 
-	              case 27:
-	                _context4.prev = 27;
-	                config = {};
+	              case 25:
+	                _context5.prev = 25;
+	                _context5.next = 28;
+	                return this.parent.http.post(Config$1.get('handler'), form, this._configAction(withProgress, names));
 
-	                if (withProgress) {
-	                  config.onUploadProgress = function (e) {
-	                    var percent = Math.floor(e.loaded * 100 / e.total);
-
-	                    _this3.parent.events.emit(ACTION_PROGRESS, [names, percent]);
-	                  };
-
-	                  config.onDownloadProgress = function (e) {
-	                    var percent = Math.floor(e.loaded * 100 / e.total);
-
-	                    _this3.parent.events.emit(ACTION_PROGRESS, [names, percent]);
-	                  };
-	                }
-
-	                _context4.next = 32;
-	                return this.parent.http.post(Config$1.get('handler'), form, config);
-
-	              case 32:
-	                _ref6 = _context4.sent;
+	              case 28:
+	                _ref6 = _context5.sent;
 	                actionResults = _ref6.data;
 
 	                if (Array.isArray(actionResults)) {
-	                  _context4.next = 38;
+	                  _context5.next = 34;
 	                  break;
 	                }
 
 	                result.errors = {
-	                  message: ['Unexpected API response']
+	                  other: {
+	                    message: ['Unexpected API response']
+	                  }
 	                };
-	                _context4.next = 70;
+	                _context5.next = 66;
 	                break;
 
-	              case 38:
+	              case 34:
 	                _iteratorNormalCompletion = true;
 	                _didIteratorError = false;
 	                _iteratorError = undefined;
-	                _context4.prev = 41;
+	                _context5.prev = 37;
 	                _iterator = actionResults[Symbol.iterator]();
 
-	              case 43:
+	              case 39:
 	                if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-	                  _context4.next = 56;
+	                  _context5.next = 52;
 	                  break;
 	                }
 
@@ -1733,7 +1781,7 @@
 	                data = actionResult[_action];
 
 	                if (!actionResult[_action].errors) {
-	                  _context4.next = 51;
+	                  _context5.next = 47;
 	                  break;
 	                }
 
@@ -1742,77 +1790,77 @@
 	                }
 
 	                result.errors[_action] = actionResult[_action].errors;
-	                return _context4.abrupt("continue", 53);
+	                return _context5.abrupt("continue", 49);
 
-	              case 51:
+	              case 47:
 	                if (!result.data) {
 	                  result.data = {};
 	                }
 
 	                result.data[_action] = data;
 
-	              case 53:
+	              case 49:
 	                _iteratorNormalCompletion = true;
-	                _context4.next = 43;
+	                _context5.next = 39;
 	                break;
 
-	              case 56:
-	                _context4.next = 62;
+	              case 52:
+	                _context5.next = 58;
 	                break;
+
+	              case 54:
+	                _context5.prev = 54;
+	                _context5.t2 = _context5["catch"](37);
+	                _didIteratorError = true;
+	                _iteratorError = _context5.t2;
 
 	              case 58:
-	                _context4.prev = 58;
-	                _context4.t2 = _context4["catch"](41);
-	                _didIteratorError = true;
-	                _iteratorError = _context4.t2;
-
-	              case 62:
-	                _context4.prev = 62;
-	                _context4.prev = 63;
+	                _context5.prev = 58;
+	                _context5.prev = 59;
 
 	                if (!_iteratorNormalCompletion && _iterator["return"] != null) {
 	                  _iterator["return"]();
 	                }
 
-	              case 65:
-	                _context4.prev = 65;
+	              case 61:
+	                _context5.prev = 61;
 
 	                if (!_didIteratorError) {
-	                  _context4.next = 68;
+	                  _context5.next = 64;
 	                  break;
 	                }
 
 	                throw _iteratorError;
 
-	              case 68:
-	                return _context4.finish(65);
+	              case 64:
+	                return _context5.finish(61);
 
-	              case 69:
-	                return _context4.finish(62);
+	              case 65:
+	                return _context5.finish(58);
 
-	              case 70:
-	                _context4.next = 76;
+	              case 66:
+	                _context5.next = 72;
 	                break;
 
-	              case 72:
-	                _context4.prev = 72;
-	                _context4.t3 = _context4["catch"](27);
-	                _errors = get(_context4.t3, 'response.data.errors', false);
+	              case 68:
+	                _context5.prev = 68;
+	                _context5.t3 = _context5["catch"](25);
+	                _errors = get(_context5.t3, 'response.data.errors', false);
 	                result.errors = {
 	                  other: _errors ? _errors : {
-	                    message: [_context4.t3.response]
+	                    message: [_context5.t3.response]
 	                  }
 	                };
 
-	              case 76:
-	                return _context4.abrupt("return", finishTransaction());
+	              case 72:
+	                return _context5.abrupt("return", finishTransaction());
 
-	              case 77:
+	              case 73:
 	              case "end":
-	                return _context4.stop();
+	                return _context5.stop();
 	            }
 	          }
-	        }, _callee4, this, [[27, 72], [41, 58, 62, 70], [63,, 65, 69]]);
+	        }, _callee5, this, [[25, 68], [37, 54, 58, 66], [59,, 61, 65]]);
 	      }));
 
 	      function batch() {
@@ -1832,8 +1880,8 @@
 	    value: function () {
 	      var _call2 = asyncToGenerator(
 	      /*#__PURE__*/
-	      regenerator.mark(function _callee5(action) {
-	        var _this4 = this;
+	      regenerator.mark(function _callee6(action) {
+	        var _this5 = this;
 
 	        var data,
 	            result,
@@ -1841,19 +1889,18 @@
 	            withLoading,
 	            payload,
 	            start,
+	            finishTransaction,
 	            errors,
-	            config,
 	            _ref7,
 	            _data,
 	            _errors2,
-	            end,
-	            _args5 = arguments;
+	            _args6 = arguments;
 
-	        return regenerator.wrap(function _callee5$(_context5) {
+	        return regenerator.wrap(function _callee6$(_context6) {
 	          while (1) {
-	            switch (_context5.prev = _context5.next) {
+	            switch (_context6.prev = _context6.next) {
 	              case 0:
-	                data = _args5.length > 1 && _args5[1] !== undefined ? _args5[1] : {};
+	                data = _args6.length > 1 && _args6[1] !== undefined ? _args6[1] : {};
 	                result = {
 	                  errors: false,
 	                  data: false
@@ -1866,59 +1913,49 @@
 
 	                start = +new Date();
 	                d('info', "Doing action [".concat(action, "], sent payload:"), payload);
+
+	                finishTransaction = function finishTransaction() {
+	                  if (withLoading) {
+	                    _this5.parent.events.emit(LOADING_END, [action, payload]);
+	                  }
+
+	                  if (result.errors) {
+	                    _this5.parent.events.emit(ACTION_ERROR, [action, result.errors, payload]);
+	                  } else {
+	                    _this5.parent.events.emit(ACTION_SUCCESS, [action, result.data, payload]);
+	                  }
+
+	                  var end = +new Date();
+	                  d('info', "Finished doing action [".concat(action, "] in [").concat(end - start, " ms], result:"), result);
+	                  return result;
+	                };
 	                /**
 	                 * Do client side validation
 	                 */
 
-	                if (!(Actions.actions[action] && Object.keys(Actions.actions[action]).length)) {
-	                  _context5.next = 16;
-	                  break;
-	                }
 
-	                _context5.next = 9;
-	                return this.parent.validator.validate(payload, Actions.actions[action]);
+	                _context6.next = 9;
+	                return this._validateAction(action, payload);
 
 	              case 9:
-	                errors = _context5.sent;
+	                errors = _context6.sent;
 
-	                if (!Object.keys(errors).length) {
-	                  _context5.next = 16;
+	                if (!errors) {
+	                  _context6.next = 14;
 	                  break;
 	                }
 
 	                result.errors = errors;
 	                d('info', "Local validation failed for [".concat(action, "], errors:"), errors);
+	                return _context6.abrupt("return", finishTransaction());
 
-	                if (withLoading) {
-	                  this.parent.events.emit(LOADING_END, [action, payload]);
-	                }
+	              case 14:
+	                _context6.prev = 14;
+	                _context6.next = 17;
+	                return this.parent.http.post(Config$1.get('handler'), [action, payload], this._configAction(withProgress, action));
 
-	                this.parent.events.emit(ACTION_ERROR, [action, errors, payload]);
-	                return _context5.abrupt("return", result);
-
-	              case 16:
-	                _context5.prev = 16;
-	                config = {};
-
-	                if (typeof FormData !== 'undefined' && payload instanceof FormData && withProgress) {
-	                  config.onUploadProgress = function (e) {
-	                    var percent = Math.floor(e.loaded * 100 / e.total);
-
-	                    _this4.parent.events.emit(ACTION_PROGRESS, [action, percent]);
-	                  };
-
-	                  config.onDownloadProgress = function (e) {
-	                    var percent = Math.floor(e.loaded * 100 / e.total);
-
-	                    _this4.parent.events.emit(ACTION_PROGRESS, [action, percent]);
-	                  };
-	                }
-
-	                _context5.next = 21;
-	                return this.parent.http.post(Config$1.get('handler'), [action, payload], config);
-
-	              case 21:
-	                _ref7 = _context5.sent;
+	              case 17:
+	                _ref7 = _context6.sent;
 	                _data = _ref7.data;
 
 	                if (_data && _data.errors) {
@@ -1927,41 +1964,29 @@
 	                  result.data = _data;
 	                }
 
-	                _context5.next = 30;
+	                _context6.next = 26;
 	                break;
 
-	              case 26:
-	                _context5.prev = 26;
-	                _context5.t0 = _context5["catch"](16);
-	                _errors2 = get(_context5.t0, 'response.data.errors', false);
+	              case 22:
+	                _context6.prev = 22;
+	                _context6.t0 = _context6["catch"](14);
+	                _errors2 = get(_context6.t0, 'response.data.errors', false);
 	                result.errors = _errors2 ? _errors2 : {
-	                  message: [_context5.t0.response]
+	                  message: [_context6.t0.response]
 	                };
 
-	              case 30:
-	                if (withLoading) {
-	                  this.parent.events.emit(LOADING_END, [action, payload]);
-	                }
+	              case 26:
+	                return _context6.abrupt("return", finishTransaction());
 
-	                if (result.errors) {
-	                  this.parent.events.emit(ACTION_ERROR, [action, result.errors, payload]);
-	                } else {
-	                  this.parent.events.emit(ACTION_SUCCESS, [action, result.data, payload]);
-	                }
-
-	                end = +new Date();
-	                d('info', "Finished doing action [".concat(action, "] in [").concat(end - start, " ms], result:"), result);
-	                return _context5.abrupt("return", result);
-
-	              case 35:
+	              case 27:
 	              case "end":
-	                return _context5.stop();
+	                return _context6.stop();
 	            }
 	          }
-	        }, _callee5, this, [[16, 26]]);
+	        }, _callee6, this, [[14, 22]]);
 	      }));
 
-	      function _call(_x3) {
+	      function _call(_x5) {
 	        return _call2.apply(this, arguments);
 	      }
 
