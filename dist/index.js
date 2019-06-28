@@ -1410,41 +1410,63 @@
 	      regenerator.mark(function _callee3() {
 	        var _this2 = this;
 
-	        var http, data, _ref3, actions, _loop, key, _ret;
+	        var actions,
+	            http,
+	            data,
+	            _ref3,
+	            _actions,
+	            _loop,
+	            key,
+	            _ret,
+	            _args3 = arguments;
 
 	        return regenerator.wrap(function _callee3$(_context3) {
 	          while (1) {
 	            switch (_context3.prev = _context3.next) {
 	              case 0:
+	                actions = _args3.length > 0 && _args3[0] !== undefined ? _args3[0] : {};
 	                http = this.parent.http = this.makeHttpClient();
 
 	                if (Config$1.get('actions')) {
-	                  _context3.next = 3;
+	                  _context3.next = 4;
 	                  break;
 	                }
 
 	                return _context3.abrupt("return");
 
-	              case 3:
+	              case 4:
 	                data = {};
-	                _context3.prev = 4;
-	                _context3.next = 7;
+
+	                if (Object.keys(actions).length) {
+	                  _context3.next = 20;
+	                  break;
+	                }
+
+	                _context3.prev = 6;
+	                _context3.next = 9;
 	                return http.get(Config$1.get('actions'));
 
-	              case 7:
+	              case 9:
 	                _ref3 = _context3.sent;
-	                actions = _ref3.data;
-	                data = actions;
-	                _context3.next = 16;
+	                _actions = _ref3.data;
+	                data = _actions;
+	                _context3.next = 18;
 	                break;
 
-	              case 12:
-	                _context3.prev = 12;
-	                _context3.t0 = _context3["catch"](4);
+	              case 14:
+	                _context3.prev = 14;
+	                _context3.t0 = _context3["catch"](6);
 	                d('error', 'Could not load actions list.');
 	                this.parent.events.emit(ACTION_ERROR, ['init', _context3.t0]);
 
-	              case 16:
+	              case 18:
+	                _context3.next = 21;
+	                break;
+
+	              case 20:
+	                data = actions;
+
+	              case 21:
 	                Actions.actions = data;
 
 	                _loop = function _loop(key) {
@@ -1522,9 +1544,9 @@
 
 	                _context3.t1 = regenerator.keys(data);
 
-	              case 19:
+	              case 24:
 	                if ((_context3.t2 = _context3.t1()).done) {
-	                  _context3.next = 26;
+	                  _context3.next = 31;
 	                  break;
 	                }
 
@@ -1532,22 +1554,22 @@
 	                _ret = _loop(key);
 
 	                if (!(_ret === "continue")) {
-	                  _context3.next = 24;
+	                  _context3.next = 29;
 	                  break;
 	                }
 
-	                return _context3.abrupt("continue", 19);
+	                return _context3.abrupt("continue", 24);
 
-	              case 24:
-	                _context3.next = 19;
+	              case 29:
+	                _context3.next = 24;
 	                break;
 
-	              case 26:
+	              case 31:
 	              case "end":
 	                return _context3.stop();
 	            }
 	          }
-	        }, _callee3, this, [[4, 12]]);
+	        }, _callee3, this, [[6, 14]]);
 	      }));
 
 	      function setup() {
@@ -2751,10 +2773,13 @@
 	      var _setup = asyncToGenerator(
 	      /*#__PURE__*/
 	      regenerator.mark(function _callee() {
+	        var actions,
+	            _args = arguments;
 	        return regenerator.wrap(function _callee$(_context) {
 	          while (1) {
 	            switch (_context.prev = _context.next) {
 	              case 0:
+	                actions = _args.length > 0 && _args[0] !== undefined ? _args[0] : {};
 	                this.events = new Event();
 	                this.auth = new Auth(this);
 	                this.actions = new Actions(this, Config$1.get('axios'));
@@ -2763,17 +2788,17 @@
 	                this.validator = new Validator(this);
 	                this.utils = Utils;
 	                this.config = Config$1;
-	                _context.next = 10;
-	                return this.actions.setup();
+	                _context.next = 11;
+	                return this.actions.setup(actions);
 
-	              case 10:
-	                _context.next = 12;
+	              case 11:
+	                _context.next = 13;
 	                return this.i18n.setup();
 
-	              case 12:
+	              case 13:
 	                typeof this.onReady === 'function' && this.onReady();
 
-	              case 13:
+	              case 14:
 	              case "end":
 	                return _context.stop();
 	            }

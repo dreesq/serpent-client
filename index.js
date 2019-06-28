@@ -61,7 +61,7 @@ export default class Serpent {
       * @returns {Promise<void>}
       */
 
-     async setup() {
+     async setup(actions = {}) {
           this.events = new Event();
           this.auth = new Auth(this);
           this.actions = new Actions(this, Config.get('axios'));
@@ -72,7 +72,7 @@ export default class Serpent {
           this.utils = Utils;
           this.config = Config;
 
-          await this.actions.setup();
+          await this.actions.setup(actions);
           await this.i18n.setup();
 
           typeof this.onReady === 'function' && this.onReady();
