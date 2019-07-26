@@ -1119,7 +1119,7 @@
 	  };
 
 	  var logger = loggers.info ? loggers.info : console.info;
-	  logger("\uD83D\uDC0D Welcome to serpent-client@1.7.3\n-----\ndebug: ".concat(Config$1.get('debug'), "  \nendpoint: ").concat(Config$1.get('path'), "\n-----\n    "));
+	  logger("\uD83D\uDC0D Welcome to serpent-client@1.7.5\n-----\ndebug: ".concat(Config$1.get('debug'), "  \nendpoint: ").concat(Config$1.get('path'), "\n-----\n    "));
 	};
 
 	var Utils = /*#__PURE__*/Object.freeze({
@@ -1275,7 +1275,7 @@
 	  function Actions(parent, client) {
 	    classCallCheck(this, Actions);
 
-	    this.actions = {};
+	    this.list = {};
 	    this.parent = parent;
 	    this.httpClient = client;
 	  }
@@ -1407,7 +1407,7 @@
 	  }, {
 	    key: "getAction",
 	    value: function getAction(action) {
-	      return this.actions[action];
+	      return this.list[action];
 	    }
 	  }, {
 	    key: "setup",
@@ -1474,7 +1474,7 @@
 	                data = actions;
 
 	              case 21:
-	                this.actions = data;
+	                this.list = data;
 
 	                _loop = function _loop(key) {
 	                  if (!data.hasOwnProperty(key)) {
@@ -1623,7 +1623,7 @@
 	              case 0:
 	                result = false;
 
-	                if (!(this.actions[action] && Object.keys(this.actions[action]).length)) {
+	                if (!(this.list[action] && Object.keys(this.actions[action]).length)) {
 	                  _context4.next = 6;
 	                  break;
 	                }
