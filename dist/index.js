@@ -1115,10 +1115,11 @@
 
 	  window.onerror = function (message, url, line) {
 	    var logger = loggers.error ? loggers.error : console.error;
-	    logger.error("Error: ".concat(message, ", ").concat(url, ": ").concat(line));
+	    logger("Error: ".concat(message, ", ").concat(url, ": ").concat(line));
 	  };
 
-	  d('info', "\uD83D\uDC0D Welcome to (serpent@1.0.1)");
+	  var logger = loggers.info ? loggers.info : console.info;
+	  logger("\uD83D\uDC0D Welcome to serpent-client@1.7.3\n-----\ndebug: ".concat(Config$1.get('debug'), "  \nendpoint: ").concat(Config$1.get('path'), "\n-----\n    "));
 	};
 
 	var Utils = /*#__PURE__*/Object.freeze({
@@ -1401,6 +1402,11 @@
 	        };
 	      }());
 	      return client;
+	    }
+	  }, {
+	    key: "getAction",
+	    value: function getAction(action) {
+	      return Actions.actions[action];
 	    }
 	  }, {
 	    key: "setup",
