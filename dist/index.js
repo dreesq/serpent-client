@@ -1275,6 +1275,7 @@
 	  function Actions(parent, client) {
 	    classCallCheck(this, Actions);
 
+	    this.actions = {};
 	    this.parent = parent;
 	    this.httpClient = client;
 	  }
@@ -1406,7 +1407,7 @@
 	  }, {
 	    key: "getAction",
 	    value: function getAction(action) {
-	      return Actions.actions[action];
+	      return this.actions[action];
 	    }
 	  }, {
 	    key: "setup",
@@ -1473,7 +1474,7 @@
 	                data = actions;
 
 	              case 21:
-	                Actions.actions = data;
+	                this.actions = data;
 
 	                _loop = function _loop(key) {
 	                  if (!data.hasOwnProperty(key)) {
@@ -1622,13 +1623,13 @@
 	              case 0:
 	                result = false;
 
-	                if (!(Actions.actions[action] && Object.keys(Actions.actions[action]).length)) {
+	                if (!(this.actions[action] && Object.keys(this.actions[action]).length)) {
 	                  _context4.next = 6;
 	                  break;
 	                }
 
 	                _context4.next = 4;
-	                return this.parent.validator.validate(payload, Actions.actions[action]);
+	                return this.parent.validator.validate(payload, this.actions[action]);
 
 	              case 4:
 	                errors = _context4.sent;
@@ -2024,7 +2025,6 @@
 
 	  return Actions;
 	}();
-	Actions.actions = {};
 
 	var Auth =
 	/*#__PURE__*/
@@ -2844,11 +2844,6 @@
 
 	  return Serpent;
 	}();
-	Serpent.actions = {};
-	/**
-	 * Attach constants to the global object
-	 */
-
 	Serpent.Constants = Constants;
 
 	return Serpent;

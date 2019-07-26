@@ -100,13 +100,6 @@ export default class Serpent {
 }
 
 /**
- * Static properties
- * @type {{}}
- */
-
-Serpent.actions = {};
-
-/**
  * Attach constants to the global object
  */
 
