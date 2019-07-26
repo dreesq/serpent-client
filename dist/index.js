@@ -1119,7 +1119,7 @@
 	  };
 
 	  var logger = loggers.info ? loggers.info : console.info;
-	  logger("\uD83D\uDC0D Welcome to serpent-client@1.7.5\n-----\ndebug: ".concat(Config$1.get('debug'), "  \nendpoint: ").concat(Config$1.get('path'), "\n-----\n    "));
+	  logger("\uD83D\uDC0D Welcome to serpent-client@1.7.6\n-----\ndebug: ".concat(Config$1.get('debug'), "  \nendpoint: ").concat(Config$1.get('path'), "\n-----\n    "));
 	};
 
 	var Utils = /*#__PURE__*/Object.freeze({
@@ -1623,13 +1623,13 @@
 	              case 0:
 	                result = false;
 
-	                if (!(this.list[action] && Object.keys(this.actions[action]).length)) {
+	                if (!(this.list[action] && Object.keys(this.list[action]).length)) {
 	                  _context4.next = 6;
 	                  break;
 	                }
 
 	                _context4.next = 4;
-	                return this.parent.validator.validate(payload, this.actions[action]);
+	                return this.parent.validator.validate(payload, this.list[action]);
 
 	              case 4:
 	                errors = _context4.sent;
