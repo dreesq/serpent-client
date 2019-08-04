@@ -8,3 +8,13 @@ export const LOADING_END = 'loading:end';
 export const ACTION_SUCCESS = 'success';
 export const ACTION_ERROR = 'error';
 export const ACTION_PROGRESS = 'progress';
+
+/**
+ * Socket events
+ * @type {string}
+ */
+
+export const SOCKET_CONNECTED = 'socket:connected';
+export const SOCKET_DISCONNECTED = 'socket:disconnected';
+export const SOCKET_RECONNECTED = 'socket:reconnected';
+export const SOCKET_AUTHENTICATED = 'socket:authenticated';
