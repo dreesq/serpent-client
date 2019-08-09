@@ -976,146 +976,199 @@
 	  if (typeof window === 'undefined') {
 	    return;
 	  }
-	  /**
-	   * Colorize helper
-	   * @param data
-	   * @param location
-	   * @returns {Array}
-	   */
 
+	  var panel = {
+	    el: null,
+	    state: {},
+	    init: function init() {
+	      panel.state = JSON.parse(localStorage.getItem('debugPanel') || '{}');
+	      panel.initHtml();
+	      panel.initStyle();
+	      panel.onLoad();
+	      panel.hookLoggers();
+	      panel.onFinish();
+	    },
+	    colorize: function colorize(data) {
+	      var location = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'console';
 
-	  var colorize = function colorize(data) {
-	    var location = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'console';
-
-	    if (typeof data != 'string') {
-	      data = JSON.stringify(data, undefined, '\t');
-	    }
-
-	    var result = [];
-	    var styles = {
-	      string: 'color:#55c149',
-	      number: 'color:#b66bb2',
-	      "boolean": 'color:#ff82a4',
-	      "null": 'color:#ff7477',
-	      key: 'color:#619bab'
-	    };
-	    data = data.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-	      var type = 'number';
-
-	      if (/^"/.test(match)) {
-	        if (/:$/.test(match)) {
-	          type = 'key';
-	        } else {
-	          type = 'string';
-	        }
-	      } else if (/true|false/.test(match)) {
-	        type = 'boolean';
-	      } else if (/null/.test(match)) {
-	        type = 'null';
+	      if (typeof data != 'string') {
+	        data = JSON.stringify(data, undefined, '\t');
 	      }
 
-	      location === 'console' && result.push(styles[type], '');
-	      return location === 'console' ? "%c".concat(match, "%c") : "<span class=\"".concat(type, "\">").concat(match, "</span>");
-	    });
-	    result.unshift(data);
-	    return result;
-	  };
-
-	  var el = document.createElement('div');
-	  el.id = 'debugPanel';
-	  document.body.appendChild(el);
-	  var style = document.createElement('style');
-	  var pref = JSON.parse(localStorage.getItem('debugPanel') || '{}');
-	  style.innerHTML = "\n        #debugPanel {\n            background: #1d1d1d;\n            position: fixed;\n            width: 460px;\n            padding: 20px;\n            overflow: auto;\n            word-wrap: normal;\n            border-radius: 4px;\n            box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);\n            color: #fff;\n            min-height: 120px;\n            max-height: 500px;\n            overflow-y: auto;\n            overflow-x: hidden;\n            cursor: grab;\n            left: ".concat(pref.left || '20px', ";\n            top: ").concat(pref.top || '20px', ";\n            font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n        }\n        \n        #debugPanel .number {\n            color:#b66bb2\n        }\n        \n        #debugPanel .key {\n            color: #619bab;\n        }\n        \n        #debugPanel .string {\n            color:#55c149\n        }\n        \n        #debugPanel .boolean {\n            color:#ff82a4;\n        }\n        \n        #debugPanel .null {\n            color:#ff7477;\n        }\n        \n        #debugPanel::-webkit-scrollbar {\n          width: 5px;\n          height: 12px;\n        }\n        \n        #debugPanel::-webkit-scrollbar-track {\n          background: rgba(0, 0, 0, 0.1);\n        }\n        \n        #debugPanel::-webkit-scrollbar-thumb {\n          background: #ffd457;\n        }\n        \n        #debugPanel .message {\n            display: block;\n            padding: 2px 0;\n            font: 13px Verdana, Arial, sans-serif;\n            white-space: pre-wrap;\n        }\n        \n        #debugPanel .info {\n            color: #00c5b5;\n        }\n        \n        #debugPanel .error {\n            color: #ff6b6b;\n        }\n        \n        #debugPanel .log {\n            color: #4cff85;\n        }\n        \n        #debugPanel .object {\n            color: #619bab;\n        }\n    ");
-	  document.head.append(style);
-	  var offset, mousePosition;
-	  var isDown = false;
-	  el.addEventListener('mousedown', function (e) {
-	    isDown = true;
-	    offset = [el.offsetLeft - e.clientX, el.offsetTop - e.clientY];
-	  }, true);
-	  document.addEventListener('mouseup', function () {
-	    isDown = false;
-	  }, true);
-	  document.addEventListener('mousemove', function (event) {
-	    event.preventDefault();
-
-	    if (isDown) {
-	      mousePosition = {
-	        x: event.clientX,
-	        y: event.clientY
+	      var result = [];
+	      var styles = {
+	        string: 'color:#55c149',
+	        number: 'color:#b66bb2',
+	        "boolean": 'color:#ff82a4',
+	        "null": 'color:#ff7477',
+	        key: 'color:#619bab'
 	      };
-	      var left = mousePosition.x + offset[0] + 'px';
-	      var top = mousePosition.y + offset[1] + 'px';
-	      el.style.left = left;
-	      el.style.top = top;
-	      localStorage.setItem('debugPanel', JSON.stringify({
-	        left: left,
-	        top: top
-	      }));
+	      data = data.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+	        var type = 'number';
+
+	        if (/^"/.test(match)) {
+	          if (/:$/.test(match)) {
+	            type = 'key';
+	          } else {
+	            type = 'string';
+	          }
+	        } else if (/true|false/.test(match)) {
+	          type = 'boolean';
+	        } else if (/null/.test(match)) {
+	          type = 'null';
+	        }
+
+	        location === 'console' && result.push(styles[type], '');
+	        return location === 'console' ? "%c".concat(match, "%c") : "<span class=\"".concat(type, "\">").concat(match, "</span>");
+	      });
+	      result.unshift(data);
+	      return result;
+	    },
+	    initStyle: function initStyle() {
+	      var style = document.createElement('style');
+	      style.innerHTML = "\n                #debugPanel {\n                    background: #1d1d1d;\n                    z-index: 1337;\n                    position: fixed;\n                    min-width: 460px;\n                    word-wrap: normal;\n                    border-radius: 4px;\n                    box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);\n                    color: #fff;\n                    resize: both;\n                    left: ".concat(panel.state.left || '20px', ";\n                    top: ").concat(panel.state.top || '20px', ";\n                    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n                }\n                \n                #debugPanel .drag-handle {\n                    cursor: grab;\n                }\n                \n                #debugPanel .resize-handle {\n                    cursor: se-resize;\n                }\n                \n                #debugPanel button {\n                    cursor: pointer;\n                    outline: none;\n                }\n                \n                #debugPanel .inner {\n                    min-height: 120px;\n                    overflow-y: auto;\n                    overflow-x: hidden;\n                    padding: 20px 20px 0 20px;\n                    ").concat(panel.state.width ? 'width: ' + panel.state.width + ';' : '', "\n                    ").concat(panel.state.height ? 'height: ' + panel.state.height + ';' : '', "\n                }\n                \n                #debugPanel .controls {\n                    height: 50px;\n                    display: flex;\n                    align-items: center;\n                    float: right;\n                }\n               \n                #debugPanel .controls button {\n                    background: #ffd457;\n                    border: none;\n                    border-radius: 4px;\n                    color: #1d1d1d;\n                    padding: 6px 11px;\n                    font-weight: bold;\n                    margin-right: 6px;\n                }\n               \n                #debugPanel .number {\n                    color:#b66bb2\n                }\n                \n                #debugPanel .key {\n                    color: #619bab;\n                }\n                \n                #debugPanel .string {\n                    color:#55c149\n                }\n                \n                #debugPanel .boolean {\n                    color:#ff82a4;\n                }\n                \n                #debugPanel .null {\n                    color:#ff7477;\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar {\n                  width: 5px;\n                  height: 12px;\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar-track {\n                  background: rgba(0, 0, 0, 0.1);\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar-thumb {\n                  background: #ffd457;\n                }\n                \n                #debugPanel .message {\n                    display: block;\n                    padding: 2px 0;\n                    font: 13px Verdana, Arial, sans-serif;\n                    white-space: pre-wrap;\n                }\n                \n                #debugPanel .info {\n                    color: #00c5b5;\n                }\n                \n                #debugPanel .error {\n                    color: #ff6b6b;\n                }\n                \n                #debugPanel .log {\n                    color: #4cff85;\n                }\n                \n                #debugPanel .object {\n                    color: #619bab;\n                }\n            ");
+	      document.head.append(style);
+	    },
+	    initHtml: function initHtml() {
+	      panel.el = document.createElement('div');
+	      panel.el.id = 'debugPanel';
+	      document.body.appendChild(panel.el);
+	      panel.el.innerHTML = "\n                <div class=\"inner\">\n                \n                </div>\n                <div class=\"controls\">\n                    <button class=\"toggle-minimize\">\n                        &#128469;\n                    </button>\n                    <button class=\"clear-panel\">\n                        &#128465;\n                    </button>\n                    <button class=\"drag-handle\">\n                        &#10021;\n                    </button>\n                    <button class=\"resize-handle\">\n                        &searr;\n                     </button>\n                </div>\n            ";
+	    },
+	    onLoad: function onLoad() {
+	      var offset, mousePosition;
+	      var isDragDown = false;
+	      var isResizeDown = false;
+	      var dragButton = panel.el.querySelector('.drag-handle');
+	      var resizeButton = panel.el.querySelector('.resize-handle');
+	      var clearButton = panel.el.querySelector('.clear-panel');
+	      var minimizeToggle = panel.el.querySelector('.toggle-minimize');
+	      minimizeToggle.addEventListener('click', function () {
+	        panel.state.minimized = !panel.state.minimized;
+	        panel.saveState();
+	        panel.el.querySelector('.inner').style.display = panel.state.minimized ? 'none' : 'block';
+	      });
+	      clearButton.addEventListener('click', function () {
+	        panel.el.querySelector('.inner').innerHTML = '';
+	      });
+	      resizeButton.addEventListener('mousedown', function (e) {
+	        isResizeDown = true;
+	      }, false);
+	      document.addEventListener('mouseup', function (e) {
+	        isResizeDown = false;
+	      }, false);
+	      dragButton.addEventListener('mousedown', function (e) {
+	        isDragDown = true;
+	        offset = [panel.el.offsetLeft - e.clientX, panel.el.offsetTop - e.clientY];
+	      });
+	      document.addEventListener('mouseup', function () {
+	        isDragDown = false;
+	      });
+	      document.addEventListener('mousemove', function (event) {
+	        event.preventDefault();
+
+	        if (isDragDown) {
+	          mousePosition = {
+	            x: event.clientX,
+	            y: event.clientY
+	          };
+	          var left = mousePosition.x + offset[0] + 'px';
+	          var top = mousePosition.y + offset[1] + 'px';
+	          panel.el.style.left = left;
+	          panel.el.style.top = top;
+	          panel.state.left = left;
+	          panel.state.top = top;
+	          panel.saveState();
+	        }
+
+	        if (isResizeDown) {
+	          var width = event.clientX - panel.el.offsetLeft - 20 + 'px';
+	          var height = event.clientY - panel.el.offsetTop - 55 + 'px';
+
+	          if (parseInt(width) > 460) {
+	            panel.el.querySelector('.inner').style.width = width;
+	            panel.state.width = width;
+	          } else {
+	            panel.el.querySelector('.inner').style.width = '460px';
+	            panel.state.width = '460px';
+	          }
+
+	          panel.el.querySelector('.inner').style.height = height;
+	          panel.state.height = height;
+	          panel.saveState();
+	        }
+	      });
+	    },
+	    saveState: function saveState() {
+	      localStorage.setItem('debugPanel', JSON.stringify(panel.state));
+	    },
+	    onFinish: function onFinish() {
+	      var logger = loggers.info ? loggers.info : console.info;
+	      logger(["\uD83D\uDC0D Welcome to (serpent-client@1.7.9)", '', '-', "debug: <span style=\"color: #fff;\">".concat(Config$1.get('debug'), "</span>"), "endpoint: <span style=\"color: #fff;\">".concat(Config$1.get('path'), "</span>"), '-', '', ''].join('\n'));
+	    },
+	    hookLoggers: function hookLoggers() {
+	      var hooks = ['log', 'error', 'info', 'warn'];
+	      var inner = panel.el.querySelector('.inner');
+
+	      var _loop = function _loop() {
+	        var hook = _hooks[_i];
+
+	        loggers[hook] = function () {
+	          for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+	            args[_key2] = arguments[_key2];
+	          }
+
+	          var clonedArgs = [].concat(args);
+	          var message = "<span class=\"message ".concat(hook, "\">");
+	          var _iteratorNormalCompletion = true;
+	          var _didIteratorError = false;
+	          var _iteratorError = undefined;
+
+	          try {
+	            for (var _iterator = clonedArgs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	              var arg = _step.value;
+
+	              if (_typeof_1(arg) === 'object' || Array.isArray(arg)) {
+	                message += '<span class="object">';
+	                message += panel.colorize(arg, 'panel');
+	                message += '</span>';
+	                continue;
+	              }
+
+	              message += arg;
+	            }
+	          } catch (err) {
+	            _didIteratorError = true;
+	            _iteratorError = err;
+	          } finally {
+	            try {
+	              if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+	                _iterator["return"]();
+	              }
+	            } finally {
+	              if (_didIteratorError) {
+	                throw _iteratorError;
+	              }
+	            }
+	          }
+
+	          message += "</span>";
+	          inner.innerHTML += message;
+	          inner.scrollTop = inner.scrollHeight;
+	        };
+	      };
+
+	      for (var _i = 0, _hooks = hooks; _i < _hooks.length; _i++) {
+	        _loop();
+	      }
+
+	      window.onerror = function (message, url, line) {
+	        var logger = loggers.error ? loggers.error : console.error;
+	        logger("Error: ".concat(message, ", ").concat(url, ": ").concat(line));
+	      };
 	    }
-	  });
-	  var hooks = ['log', 'error', 'info', 'warn'];
-
-	  var _loop = function _loop() {
-	    var hook = _hooks[_i];
-
-	    loggers[hook] = function () {
-	      for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-	        args[_key2] = arguments[_key2];
-	      }
-
-	      var clonedArgs = [].concat(args);
-	      var message = "<span class=\"message ".concat(hook, "\">");
-	      var _iteratorNormalCompletion = true;
-	      var _didIteratorError = false;
-	      var _iteratorError = undefined;
-
-	      try {
-	        for (var _iterator = clonedArgs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	          var arg = _step.value;
-
-	          if (_typeof_1(arg) === 'object' || Array.isArray(arg)) {
-	            message += '<span class="object">';
-	            message += colorize(arg, 'panel');
-	            message += '</span>';
-	            continue;
-	          }
-
-	          message += arg;
-	        }
-	      } catch (err) {
-	        _didIteratorError = true;
-	        _iteratorError = err;
-	      } finally {
-	        try {
-	          if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-	            _iterator["return"]();
-	          }
-	        } finally {
-	          if (_didIteratorError) {
-	            throw _iteratorError;
-	          }
-	        }
-	      }
-
-	      message += "</span>";
-	      el.innerHTML += message;
-	      el.scrollTop = el.scrollHeight;
-	    };
 	  };
-
-	  for (var _i = 0, _hooks = hooks; _i < _hooks.length; _i++) {
-	    _loop();
-	  }
-
-	  window.onerror = function (message, url, line) {
-	    var logger = loggers.error ? loggers.error : console.error;
-	    logger("Error: ".concat(message, ", ").concat(url, ": ").concat(line));
-	  };
-
-	  var logger = loggers.info ? loggers.info : console.info;
-	  logger("\uD83D\uDC0D Welcome to (serpent-client@1.7.8)\n-\ndebug: ".concat(Config$1.get('debug'), "  \nendpoint: ").concat(Config$1.get('path'), "\n-\n    "));
+	  panel.init();
 	};
 
 	var Utils = /*#__PURE__*/Object.freeze({
@@ -1902,7 +1955,7 @@
 	      }
 
 	      var end = +new Date();
-	      d('info', "(ok) (".concat(action, ") in (").concat(end - start, " ms)"), result);
+	      d(!!result.errors ? 'error' : 'info', "(".concat(!!result.errors ? 'fail' : 'ok', ") (").concat(action, ") in (").concat(end - start, " ms)"), result);
 	      return result;
 	    }
 	    /**
@@ -1924,6 +1977,7 @@
 	            errors,
 	            _ref7,
 	            data,
+	            debug,
 	            _errors2,
 	            _args6 = arguments;
 
@@ -1984,21 +2038,26 @@
 	                  result.data = data;
 	                }
 
-	                _context6.next = 25;
+	                _context6.next = 27;
 	                break;
 
 	              case 21:
 	                _context6.prev = 21;
 	                _context6.t0 = _context6["catch"](13);
+	                debug = get(_context6.t0, 'response.data.debug', false);
 	                _errors2 = get(_context6.t0, 'response.data.errors', false);
 	                result.errors = _errors2 ? _errors2 : {
 	                  message: [_context6.t0.response]
 	                };
 
-	              case 25:
+	                if (debug) {
+	                  result.debug = debug;
+	                }
+
+	              case 27:
 	                return _context6.abrupt("return", this.finishTransaction(options, action, result, payload, start));
 
-	              case 26:
+	              case 28:
 	              case "end":
 	                return _context6.stop();
 	            }
@@ -2271,6 +2330,8 @@
 	  }, {
 	    key: "removeListener",
 	    value: function removeListener(event, listener) {
+	      d('info', "- event (".concat(event, ")"));
+
 	      if (_typeof_1(this.events[event]) !== 'object') {
 	        return;
 	      }
@@ -2758,6 +2819,10 @@
 	    });
 	    Config$1.store(this.opts);
 	    this.onReady = false;
+
+	    if (this.opts.debug) {
+	      debugPanel();
+	    }
 	  }
 	  /**
 	   * Setup the client
