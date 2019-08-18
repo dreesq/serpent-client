@@ -20,6 +20,14 @@
 
         client.actions._call('test-6', {
             a: [1, 2, 3]
+        }, {
+            cache: true
+        }).then(() => {
+            client.actions._call('test-6', {
+                a: [1, 2, 3]
+            }, {
+                cache: true
+            });
         });
     });
 </script>

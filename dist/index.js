@@ -917,14 +917,7 @@
 	    args[_key - 1] = arguments[_key];
 	  }
 
-	  if (args.length === 1) {
-	    return log.apply(void 0, args);
-	  }
-
-	  for (var arg in args) {
-	    var current = args[arg];
-	    log(current);
-	  }
+	  return log.apply(void 0, args);
 	};
 	/**
 	 * Parse template helper
@@ -1026,14 +1019,14 @@
 	    },
 	    initStyle: function initStyle() {
 	      var style = document.createElement('style');
-	      style.innerHTML = "\n                #debugPanel {\n                    background: #1d1d1d;\n                    z-index: 1337;\n                    position: fixed;\n                    min-width: 460px;\n                    word-wrap: normal;\n                    border-radius: 4px;\n                    box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);\n                    color: #fff;\n                    resize: both;\n                    left: ".concat(panel.state.left || '20px', ";\n                    top: ").concat(panel.state.top || '20px', ";\n                    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n                }\n                \n                #debugPanel .drag-handle {\n                    cursor: grab;\n                }\n                \n                #debugPanel .resize-handle {\n                    cursor: se-resize;\n                }\n                \n                #debugPanel button {\n                    cursor: pointer;\n                    outline: none;\n                }\n                \n                #debugPanel .inner {\n                    min-height: 120px;\n                    overflow-y: auto;\n                    overflow-x: hidden;\n                    padding: 20px 20px 0 20px;\n                    ").concat(panel.state.width ? 'width: ' + panel.state.width + ';' : '', "\n                    ").concat(panel.state.height ? 'height: ' + panel.state.height + ';' : '', "\n                    max-height: 600px;\n                }\n                \n                #debugPanel .controls {\n                    height: 50px;\n                    display: flex;\n                    align-items: center;\n                    float: right;\n                }\n               \n                #debugPanel .controls button {\n                    background: #ffd457;\n                    border: none;\n                    border-radius: 4px;\n                    color: #1d1d1d;\n                    padding: 6px 11px;\n                    font-weight: bold;\n                    margin-right: 6px;\n                }\n               \n                #debugPanel .number {\n                    color:#b66bb2\n                }\n                \n                #debugPanel .key {\n                    color: #619bab;\n                }\n                \n                #debugPanel .string {\n                    color:#55c149\n                }\n                \n                #debugPanel .boolean {\n                    color:#ff82a4;\n                }\n                \n                #debugPanel .null {\n                    color:#ff7477;\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar {\n                  width: 5px;\n                  height: 12px;\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar-track {\n                  background: rgba(0, 0, 0, 0.1);\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar-thumb {\n                  background: #ffd457;\n                }\n                \n                #debugPanel .message {\n                    display: block;\n                    padding: 2px 0;\n                    font: 13px Verdana, Arial, sans-serif;\n                    white-space: pre-wrap;\n                }\n                \n                #debugPanel .info {\n                    color: #00c5b5;\n                }\n                \n                #debugPanel .error {\n                    color: #ff6b6b;\n                }\n                \n                #debugPanel .log {\n                    color: #4cff85;\n                }\n                \n                #debugPanel .object {\n                    color: #619bab;\n                }\n            ");
+	      style.innerHTML = "\n                #debugPanel {\n                    background: #171616;\n                    z-index: 9203021;\n                    position: fixed;\n                    min-width: 460px;\n                    word-wrap: normal;\n                    border-radius: 4px;\n                    box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);\n                    color: #fff;\n                    resize: both;\n                    left: ".concat(panel.state.left || '20px', ";\n                    top: ").concat(panel.state.top || '20px', ";\n                    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n                }\n                \n                #debugPanel .drag-handle {\n                    cursor: grab;\n                }\n                \n                #debugPanel .welcome-message {\n                    font-size: 12px;\n                    margin-top: -36px;\n                    display: flex;\n                    align-items: center;\n                    color: #f9243d;\n                    font-family: Verdana;\n                }\n                \n                #debugPanel .welcome-message div {\n                    color: #4a4545;\n                }\n                \n                #debugPanel .welcome-message span {\n                    color: #30bf58;\n                }\n                \n                #debugPanel .resize-handle {\n                    cursor: se-resize;\n                }\n                \n                #debugPanel button {\n                    cursor: pointer;\n                    outline: none;\n                }\n                \n                #debugPanel .inner {\n                    min-height: 120px;\n                    overflow-y: auto;\n                    overflow-x: hidden;\n                    padding: 20px 20px 0 20px;\n                    ").concat(panel.state.width ? 'width: ' + panel.state.width + ';' : '', "\n                    ").concat(panel.state.width ? 'max-width: ' + panel.state.width + ';' : '', "\n                    ").concat(panel.state.height ? 'height: ' + panel.state.height + ';' : '', "\n                    max-height: 600px;\n                }\n                \n                #debugPanel .controls {\n                    height: 36px;\n                    display: flex;\n                    align-items: center;\n                    background: #212021;\n                    justify-content: flex-end;\n                    border-bottom-left-radius: 4px;\n                    border-top-right-radius: 4px;\n                    width: 163px;\n                    margin-left: auto;\n                }\n               \n                #debugPanel .controls button {\n                    background: #1b1a1a;\n                    border: none;\n                    border-radius: 4px;\n                    color: #fff;\n                    padding: 6px 11px;\n                    font-weight: bold;\n                    margin-right: 6px;  \n                }\n               \n                #debugPanel .number {\n                    color:#b66bb2\n                }\n                \n                #debugPanel .key {\n                    color: #619bab;\n                }\n                \n                #debugPanel .string {\n                    color:#55c149\n                }\n                \n                #debugPanel .boolean {\n                    color:#ff82a4;\n                }\n                \n                #debugPanel .null {\n                    color:#ff7477;\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar {\n                  width: 5px;\n                  height: 12px;\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar-track {\n                  background: rgba(0, 0, 0, 0.1);\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar-thumb {\n                  background: #ffd457;\n                }\n                \n                #debugPanel .message {\n                    display: block;\n                    padding: 2px 0;\n                    white-space: pre-wrap;\n                    font-size: 13px;\n                    margin: 0 0 2px 0;\n                }\n                \n                #debugPanel .info {\n                    color: #00a7c5;\n                }\n                \n                #debugPanel .error {\n                    color: #ff6b6b;\n                }\n                \n                #debugPanel .log {\n                    color: #4cff85;\n                }\n                \n                #debugPanel .object {\n                    color: #619bab;\n                    font-size: 12px;\n                    padding: 10px;\n                    display: block;\n                    background: #1b1a1a;\n                    margin: 6px 0;\n                    border-radius: 4px;\n                    max-height: 160px;\n                    overflow-x: scroll;\n                }\n                \n                #debugPanel .entity {\n                    display: block;\n                }\n            ");
 	      document.head.append(style);
 	    },
 	    initHtml: function initHtml() {
 	      panel.el = document.createElement('div');
 	      panel.el.id = 'debugPanel';
 	      document.body.appendChild(panel.el);
-	      panel.el.innerHTML = "\n                <div class=\"inner\">\n                \n                </div>\n                <div class=\"controls\">\n                    <button class=\"toggle-minimize\">\n                        &#128469;\n                    </button>\n                    <button class=\"clear-panel\">\n                        &#128465;\n                    </button>\n                    <button class=\"drag-handle\">\n                        &#10021;\n                    </button>\n                    <button class=\"resize-handle\">\n                        &searr;\n                     </button>\n                </div>\n            ";
+	      panel.el.innerHTML = "\n                <div class=\"controls\">\n                    <button class=\"toggle-minimize\">\n                        &#128469;\n                    </button>\n                    <button class=\"clear-panel\">\n                        &#128465;\n                    </button>\n                    <button class=\"drag-handle\">\n                        &#10021;\n                    </button>\n                    <button class=\"resize-handle\">\n                        &searr;\n                     </button>\n                </div>\n                <div class=\"inner\">\n                \n                </div>\n            ";
 	    },
 	    onLoad: function onLoad() {
 	      var offset, mousePosition;
@@ -1053,10 +1046,10 @@
 	      });
 	      resizeButton.addEventListener('mousedown', function (e) {
 	        isResizeDown = true;
-	      }, false);
+	      });
 	      document.addEventListener('mouseup', function (e) {
 	        isResizeDown = false;
-	      }, false);
+	      });
 	      dragButton.addEventListener('mousedown', function (e) {
 	        isDragDown = true;
 	        offset = [panel.el.offsetLeft - e.clientX, panel.el.offsetTop - e.clientY];
@@ -1065,8 +1058,6 @@
 	        isDragDown = false;
 	      });
 	      document.addEventListener('mousemove', function (event) {
-	        event.preventDefault();
-
 	        if (isDragDown) {
 	          mousePosition = {
 	            x: event.clientX,
@@ -1087,6 +1078,7 @@
 
 	          if (parseInt(width) > 460) {
 	            panel.el.querySelector('.inner').style.width = width;
+	            panel.el.querySelector('.inner').style.maxWidth = width;
 	            panel.state.width = width;
 	          } else {
 	            panel.el.querySelector('.inner').style.width = '460px';
@@ -1104,7 +1096,7 @@
 	    },
 	    onFinish: function onFinish() {
 	      var logger = loggers.info ? loggers.info : console.info;
-	      logger(["\uD83D\uDC0D Welcome to (serpent-client@1.8.0)", '', '-', "debug: <span style=\"color: #fff;\">".concat(Config$1.get('debug'), "</span>"), "endpoint: <span style=\"color: #fff;\">".concat(Config$1.get('path'), "</span>"), '-', '', ''].join('\n'));
+	      logger(['<div class="welcome-message">', "\n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>debug: <span>".concat(Config$1.get('debug'), "</span>"), "endpoint: <span>".concat(Config$1.get('path'), "</span>"), "version: <span>1.8.1</span></div>", '', '</div>'].join('\n'));
 	    },
 	    hookLoggers: function hookLoggers() {
 	      var hooks = ['log', 'error', 'info', 'warn'];
@@ -1112,6 +1104,7 @@
 
 	      var _loop = function _loop() {
 	        var hook = _hooks[_i];
+	        var consoleLogger = console[hook];
 
 	        loggers[hook] = function () {
 	          for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
@@ -1135,7 +1128,7 @@
 	                continue;
 	              }
 
-	              message += arg;
+	              message += "<span class=\"entity\">".concat(arg, "</span>");
 	            }
 	          } catch (err) {
 	            _didIteratorError = true;
@@ -1156,16 +1149,26 @@
 	          inner.innerHTML += message;
 	          inner.scrollTop = inner.scrollHeight;
 	        };
+
+	        console[hook] = function () {
+	          consoleLogger.apply(void 0, arguments);
+	          loggers[hook].apply(loggers, arguments);
+	        };
 	      };
 
 	      for (var _i = 0, _hooks = hooks; _i < _hooks.length; _i++) {
 	        _loop();
 	      }
 
-	      window.onerror = function (message, url, line) {
+	      window.addEventListener('error', function (e) {
+	        var message = e.message,
+	            source = e.source,
+	            lineno = e.lineno,
+	            colno = e.colno,
+	            error = e.error;
 	        var logger = loggers.error ? loggers.error : console.error;
-	        logger("Error: ".concat(message, ", ").concat(url, ": ").concat(line));
-	      };
+	        logger("Error: ".concat(message, ". ").concat(source, ":").concat(lineno, ", ").concat(error ? error.stack : ''));
+	      });
 	    }
 	  };
 	  panel.init();
@@ -1987,7 +1990,9 @@
 	              case 0:
 	                payload = _args6.length > 1 && _args6[1] !== undefined ? _args6[1] : {};
 	                options = _args6.length > 2 && _args6[2] !== undefined ? _args6[2] : {
-	                  validate: true
+	                  validate: true,
+	                  cache: false,
+	                  shouldInvalidate: false
 	                };
 	                result = {
 	                  errors: false,
@@ -1999,36 +2004,50 @@
 	                }
 
 	                start = +new Date();
-	                d('info', "+ running (".concat(action, ")"), payload);
+	                d('info', "+ running (".concat(action, "), payload:"), payload);
 	                /**
-	                 * Do client side validation
+	                 * If in cache, return cached value
 	                 */
 
-	                if (!options.validate) {
-	                  _context6.next = 13;
+	                if (typeof options.shouldInvalidate === 'function' && options.shouldInvalidate(Actions.cache[action], Actions.cache[action])) {
+	                  delete Actions.cache[action];
+	                }
+
+	                if (!(Actions.cache[action] && Actions.cache[action].data)) {
+	                  _context6.next = 11;
 	                  break;
 	                }
 
-	                _context6.next = 9;
+	                d('info', "+ cache (".concat(action, ") is cached"));
+	                result = Actions.cache[action];
+	                return _context6.abrupt("return", this.finishTransaction(options, action, result, payload, start));
+
+	              case 11:
+	                if (!options.validate) {
+	                  _context6.next = 18;
+	                  break;
+	                }
+
+	                _context6.next = 14;
 	                return this._validateAction(action, payload);
 
-	              case 9:
+	              case 14:
 	                errors = _context6.sent;
 
 	                if (!errors) {
-	                  _context6.next = 13;
+	                  _context6.next = 18;
 	                  break;
 	                }
 
 	                result.errors = errors;
 	                return _context6.abrupt("return", this.finishTransaction(options, action, result, payload, start));
 
-	              case 13:
-	                _context6.prev = 13;
-	                _context6.next = 16;
+	              case 18:
+	                _context6.prev = 18;
+	                _context6.next = 21;
 	                return this.parent.http.post(Config$1.get('handler'), [action, payload], this._configAction(options.progress, action));
 
-	              case 16:
+	              case 21:
 	                _ref7 = _context6.sent;
 	                data = _ref7.data;
 
@@ -2036,14 +2055,20 @@
 	                  result.errors = data.errors;
 	                } else {
 	                  result.data = data;
+
+	                  if (options.cache) {
+	                    d('info', "+ cache Adding data to cache for (".concat(action, ")"));
+	                    Actions.cache[action] = result;
+	                    Actions.cache[action].createdAt = new Date();
+	                  }
 	                }
 
-	                _context6.next = 27;
+	                _context6.next = 32;
 	                break;
 
-	              case 21:
-	                _context6.prev = 21;
-	                _context6.t0 = _context6["catch"](13);
+	              case 26:
+	                _context6.prev = 26;
+	                _context6.t0 = _context6["catch"](18);
 	                debug = get(_context6.t0, 'response.data.debug', false);
 	                _errors2 = get(_context6.t0, 'response.data.errors', false);
 	                result.errors = _errors2 ? _errors2 : {
@@ -2054,15 +2079,15 @@
 	                  result.debug = debug;
 	                }
 
-	              case 27:
+	              case 32:
 	                return _context6.abrupt("return", this.finishTransaction(options, action, result, payload, start));
 
-	              case 28:
+	              case 33:
 	              case "end":
 	                return _context6.stop();
 	            }
 	          }
-	        }, _callee6, this, [[13, 21]]);
+	        }, _callee6, this, [[18, 26]]);
 	      }));
 
 	      function _call(_x5) {
@@ -2075,6 +2100,8 @@
 
 	  return Actions;
 	}();
+
+	Actions.cache = {};
 
 	var Auth =
 	/*#__PURE__*/
