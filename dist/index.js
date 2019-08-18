@@ -985,7 +985,18 @@
 	      var location = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'console';
 
 	      if (typeof data != 'string') {
-	        data = JSON.stringify(data, undefined, '\t');
+	        var cache = {};
+	        data = JSON.stringify(data, function (key, value) {
+	          if (_typeof_1(value) === 'object' && value !== null) {
+	            if (cache.indexOf(value) !== -1) {
+	              return;
+	            }
+
+	            cache.push(value);
+	          }
+
+	          return value;
+	        }, '\t');
 	      }
 
 	      var result = [];
@@ -1096,7 +1107,7 @@
 	    },
 	    onFinish: function onFinish() {
 	      var logger = loggers.info ? loggers.info : console.info;
-	      logger(['<div class="welcome-message">', "\n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>debug: <span>".concat(Config$1.get('debug'), "</span>"), "endpoint: <span>".concat(Config$1.get('path'), "</span>"), "version: <span>1.8.2</span></div>", '', '</div>'].join('\n'));
+	      logger(['<div class="welcome-message">', "\n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>debug: <span>".concat(Config$1.get('debug'), "</span>"), "endpoint: <span>".concat(Config$1.get('path'), "</span>"), "version: <span>1.8.3</span></div>", '', '</div>'].join('\n'));
 	    },
 	    hookLoggers: function hookLoggers() {
 	      var hooks = ['log', 'error', 'info', 'warn'];
