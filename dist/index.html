@@ -10,24 +10,16 @@
 <script src="/index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
 <script>
-    window.client = new Serpent('http://localhost:3001', {
+    window.client = new Serpent('http://localhost:3000', {
         debug: true,
         axios
     });
 
     client.setup().then(() => {
-        client.utils.debugPanel();
         client.utils.d('info', 'Client loaded.');
 
-        client.actions.batch({
-            firstAction: {
-
-            },
-            secondAction: {
-
-            }
-        }).then(res => {
-            console.log('done', res);
+        client.actions._call('test-6', {
+            a: [1, 2, 3]
         });
     });
 </script>

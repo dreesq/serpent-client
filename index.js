@@ -54,6 +54,10 @@ export default class Serpent {
 
           Config.store(this.opts);
           this.onReady = false;
+
+          if (this.opts.debug) {
+               Utils.debugPanel();
+          }
      }
 
      /**

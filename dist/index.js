@@ -921,14 +921,10 @@
 	    return log.apply(void 0, args);
 	  }
 
-	  loggers.warn('\n');
-
 	  for (var arg in args) {
 	    var current = args[arg];
 	    log(current);
 	  }
-
-	  loggers.warn('\n');
 	};
 	/**
 	 * Parse template helper
@@ -980,146 +976,199 @@
 	  if (typeof window === 'undefined') {
 	    return;
 	  }
-	  /**
-	   * Colorize helper
-	   * @param data
-	   * @param location
-	   * @returns {Array}
-	   */
 
+	  var panel = {
+	    el: null,
+	    state: {},
+	    init: function init() {
+	      panel.state = JSON.parse(localStorage.getItem('debugPanel') || '{}');
+	      panel.initHtml();
+	      panel.initStyle();
+	      panel.onLoad();
+	      panel.hookLoggers();
+	      panel.onFinish();
+	    },
+	    colorize: function colorize(data) {
+	      var location = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'console';
 
-	  var colorize = function colorize(data) {
-	    var location = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'console';
-
-	    if (typeof data != 'string') {
-	      data = JSON.stringify(data, undefined, '\t');
-	    }
-
-	    var result = [];
-	    var styles = {
-	      string: 'color:#55c149',
-	      number: 'color:#b66bb2',
-	      "boolean": 'color:#ff82a4',
-	      "null": 'color:#ff7477',
-	      key: 'color:#619bab'
-	    };
-	    data = data.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-	      var type = 'number';
-
-	      if (/^"/.test(match)) {
-	        if (/:$/.test(match)) {
-	          type = 'key';
-	        } else {
-	          type = 'string';
-	        }
-	      } else if (/true|false/.test(match)) {
-	        type = 'boolean';
-	      } else if (/null/.test(match)) {
-	        type = 'null';
+	      if (typeof data != 'string') {
+	        data = JSON.stringify(data, undefined, '\t');
 	      }
 
-	      location === 'console' && result.push(styles[type], '');
-	      return location === 'console' ? "%c".concat(match, "%c") : "<span class=\"".concat(type, "\">").concat(match, "</span>");
-	    });
-	    result.unshift(data);
-	    return result;
-	  };
-
-	  var el = document.createElement('div');
-	  el.id = 'debugPanel';
-	  document.body.appendChild(el);
-	  var style = document.createElement('style');
-	  var pref = JSON.parse(localStorage.getItem('debugPanel') || '{}');
-	  style.innerHTML = "\n        #debugPanel {\n            background: #1d1d1d;\n            position: fixed;\n            width: 460px;\n            padding: 20px;\n            overflow: auto;\n            word-wrap: normal;\n            border-radius: 4px;\n            box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);\n            color: #fff;\n            min-height: 120px;\n            max-height: 250px;\n            overflow-y: auto;\n            overflow-x: hidden;\n            cursor: grab;\n            left: ".concat(pref.left || '20px', ";\n            top: ").concat(pref.top || '20px', ";\n            font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n        }\n        \n        #debugPanel .number {\n            color:#b66bb2\n        }\n        \n        #debugPanel .key {\n            color: #619bab;\n        }\n        \n        #debugPanel .string {\n            color:#55c149\n        }\n        \n        #debugPanel .boolean {\n            color:#ff82a4;\n        }\n        \n        #debugPanel .null {\n            color:#ff7477;\n        }\n        \n        #debugPanel::-webkit-scrollbar {\n          width: 5px;\n          height: 12px;\n        }\n        \n        #debugPanel::-webkit-scrollbar-track {\n          background: rgba(0, 0, 0, 0.1);\n        }\n        \n        #debugPanel::-webkit-scrollbar-thumb {\n          background: #ffd457;\n        }\n        \n        #debugPanel .message {\n            display: block;\n            padding: 2px 0;\n            font: 13px Verdana, Arial, sans-serif;\n            white-space: pre-wrap;\n        }\n        \n        #debugPanel .info {\n            color: #00c5b5;\n        }\n        \n        #debugPanel .error {\n            color: #ff6b6b;\n        }\n        \n        #debugPanel .log {\n            color: #4cff85;\n        }\n        \n        #debugPanel .object {\n            color: #619bab;\n        }\n    ");
-	  document.head.append(style);
-	  var offset, mousePosition;
-	  var isDown = false;
-	  el.addEventListener('mousedown', function (e) {
-	    isDown = true;
-	    offset = [el.offsetLeft - e.clientX, el.offsetTop - e.clientY];
-	  }, true);
-	  document.addEventListener('mouseup', function () {
-	    isDown = false;
-	  }, true);
-	  document.addEventListener('mousemove', function (event) {
-	    event.preventDefault();
-
-	    if (isDown) {
-	      mousePosition = {
-	        x: event.clientX,
-	        y: event.clientY
+	      var result = [];
+	      var styles = {
+	        string: 'color:#55c149',
+	        number: 'color:#b66bb2',
+	        "boolean": 'color:#ff82a4',
+	        "null": 'color:#ff7477',
+	        key: 'color:#619bab'
 	      };
-	      var left = mousePosition.x + offset[0] + 'px';
-	      var top = mousePosition.y + offset[1] + 'px';
-	      el.style.left = left;
-	      el.style.top = top;
-	      localStorage.setItem('debugPanel', JSON.stringify({
-	        left: left,
-	        top: top
-	      }));
+	      data = data.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+	        var type = 'number';
+
+	        if (/^"/.test(match)) {
+	          if (/:$/.test(match)) {
+	            type = 'key';
+	          } else {
+	            type = 'string';
+	          }
+	        } else if (/true|false/.test(match)) {
+	          type = 'boolean';
+	        } else if (/null/.test(match)) {
+	          type = 'null';
+	        }
+
+	        location === 'console' && result.push(styles[type], '');
+	        return location === 'console' ? "%c".concat(match, "%c") : "<span class=\"".concat(type, "\">").concat(match, "</span>");
+	      });
+	      result.unshift(data);
+	      return result;
+	    },
+	    initStyle: function initStyle() {
+	      var style = document.createElement('style');
+	      style.innerHTML = "\n                #debugPanel {\n                    background: #1d1d1d;\n                    z-index: 1337;\n                    position: fixed;\n                    min-width: 460px;\n                    word-wrap: normal;\n                    border-radius: 4px;\n                    box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);\n                    color: #fff;\n                    resize: both;\n                    left: ".concat(panel.state.left || '20px', ";\n                    top: ").concat(panel.state.top || '20px', ";\n                    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n                }\n                \n                #debugPanel .drag-handle {\n                    cursor: grab;\n                }\n                \n                #debugPanel .resize-handle {\n                    cursor: se-resize;\n                }\n                \n                #debugPanel button {\n                    cursor: pointer;\n                    outline: none;\n                }\n                \n                #debugPanel .inner {\n                    min-height: 120px;\n                    overflow-y: auto;\n                    overflow-x: hidden;\n                    padding: 20px 20px 0 20px;\n                    ").concat(panel.state.width ? 'width: ' + panel.state.width + ';' : '', "\n                    ").concat(panel.state.height ? 'height: ' + panel.state.height + ';' : '', "\n                    max-height: 600px;\n                }\n                \n                #debugPanel .controls {\n                    height: 50px;\n                    display: flex;\n                    align-items: center;\n                    float: right;\n                }\n               \n                #debugPanel .controls button {\n                    background: #ffd457;\n                    border: none;\n                    border-radius: 4px;\n                    color: #1d1d1d;\n                    padding: 6px 11px;\n                    font-weight: bold;\n                    margin-right: 6px;\n                }\n               \n                #debugPanel .number {\n                    color:#b66bb2\n                }\n                \n                #debugPanel .key {\n                    color: #619bab;\n                }\n                \n                #debugPanel .string {\n                    color:#55c149\n                }\n                \n                #debugPanel .boolean {\n                    color:#ff82a4;\n                }\n                \n                #debugPanel .null {\n                    color:#ff7477;\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar {\n                  width: 5px;\n                  height: 12px;\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar-track {\n                  background: rgba(0, 0, 0, 0.1);\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar-thumb {\n                  background: #ffd457;\n                }\n                \n                #debugPanel .message {\n                    display: block;\n                    padding: 2px 0;\n                    font: 13px Verdana, Arial, sans-serif;\n                    white-space: pre-wrap;\n                }\n                \n                #debugPanel .info {\n                    color: #00c5b5;\n                }\n                \n                #debugPanel .error {\n                    color: #ff6b6b;\n                }\n                \n                #debugPanel .log {\n                    color: #4cff85;\n                }\n                \n                #debugPanel .object {\n                    color: #619bab;\n                }\n            ");
+	      document.head.append(style);
+	    },
+	    initHtml: function initHtml() {
+	      panel.el = document.createElement('div');
+	      panel.el.id = 'debugPanel';
+	      document.body.appendChild(panel.el);
+	      panel.el.innerHTML = "\n                <div class=\"inner\">\n                \n                </div>\n                <div class=\"controls\">\n                    <button class=\"toggle-minimize\">\n                        &#128469;\n                    </button>\n                    <button class=\"clear-panel\">\n                        &#128465;\n                    </button>\n                    <button class=\"drag-handle\">\n                        &#10021;\n                    </button>\n                    <button class=\"resize-handle\">\n                        &searr;\n                     </button>\n                </div>\n            ";
+	    },
+	    onLoad: function onLoad() {
+	      var offset, mousePosition;
+	      var isDragDown = false;
+	      var isResizeDown = false;
+	      var dragButton = panel.el.querySelector('.drag-handle');
+	      var resizeButton = panel.el.querySelector('.resize-handle');
+	      var clearButton = panel.el.querySelector('.clear-panel');
+	      var minimizeToggle = panel.el.querySelector('.toggle-minimize');
+	      minimizeToggle.addEventListener('click', function () {
+	        panel.state.minimized = !panel.state.minimized;
+	        panel.saveState();
+	        panel.el.querySelector('.inner').style.display = panel.state.minimized ? 'none' : 'block';
+	      });
+	      clearButton.addEventListener('click', function () {
+	        panel.el.querySelector('.inner').innerHTML = '';
+	      });
+	      resizeButton.addEventListener('mousedown', function (e) {
+	        isResizeDown = true;
+	      }, false);
+	      document.addEventListener('mouseup', function (e) {
+	        isResizeDown = false;
+	      }, false);
+	      dragButton.addEventListener('mousedown', function (e) {
+	        isDragDown = true;
+	        offset = [panel.el.offsetLeft - e.clientX, panel.el.offsetTop - e.clientY];
+	      });
+	      document.addEventListener('mouseup', function () {
+	        isDragDown = false;
+	      });
+	      document.addEventListener('mousemove', function (event) {
+	        event.preventDefault();
+
+	        if (isDragDown) {
+	          mousePosition = {
+	            x: event.clientX,
+	            y: event.clientY
+	          };
+	          var left = mousePosition.x + offset[0] + 'px';
+	          var top = mousePosition.y + offset[1] + 'px';
+	          panel.el.style.left = left;
+	          panel.el.style.top = top;
+	          panel.state.left = left;
+	          panel.state.top = top;
+	          panel.saveState();
+	        }
+
+	        if (isResizeDown) {
+	          var width = event.clientX - panel.el.offsetLeft - 20 + 'px';
+	          var height = event.clientY - panel.el.offsetTop - 55 + 'px';
+
+	          if (parseInt(width) > 460) {
+	            panel.el.querySelector('.inner').style.width = width;
+	            panel.state.width = width;
+	          } else {
+	            panel.el.querySelector('.inner').style.width = '460px';
+	            panel.state.width = '460px';
+	          }
+
+	          panel.el.querySelector('.inner').style.height = height;
+	          panel.state.height = height;
+	          panel.saveState();
+	        }
+	      });
+	    },
+	    saveState: function saveState() {
+	      localStorage.setItem('debugPanel', JSON.stringify(panel.state));
+	    },
+	    onFinish: function onFinish() {
+	      var logger = loggers.info ? loggers.info : console.info;
+	      logger(["\uD83D\uDC0D Welcome to (serpent-client@1.8.0)", '', '-', "debug: <span style=\"color: #fff;\">".concat(Config$1.get('debug'), "</span>"), "endpoint: <span style=\"color: #fff;\">".concat(Config$1.get('path'), "</span>"), '-', '', ''].join('\n'));
+	    },
+	    hookLoggers: function hookLoggers() {
+	      var hooks = ['log', 'error', 'info', 'warn'];
+	      var inner = panel.el.querySelector('.inner');
+
+	      var _loop = function _loop() {
+	        var hook = _hooks[_i];
+
+	        loggers[hook] = function () {
+	          for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+	            args[_key2] = arguments[_key2];
+	          }
+
+	          var clonedArgs = [].concat(args);
+	          var message = "<span class=\"message ".concat(hook, "\">");
+	          var _iteratorNormalCompletion = true;
+	          var _didIteratorError = false;
+	          var _iteratorError = undefined;
+
+	          try {
+	            for (var _iterator = clonedArgs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	              var arg = _step.value;
+
+	              if (_typeof_1(arg) === 'object' || Array.isArray(arg)) {
+	                message += '<span class="object">';
+	                message += panel.colorize(arg, 'panel');
+	                message += '</span>';
+	                continue;
+	              }
+
+	              message += arg;
+	            }
+	          } catch (err) {
+	            _didIteratorError = true;
+	            _iteratorError = err;
+	          } finally {
+	            try {
+	              if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+	                _iterator["return"]();
+	              }
+	            } finally {
+	              if (_didIteratorError) {
+	                throw _iteratorError;
+	              }
+	            }
+	          }
+
+	          message += "</span>";
+	          inner.innerHTML += message;
+	          inner.scrollTop = inner.scrollHeight;
+	        };
+	      };
+
+	      for (var _i = 0, _hooks = hooks; _i < _hooks.length; _i++) {
+	        _loop();
+	      }
+
+	      window.onerror = function (message, url, line) {
+	        var logger = loggers.error ? loggers.error : console.error;
+	        logger("Error: ".concat(message, ", ").concat(url, ": ").concat(line));
+	      };
 	    }
-	  });
-	  var hooks = ['log', 'error', 'info', 'warn'];
-
-	  var _loop = function _loop() {
-	    var hook = _hooks[_i];
-
-	    loggers[hook] = function () {
-	      for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-	        args[_key2] = arguments[_key2];
-	      }
-
-	      var clonedArgs = [].concat(args);
-	      var message = "<span class=\"message ".concat(hook, "\">");
-	      var _iteratorNormalCompletion = true;
-	      var _didIteratorError = false;
-	      var _iteratorError = undefined;
-
-	      try {
-	        for (var _iterator = clonedArgs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	          var arg = _step.value;
-
-	          if (_typeof_1(arg) === 'object' || Array.isArray(arg)) {
-	            message += '<span class="object">';
-	            message += colorize(arg, 'panel');
-	            message += '</span>';
-	            continue;
-	          }
-
-	          message += arg;
-	        }
-	      } catch (err) {
-	        _didIteratorError = true;
-	        _iteratorError = err;
-	      } finally {
-	        try {
-	          if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-	            _iterator["return"]();
-	          }
-	        } finally {
-	          if (_didIteratorError) {
-	            throw _iteratorError;
-	          }
-	        }
-	      }
-
-	      message += "</span>";
-	      el.innerHTML += message;
-	      el.scrollTop = el.scrollHeight;
-	    };
 	  };
-
-	  for (var _i = 0, _hooks = hooks; _i < _hooks.length; _i++) {
-	    _loop();
-	  }
-
-	  window.onerror = function (message, url, line) {
-	    var logger = loggers.error ? loggers.error : console.error;
-	    logger("Error: ".concat(message, ", ").concat(url, ": ").concat(line));
-	  };
-
-	  var logger = loggers.info ? loggers.info : console.info;
-	  logger("\uD83D\uDC0D Welcome to serpent-client@1.7.6\n-----\ndebug: ".concat(Config$1.get('debug'), "  \nendpoint: ").concat(Config$1.get('path'), "\n-----\n    "));
+	  panel.init();
 	};
 
 	var Utils = /*#__PURE__*/Object.freeze({
@@ -1155,6 +1204,37 @@
 
 	var Config$1 = new Config();
 
+	/**
+	 * Client constants
+	 * @type {string}
+	 */
+	var LOADING_START = 'loading:start';
+	var LOADING_END = 'loading:end';
+	var ACTION_SUCCESS = 'success';
+	var ACTION_ERROR = 'error';
+	var ACTION_PROGRESS = 'progress';
+	/**
+	 * Socket events
+	 * @type {string}
+	 */
+
+	var SOCKET_CONNECTED = 'socket:connected';
+	var SOCKET_DISCONNECTED = 'socket:disconnected';
+	var SOCKET_RECONNECTED = 'socket:reconnected';
+	var SOCKET_AUTHENTICATED = 'socket:authenticated';
+
+	var Constants = /*#__PURE__*/Object.freeze({
+		LOADING_START: LOADING_START,
+		LOADING_END: LOADING_END,
+		ACTION_SUCCESS: ACTION_SUCCESS,
+		ACTION_ERROR: ACTION_ERROR,
+		ACTION_PROGRESS: ACTION_PROGRESS,
+		SOCKET_CONNECTED: SOCKET_CONNECTED,
+		SOCKET_DISCONNECTED: SOCKET_DISCONNECTED,
+		SOCKET_RECONNECTED: SOCKET_RECONNECTED,
+		SOCKET_AUTHENTICATED: SOCKET_AUTHENTICATED
+	});
+
 	var Socket =
 	/*#__PURE__*/
 	function () {
@@ -1173,13 +1253,17 @@
 
 	  createClass(Socket, [{
 	    key: "emit",
-	    value: function emit(event, data) {
-	      this.client.emit(event, data);
+	    value: function emit() {
+	      var _this$client;
+
+	      (_this$client = this.client).emit.apply(_this$client, arguments);
 	    }
 	  }, {
 	    key: "on",
-	    value: function on(event, handler) {
-	      this.client.on(event, handler);
+	    value: function on() {
+	      var _this$client2;
+
+	      (_this$client2 = this.client).on.apply(_this$client2, arguments);
 	    }
 	  }, {
 	    key: "setup",
@@ -1190,84 +1274,43 @@
 	      var token = tokenHandler.get('token');
 
 	      if (token) {
-	        d('info', 'Authenticating socket.');
+	        d('info', '+ authenticating socket');
 	        this.client.emit('login', token);
 	      }
 
+	      this.client.on('connect', function () {
+	        d('info', '+ socket connected');
+
+	        _this.parent.events.emit(SOCKET_CONNECTED);
+	      });
 	      this.client.on('reconnect', function () {
-	        d('info', 'Socket has reconnected');
+	        d('info', '+ socket reconnected');
 
 	        _this.client.emit('login', token);
+
+	        _this.parent.events.emit(SOCKET_RECONNECTED);
 	      });
 	      this.client.on('login', function () {
-	        d('info', 'Socket has logged in');
+	        d('info', '+ socket authenticated');
+
+	        _this.parent.events.emit(SOCKET_AUTHENTICATED);
+	      });
+	      this.client.on('disconnect', function () {
+	        d('info', '+ socket disconnected');
+
+	        _this.parent.events.emit(SOCKET_DISCONNECTED);
 	      });
 	    }
 	  }, {
 	    key: "logout",
 	    value: function logout() {
+	      d('info', '+ socket logging out');
 	      this.client.emit('logout');
 	    }
 	  }]);
 
 	  return Socket;
 	}();
-
-	function _objectWithoutPropertiesLoose(source, excluded) {
-	  if (source == null) return {};
-	  var target = {};
-	  var sourceKeys = Object.keys(source);
-	  var key, i;
-
-	  for (i = 0; i < sourceKeys.length; i++) {
-	    key = sourceKeys[i];
-	    if (excluded.indexOf(key) >= 0) continue;
-	    target[key] = source[key];
-	  }
-
-	  return target;
-	}
-
-	var objectWithoutPropertiesLoose = _objectWithoutPropertiesLoose;
-
-	function _objectWithoutProperties(source, excluded) {
-	  if (source == null) return {};
-	  var target = objectWithoutPropertiesLoose(source, excluded);
-	  var key, i;
-
-	  if (Object.getOwnPropertySymbols) {
-	    var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
-
-	    for (i = 0; i < sourceSymbolKeys.length; i++) {
-	      key = sourceSymbolKeys[i];
-	      if (excluded.indexOf(key) >= 0) continue;
-	      if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
-	      target[key] = source[key];
-	    }
-	  }
-
-	  return target;
-	}
-
-	var objectWithoutProperties = _objectWithoutProperties;
-
-	/**
-	 * Client constants
-	 * @type {string}
-	 */
-	var LOADING_START = 'loading:start';
-	var LOADING_END = 'loading:end';
-	var ACTION_SUCCESS = 'success';
-	var ACTION_ERROR = 'error';
-	var ACTION_PROGRESS = 'progress';
-
-	var Constants = /*#__PURE__*/Object.freeze({
-		LOADING_START: LOADING_START,
-		LOADING_END: LOADING_END,
-		ACTION_SUCCESS: ACTION_SUCCESS,
-		ACTION_ERROR: ACTION_ERROR,
-		ACTION_PROGRESS: ACTION_PROGRESS
-	});
 
 	var Actions =
 	/*#__PURE__*/
@@ -1350,7 +1393,7 @@
 	                    break;
 	                  }
 
-	                  d('info', 'Attempting token refresh');
+	                  d('info', '+ token refresh');
 	                  _context.next = 6;
 	                  return _this.parent.refreshToken({
 	                    token: refreshToken
@@ -1373,7 +1416,7 @@
 	                  /**
 	                   * Update the tokens
 	                   */
-	                  d('info', 'Successfully refreshed token, retrying request.');
+	                  d('info', '(ok) refreshed token');
 	                  tokenHandler.set('token', data.token);
 	                  tokenHandler.set('refresh', data.refresh);
 	                  _this.parent.http.defaults.headers.Authorization = data.token;
@@ -1445,35 +1488,36 @@
 	                data = {};
 
 	                if (Object.keys(actions).length) {
-	                  _context3.next = 20;
+	                  _context3.next = 21;
 	                  break;
 	                }
 
-	                _context3.prev = 6;
-	                _context3.next = 9;
+	                d('info', '+ actions');
+	                _context3.prev = 7;
+	                _context3.next = 10;
 	                return http.get(Config$1.get('actions'));
 
-	              case 9:
+	              case 10:
 	                _ref3 = _context3.sent;
 	                _actions = _ref3.data;
 	                data = _actions;
-	                _context3.next = 18;
+	                _context3.next = 19;
 	                break;
 
-	              case 14:
-	                _context3.prev = 14;
-	                _context3.t0 = _context3["catch"](6);
-	                d('error', 'Could not load actions list.');
+	              case 15:
+	                _context3.prev = 15;
+	                _context3.t0 = _context3["catch"](7);
+	                d('error', '(err) failed loading actions list', _context3.t0);
 	                this.parent.events.emit(ACTION_ERROR, ['init', _context3.t0]);
 
-	              case 18:
-	                _context3.next = 21;
+	              case 19:
+	                _context3.next = 22;
 	                break;
 
-	              case 20:
+	              case 21:
 	                data = actions;
 
-	              case 21:
+	              case 22:
 	                this.list = data;
 
 	                _loop = function _loop(key) {
@@ -1482,7 +1526,7 @@
 	                  }
 
 	                  if (_this2.hasOwnProperty(key)) {
-	                    d('warn', "Could not register ".concat(key, " as it is already being used."));
+	                    d('warn', "(err) (".concat(key, ") already registered"));
 	                    return "continue";
 	                  }
 
@@ -1492,17 +1536,23 @@
 	                    var _ref4 = asyncToGenerator(
 	                    /*#__PURE__*/
 	                    regenerator.mark(function _callee2(payload) {
-	                      var tokenHandler, _ref5, data, errors;
+	                      var options,
+	                          tokenHandler,
+	                          _ref5,
+	                          data,
+	                          errors,
+	                          _args2 = arguments;
 
 	                      return regenerator.wrap(function _callee2$(_context2) {
 	                        while (1) {
 	                          switch (_context2.prev = _context2.next) {
 	                            case 0:
+	                              options = _args2.length > 1 && _args2[1] !== undefined ? _args2[1] : {};
 	                              tokenHandler = Config$1.get('tokenHandler');
-	                              _context2.next = 3;
-	                              return _this2._call(key, payload);
+	                              _context2.next = 4;
+	                              return _this2._call(key, payload, options);
 
-	                            case 3:
+	                            case 4:
 	                              _ref5 = _context2.sent;
 	                              data = _ref5.data;
 	                              errors = _ref5.errors;
@@ -1535,7 +1585,7 @@
 	                                errors: errors
 	                              });
 
-	                            case 9:
+	                            case 10:
 	                            case "end":
 	                              return _context2.stop();
 	                          }
@@ -1551,9 +1601,9 @@
 
 	                _context3.t1 = regenerator.keys(data);
 
-	              case 24:
+	              case 25:
 	                if ((_context3.t2 = _context3.t1()).done) {
-	                  _context3.next = 31;
+	                  _context3.next = 32;
 	                  break;
 	                }
 
@@ -1561,22 +1611,22 @@
 	                _ret = _loop(key);
 
 	                if (!(_ret === "continue")) {
-	                  _context3.next = 29;
+	                  _context3.next = 30;
 	                  break;
 	                }
 
-	                return _context3.abrupt("continue", 24);
+	                return _context3.abrupt("continue", 25);
 
-	              case 29:
-	                _context3.next = 24;
+	              case 30:
+	                _context3.next = 25;
 	                break;
 
-	              case 31:
+	              case 32:
 	              case "end":
 	                return _context3.stop();
 	            }
 	          }
-	        }, _callee3, this, [[6, 14]]);
+	        }, _callee3, this, [[7, 15]]);
 	      }));
 
 	      function setup() {
@@ -1636,7 +1686,7 @@
 
 	                if (Object.keys(errors).length) {
 	                  result = errors;
-	                  d('info', "Local validation failed for [".concat(action, "], errors:"), errors);
+	                  d('info', "(err) (".concat(action, ")(local validation)"), errors);
 	                }
 
 	              case 6:
@@ -1666,17 +1716,12 @@
 	      var _batch = asyncToGenerator(
 	      /*#__PURE__*/
 	      regenerator.mark(function _callee5() {
-	        var _this4 = this;
-
 	        var actions,
-	            extra,
+	            options,
 	            result,
 	            names,
 	            start,
 	            form,
-	            withProgress,
-	            withLoading,
-	            finishTransaction,
 	            action,
 	            payload,
 	            errors,
@@ -1698,55 +1743,41 @@
 	            switch (_context5.prev = _context5.next) {
 	              case 0:
 	                actions = _args5.length > 0 && _args5[0] !== undefined ? _args5[0] : {};
-	                extra = _args5.length > 1 && _args5[1] !== undefined ? _args5[1] : {};
+	                options = _args5.length > 1 && _args5[1] !== undefined ? _args5[1] : {
+	                  validate: true
+	                };
 	                result = {
 	                  errors: false,
 	                  data: false
 	                };
 	                names = Object.keys(actions).join(', ');
 	                start = +new Date();
-	                d('info', "Doing batched action [".concat(names, "]."));
+	                d('info', "+ running (".concat(names, ")"));
 	                form = [];
-	                withProgress = extra.__progress__, withLoading = extra.__loading__;
-
-	                finishTransaction = function finishTransaction() {
-	                  if (withLoading) {
-	                    _this4.parent.events.emit(LOADING_END, []);
-	                  }
-
-	                  if (result.errors) {
-	                    for (var key in Object.keys(result.errors)) {
-	                      _this4.parent.events.emit(ACTION_ERROR, [key, result.errors[key], actions[key]]);
-	                    }
-	                  } else {
-	                    for (var _key in Object.keys(result.data)) {
-	                      _this4.parent.events.emit(ACTION_ERROR, [_key, result.data[_key], actions[_key]]);
-	                    }
-	                  }
-
-	                  var end = +new Date();
-	                  d('info', "Finished doing batch action [".concat(names, "] in [").concat(end - start, " ms], result:"), result);
-	                  return result;
-	                };
-
 	                _context5.t0 = regenerator.keys(actions);
 
-	              case 10:
+	              case 8:
 	                if ((_context5.t1 = _context5.t0()).done) {
-	                  _context5.next = 23;
+	                  _context5.next = 22;
 	                  break;
 	                }
 
 	                action = _context5.t1.value;
 	                payload = actions[action];
-	                _context5.next = 15;
+
+	                if (!options.validate) {
+	                  _context5.next = 19;
+	                  break;
+	                }
+
+	                _context5.next = 14;
 	                return this._validateAction(action, payload);
 
-	              case 15:
+	              case 14:
 	                errors = _context5.sent;
 
 	                if (!errors) {
-	                  _context5.next = 20;
+	                  _context5.next = 19;
 	                  break;
 	                }
 
@@ -1755,32 +1786,32 @@
 	                }
 
 	                result.errors[action] = errors;
-	                return _context5.abrupt("continue", 10);
+	                return _context5.abrupt("continue", 8);
 
-	              case 20:
+	              case 19:
 	                form.push([action, payload]);
-	                _context5.next = 10;
+	                _context5.next = 8;
 	                break;
 
-	              case 23:
+	              case 22:
 	                if (form.length) {
-	                  _context5.next = 25;
+	                  _context5.next = 24;
 	                  break;
 	                }
 
-	                return _context5.abrupt("return", finishTransaction());
+	                return _context5.abrupt("return", this.finishTransaction(options, null, result, actions, start));
 
-	              case 25:
-	                _context5.prev = 25;
-	                _context5.next = 28;
-	                return this.parent.http.post(Config$1.get('handler'), form, this._configAction(withProgress, names));
+	              case 24:
+	                _context5.prev = 24;
+	                _context5.next = 27;
+	                return this.parent.http.post(Config$1.get('handler'), form, this._configAction(options.progress, names));
 
-	              case 28:
+	              case 27:
 	                _ref6 = _context5.sent;
 	                actionResults = _ref6.data;
 
 	                if (Array.isArray(actionResults)) {
-	                  _context5.next = 34;
+	                  _context5.next = 33;
 	                  break;
 	                }
 
@@ -1789,19 +1820,19 @@
 	                    message: ['Unexpected API response']
 	                  }
 	                };
-	                _context5.next = 66;
+	                _context5.next = 65;
 	                break;
 
-	              case 34:
+	              case 33:
 	                _iteratorNormalCompletion = true;
 	                _didIteratorError = false;
 	                _iteratorError = undefined;
-	                _context5.prev = 37;
+	                _context5.prev = 36;
 	                _iterator = actionResults[Symbol.iterator]();
 
-	              case 39:
+	              case 38:
 	                if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-	                  _context5.next = 52;
+	                  _context5.next = 51;
 	                  break;
 	                }
 
@@ -1810,7 +1841,7 @@
 	                data = actionResult[_action];
 
 	                if (!actionResult[_action].errors) {
-	                  _context5.next = 47;
+	                  _context5.next = 46;
 	                  break;
 	                }
 
@@ -1819,61 +1850,61 @@
 	                }
 
 	                result.errors[_action] = actionResult[_action].errors;
-	                return _context5.abrupt("continue", 49);
+	                return _context5.abrupt("continue", 48);
 
-	              case 47:
+	              case 46:
 	                if (!result.data) {
 	                  result.data = {};
 	                }
 
 	                result.data[_action] = data;
 
-	              case 49:
+	              case 48:
 	                _iteratorNormalCompletion = true;
-	                _context5.next = 39;
+	                _context5.next = 38;
 	                break;
 
-	              case 52:
-	                _context5.next = 58;
+	              case 51:
+	                _context5.next = 57;
 	                break;
 
-	              case 54:
-	                _context5.prev = 54;
-	                _context5.t2 = _context5["catch"](37);
+	              case 53:
+	                _context5.prev = 53;
+	                _context5.t2 = _context5["catch"](36);
 	                _didIteratorError = true;
 	                _iteratorError = _context5.t2;
 
-	              case 58:
+	              case 57:
+	                _context5.prev = 57;
 	                _context5.prev = 58;
-	                _context5.prev = 59;
 
 	                if (!_iteratorNormalCompletion && _iterator["return"] != null) {
 	                  _iterator["return"]();
 	                }
 
-	              case 61:
-	                _context5.prev = 61;
+	              case 60:
+	                _context5.prev = 60;
 
 	                if (!_didIteratorError) {
-	                  _context5.next = 64;
+	                  _context5.next = 63;
 	                  break;
 	                }
 
 	                throw _iteratorError;
 
+	              case 63:
+	                return _context5.finish(60);
+
 	              case 64:
-	                return _context5.finish(61);
+	                return _context5.finish(57);
 
 	              case 65:
-	                return _context5.finish(58);
-
-	              case 66:
-	                _context5.next = 72;
+	                _context5.next = 71;
 	                break;
 
-	              case 68:
-	                _context5.prev = 68;
-	                _context5.t3 = _context5["catch"](25);
+	              case 67:
+	                _context5.prev = 67;
+	                _context5.t3 = _context5["catch"](24);
 	                _errors = get(_context5.t3, 'response.data.errors', false);
 	                result.errors = {
 	                  other: _errors ? _errors : {
@@ -1881,15 +1912,15 @@
 	                  }
 	                };
 
-	              case 72:
-	                return _context5.abrupt("return", finishTransaction());
+	              case 71:
+	                return _context5.abrupt("return", this.finishTransaction(options, null, result, actions, start));
 
-	              case 73:
+	              case 72:
 	              case "end":
 	                return _context5.stop();
 	            }
 	          }
-	        }, _callee5, this, [[25, 68], [37, 54, 58, 66], [59,, 61, 65]]);
+	        }, _callee5, this, [[24, 67], [36, 53, 57, 65], [58,, 60, 64]]);
 	      }));
 
 	      function batch() {
@@ -1898,6 +1929,35 @@
 
 	      return batch;
 	    }()
+	  }, {
+	    key: "finishTransaction",
+	    value: function finishTransaction(options, action, result, payload, start) {
+	      if (options.loading) {
+	        this.parent.events.emit(LOADING_END, [action, payload]);
+	      }
+
+	      if (result.errors) {
+	        if (action === null) {
+	          for (var key in Object.keys(result.errors)) {
+	            this.parent.events.emit(ACTION_ERROR, [key, result.errors[key], payload[key]]);
+	          }
+	        } else {
+	          this.parent.events.emit(ACTION_ERROR, [action, result.errors, payload]);
+	        }
+	      } else {
+	        if (action === null) {
+	          for (var _key in Object.keys(result.data)) {
+	            this.parent.events.emit(ACTION_ERROR, [_key, result.data[_key], payload[_key]]);
+	          }
+	        } else {
+	          this.parent.events.emit(ACTION_SUCCESS, [action, result.data, payload]);
+	        }
+	      }
+
+	      var end = +new Date();
+	      d(!!result.errors ? 'error' : 'info', "(".concat(!!result.errors ? 'fail' : 'ok', ") (").concat(action, ") in (").concat(end - start, " ms)"), result);
+	      return result;
+	    }
 	    /**
 	     * Call an action
 	     * @returns
@@ -1910,18 +1970,14 @@
 	      var _call2 = asyncToGenerator(
 	      /*#__PURE__*/
 	      regenerator.mark(function _callee6(action) {
-	        var _this5 = this;
-
-	        var data,
+	        var payload,
+	            options,
 	            result,
-	            withProgress,
-	            withLoading,
-	            payload,
 	            start,
-	            finishTransaction,
 	            errors,
 	            _ref7,
-	            _data,
+	            data,
+	            debug,
 	            _errors2,
 	            _args6 = arguments;
 
@@ -1929,39 +1985,29 @@
 	          while (1) {
 	            switch (_context6.prev = _context6.next) {
 	              case 0:
-	                data = _args6.length > 1 && _args6[1] !== undefined ? _args6[1] : {};
+	                payload = _args6.length > 1 && _args6[1] !== undefined ? _args6[1] : {};
+	                options = _args6.length > 2 && _args6[2] !== undefined ? _args6[2] : {
+	                  validate: true
+	                };
 	                result = {
 	                  errors: false,
 	                  data: false
 	                };
-	                withProgress = data.__progress__, withLoading = data.__loading__, payload = objectWithoutProperties(data, ["__progress__", "__loading__"]);
 
-	                if (withLoading) {
+	                if (options.loading) {
 	                  this.parent.events.emit(LOADING_START, [action, payload]);
 	                }
 
 	                start = +new Date();
-	                d('info', "Doing action [".concat(action, "], sent payload:"), payload);
-
-	                finishTransaction = function finishTransaction() {
-	                  if (withLoading) {
-	                    _this5.parent.events.emit(LOADING_END, [action, payload]);
-	                  }
-
-	                  if (result.errors) {
-	                    _this5.parent.events.emit(ACTION_ERROR, [action, result.errors, payload]);
-	                  } else {
-	                    _this5.parent.events.emit(ACTION_SUCCESS, [action, result.data, payload]);
-	                  }
-
-	                  var end = +new Date();
-	                  d('info', "Finished doing action [".concat(action, "] in [").concat(end - start, " ms], result:"), result);
-	                  return result;
-	                };
+	                d('info', "+ running (".concat(action, ")"), payload);
 	                /**
 	                 * Do client side validation
 	                 */
 
+	                if (!options.validate) {
+	                  _context6.next = 13;
+	                  break;
+	                }
 
 	                _context6.next = 9;
 	                return this._validateAction(action, payload);
@@ -1970,49 +2016,53 @@
 	                errors = _context6.sent;
 
 	                if (!errors) {
-	                  _context6.next = 14;
+	                  _context6.next = 13;
 	                  break;
 	                }
 
 	                result.errors = errors;
-	                d('info', "Local validation failed for [".concat(action, "], errors:"), errors);
-	                return _context6.abrupt("return", finishTransaction());
+	                return _context6.abrupt("return", this.finishTransaction(options, action, result, payload, start));
 
-	              case 14:
-	                _context6.prev = 14;
-	                _context6.next = 17;
-	                return this.parent.http.post(Config$1.get('handler'), [action, payload], this._configAction(withProgress, action));
+	              case 13:
+	                _context6.prev = 13;
+	                _context6.next = 16;
+	                return this.parent.http.post(Config$1.get('handler'), [action, payload], this._configAction(options.progress, action));
 
-	              case 17:
+	              case 16:
 	                _ref7 = _context6.sent;
-	                _data = _ref7.data;
+	                data = _ref7.data;
 
-	                if (_data && _data.errors) {
-	                  result.errors = _data.errors;
+	                if (data && data.errors) {
+	                  result.errors = data.errors;
 	                } else {
-	                  result.data = _data;
+	                  result.data = data;
 	                }
 
-	                _context6.next = 26;
+	                _context6.next = 27;
 	                break;
 
-	              case 22:
-	                _context6.prev = 22;
-	                _context6.t0 = _context6["catch"](14);
+	              case 21:
+	                _context6.prev = 21;
+	                _context6.t0 = _context6["catch"](13);
+	                debug = get(_context6.t0, 'response.data.debug', false);
 	                _errors2 = get(_context6.t0, 'response.data.errors', false);
 	                result.errors = _errors2 ? _errors2 : {
 	                  message: [_context6.t0.response]
 	                };
 
-	              case 26:
-	                return _context6.abrupt("return", finishTransaction());
+	                if (debug) {
+	                  result.debug = debug;
+	                }
 
 	              case 27:
+	                return _context6.abrupt("return", this.finishTransaction(options, action, result, payload, start));
+
+	              case 28:
 	              case "end":
 	                return _context6.stop();
 	            }
 	          }
-	        }, _callee6, this, [[14, 22]]);
+	        }, _callee6, this, [[13, 21]]);
 	      }));
 
 	      function _call(_x5) {
@@ -2167,7 +2217,7 @@
 	          while (1) {
 	            switch (_context3.prev = _context3.next) {
 	              case 0:
-	                d('info', 'Attempting to logout');
+	                d('info', '+ running (logout)');
 	                tokenHandler = Config$1.get('tokenHandler');
 
 	                if (tokenHandler.get('token')) {
@@ -2193,7 +2243,7 @@
 	                this.user = false;
 	                tokenHandler.remove('token');
 	                tokenHandler.remove('refresh');
-	                d('info', 'User has logout');
+	                d('info', '(ok) logout');
 	                return _context3.abrupt("return", {
 	                  errors: errors,
 	                  data: data
@@ -2255,7 +2305,7 @@
 	      }
 
 	      this.events[event].push(listener);
-	      d('info', "Registering event [".concat(event, "]"));
+	      d('info', "+ event (".concat(event, ")"));
 	      return function () {
 	        return _this.removeListener(event, listener);
 	      };
@@ -2280,6 +2330,8 @@
 	  }, {
 	    key: "removeListener",
 	    value: function removeListener(event, listener) {
+	      d('info', "- event (".concat(event, ")"));
+
 	      if (_typeof_1(this.events[event]) !== 'object') {
 	        return;
 	      }
@@ -2697,6 +2749,7 @@
 
 	                if (store && typeof window !== 'undefined') {
 	                  localStorage.setItem('i18n', JSON.stringify(this.translations));
+	                  d('info', '(ok) loaded translations');
 	                }
 
 	              case 12:
@@ -2766,6 +2819,10 @@
 	    });
 	    Config$1.store(this.opts);
 	    this.onReady = false;
+
+	    if (this.opts.debug) {
+	      debugPanel();
+	    }
 	  }
 	  /**
 	   * Setup the client
