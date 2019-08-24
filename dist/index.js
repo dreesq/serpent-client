@@ -1113,7 +1113,7 @@
 	      localStorage.setItem('debugPanel', JSON.stringify(panel.state));
 	    },
 	    onFinish: function onFinish() {
-	      var version = '1.8.4';
+	      var version = '1.8.5';
 	      var logger = loggers.info ? loggers.info : console.info;
 	      logger(['<div class="welcome-message">', "\n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>debug: <span>".concat(Config$1.get('debug'), "</span>"), "endpoint: <span>".concat(Config$1.get('path'), "</span>"), "version: <span>".concat(version, "</span></div>"), '', '</div>'].join('\n'));
 	    },
