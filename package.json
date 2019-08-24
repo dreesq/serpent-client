@@ -1,6 +1,6 @@
 {
   "name": "@dreesq/serpent-client",
-  "version": "1.8.4",
+  "version": "1.8.5",
   "description": "Client component for interacting with serpent",
   "main": "./dist/index.js",
   "directories": {
