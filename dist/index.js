@@ -1113,7 +1113,7 @@
 	      localStorage.setItem('debugPanel', JSON.stringify(panel.state));
 	    },
 	    onFinish: function onFinish() {
-	      var version = '1.8.6';
+	      var version = '1.8.7';
 	      var logger = loggers.info ? loggers.info : console.info;
 	      logger(['<div class="welcome-message">', "\n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>debug: <span>".concat(Config$1.get('debug'), "</span>"), "endpoint: <span>".concat(Config$1.get('path'), "</span>"), "version: <span>".concat(version, "</span></div>"), '', '</div>'].join('\n'));
 	    },
@@ -1969,7 +1969,7 @@
 	      } else {
 	        if (action === null) {
 	          for (var _key in Object.keys(result.data)) {
-	            this.parent.events.emit(ACTION_ERROR, [_key, result.data[_key], payload[_key]]);
+	            this.parent.events.emit(ACTION_SUCCESS, [_key, result.data[_key], payload[_key]]);
 	          }
 	        } else {
 	          this.parent.events.emit(ACTION_SUCCESS, [action, result.data, payload]);
@@ -2437,7 +2437,7 @@
 	  email: function email(value) {
 	    var re = /\S+@\S+\.\S+/;
 
-	    if (!re.test(value)) {
+	    if (typeof value !== 'undefined' && !re.test(value)) {
 	      return 'validation.email';
 	    }
 	  },
@@ -2447,11 +2447,15 @@
 	    }
 	  },
 	  string: function string(value) {
-	    if (typeof value !== 'string') {
+	    if (typeof value !== 'undefined' && typeof value !== 'string') {
 	      return 'validation.string';
 	    }
 	  },
 	  min: function min(value, field, opts) {
+	    if (typeof value === 'undefined') {
+	      return;
+	    }
+
 	    if (typeof value === 'string' && value.length < Number(opts[0])) {
 	      return 'validation.min';
 	    }
@@ -2461,6 +2465,10 @@
 	    }
 	  },
 	  max: function max(value, field, opts) {
+	    if (typeof value === 'undefined') {
+	      return;
+	    }
+
 	    if (typeof value === 'string' && value.length > Number(opts[0])) {
 	      return 'validation.max';
 	    }
@@ -2470,7 +2478,7 @@
 	    }
 	  },
 	  number: function number(value) {
-	    if (typeof value !== 'number') {
+	    if (typeof value !== 'undefined' && typeof value !== 'number') {
 	      return 'validation.number';
 	    }
 	  },
@@ -2497,7 +2505,7 @@
 	  date: function date(value) {
 	    var isValid = new Date(value) !== "Invalid Date" && !isNaN(new Date(value));
 
-	    if (!isValid) {
+	    if (typeof value !== 'undefined' && !isValid) {
 	      return 'validation.date';
 	    }
 	  }
