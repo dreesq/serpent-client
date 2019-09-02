@@ -978,7 +978,7 @@
 
 	      if (!panel.state) {
 	        panel.state = {
-	          width: 420
+	          width: '420px'
 	        };
 	      }
 
