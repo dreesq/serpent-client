@@ -1119,7 +1119,7 @@
 	    },
 	    onFinish: function onFinish() {
 	      var inner = panel.el.querySelector('.inner');
-	      var version = '1.8.9';
+	      var version = '1.9.0';
 	      inner.innerHTML += ['<pre class="welcome-message">', "\n                 \n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>debug: <span>".concat(Config$1.get('debug'), "</span>"), "endpoint: <span>".concat(Config$1.get('path'), "</span>"), "version: <span>".concat(version, "</span></div>"), '', '</pre>'].join('\n');
 	    },
 	    hookLoggers: function hookLoggers() {
@@ -2013,6 +2013,8 @@
 	            result,
 	            start,
 	            errors,
+	            method,
+	            path,
 	            _ref7,
 	            data,
 	            debug,
@@ -2079,10 +2081,17 @@
 
 	              case 18:
 	                _context6.prev = 18;
-	                _context6.next = 21;
-	                return this.parent.http.post(Config$1.get('handler'), [action, payload], this._configAction(options.progress, action));
+	                method = 'post';
 
-	              case 21:
+	                if (Array.isArray(action)) {
+	                  method = action[0];
+	                  path = action[1];
+	                }
+
+	                _context6.next = 23;
+	                return this.parent.http[method](path || Config$1.get('handler'), payload instanceof FormData ? payload : [action, payload], this._configAction(options.progress, action));
+
+	              case 23:
 	                _ref7 = _context6.sent;
 	                data = _ref7.data;
 
@@ -2098,11 +2107,11 @@
 	                  }
 	                }
 
-	                _context6.next = 32;
+	                _context6.next = 34;
 	                break;
 
-	              case 26:
-	                _context6.prev = 26;
+	              case 28:
+	                _context6.prev = 28;
 	                _context6.t0 = _context6["catch"](18);
 	                debug = get(_context6.t0, 'response.data.debug', false);
 	                _errors2 = get(_context6.t0, 'response.data.errors', false);
@@ -2114,15 +2123,15 @@
 	                  result.debug = debug;
 	                }
 
-	              case 32:
+	              case 34:
 	                return _context6.abrupt("return", this.finishTransaction(options, action, result, payload, start));
 
-	              case 33:
+	              case 35:
 	              case "end":
 	                return _context6.stop();
 	            }
 	          }
-	        }, _callee6, this, [[18, 26]]);
+	        }, _callee6, this, [[18, 28]]);
 	      }));
 
 	      function _call(_x5) {
