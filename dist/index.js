@@ -1119,7 +1119,7 @@
 	    },
 	    onFinish: function onFinish() {
 	      var inner = panel.el.querySelector('.inner');
-	      var version = '1.9.1';
+	      var version = '1.9.2';
 	      inner.innerHTML += ['<pre class="welcome-message">', "\n                 \n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>debug: <span>".concat(Config$1.get('debug'), "</span>"), "endpoint: <span>".concat(Config$1.get('path'), "</span>"), "version: <span>".concat(version, "</span></div>"), '', '</pre>'].join('\n');
 	    },
 	    hookLoggers: function hookLoggers() {
@@ -2088,7 +2088,7 @@
 	                }
 
 	                _context6.next = 24;
-	                return this.parent.http[method](path, typeof window !== 'undefined' && payload instanceof FormData ? payload : [action, payload], this._configAction(options.progress, action));
+	                return this.parent.http[method]("".concat(Config$1.get('path')).concat(path), typeof window !== 'undefined' && payload instanceof FormData ? payload : [action, payload], this._configAction(options.progress, action));
 
 	              case 24:
 	                _ref7 = _context6.sent;
@@ -2123,9 +2123,10 @@
 	                }
 
 	              case 35:
+	                action = Array.isArray(action) ? action[1] : action;
 	                return _context6.abrupt("return", this.finishTransaction(options, action, result, payload, start));
 
-	              case 36:
+	              case 37:
 	              case "end":
 	                return _context6.stop();
 	            }
