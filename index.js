@@ -41,15 +41,10 @@ const defaults = {
  */
 
 export default class Serpent {
-     constructor(path, opts = {}) {
-          if (!path) {
-               throw new Error('Missing required parameter `path`.')
-          }
-
+     constructor(opts = {}) {
           this.opts = {
                ...defaults,
-               ...opts,
-               path
+               ...opts
           };
 
           Config.store(this.opts);
