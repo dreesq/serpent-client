@@ -1119,8 +1119,8 @@
 	    },
 	    onFinish: function onFinish() {
 	      var inner = panel.el.querySelector('.inner');
-	      var version = '1.9.2';
-	      inner.innerHTML += ['<pre class="welcome-message">', "\n                 \n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>debug: <span>".concat(Config$1.get('debug'), "</span>"), "endpoint: <span>".concat(Config$1.get('path'), "</span>"), "version: <span>".concat(version, "</span></div>"), '', '</pre>'].join('\n');
+	      var version = '1.9.3';
+	      inner.innerHTML += ['<pre class="welcome-message">', "\n                 \n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>debug: <span>".concat(Config$1.get('debug'), "</span>"), "endpoint: <span>".concat(Config$1.get('handler'), "</span>"), "version: <span>".concat(version, "</span></div>"), '', '</pre>'].join('\n');
 	    },
 	    hookLoggers: function hookLoggers() {
 	      var hooks = ['log', 'error', 'info', 'warn'];
@@ -1274,7 +1274,7 @@
 	      return;
 	    }
 
-	    this.client = sio(Config$1.get('path'));
+	    this.client = sio(Config$1.get('socket'));
 	    this.setup();
 	  }
 
@@ -2088,7 +2088,7 @@
 	                }
 
 	                _context6.next = 24;
-	                return this.parent.http[method]("".concat(Config$1.get('path')).concat(path), typeof window !== 'undefined' && payload instanceof FormData ? payload : [action, payload], this._configAction(options.progress, action));
+	                return this.parent.http[method](path, typeof window !== 'undefined' && payload instanceof FormData ? payload : [action, payload], this._configAction(options.progress, action));
 
 	              case 24:
 	                _ref7 = _context6.sent;
@@ -2884,18 +2884,12 @@
 	var Serpent =
 	/*#__PURE__*/
 	function () {
-	  function Serpent(path) {
-	    var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	  function Serpent() {
+	    var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
 	    classCallCheck(this, Serpent);
 
-	    if (!path) {
-	      throw new Error('Missing required parameter `path`.');
-	    }
-
-	    this.opts = objectSpread({}, defaults, opts, {
-	      path: path
-	    });
+	    this.opts = objectSpread({}, defaults, opts);
 	    Config$1.store(this.opts);
 	    this.onReady = false;
 
