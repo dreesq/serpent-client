@@ -1119,8 +1119,8 @@
 	    },
 	    onFinish: function onFinish() {
 	      var inner = panel.el.querySelector('.inner');
-	      var version = '1.9.1';
-	      inner.innerHTML += ['<pre class="welcome-message">', "\n                 \n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>debug: <span>".concat(Config$1.get('debug'), "</span>"), "endpoint: <span>".concat(Config$1.get('path'), "</span>"), "version: <span>".concat(version, "</span></div>"), '', '</pre>'].join('\n');
+	      var version = '1.9.3';
+	      inner.innerHTML += ['<pre class="welcome-message">', "\n                 \n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>debug: <span>".concat(Config$1.get('debug'), "</span>"), "endpoint: <span>".concat(Config$1.get('handler'), "</span>"), "version: <span>".concat(version, "</span></div>"), '', '</pre>'].join('\n');
 	    },
 	    hookLoggers: function hookLoggers() {
 	      var hooks = ['log', 'error', 'info', 'warn'];
@@ -1274,7 +1274,7 @@
 	      return;
 	    }
 
-	    this.client = sio(Config$1.get('path'));
+	    this.client = sio(Config$1.get('socket'));
 	    this.setup();
 	  }
 
@@ -1373,11 +1373,9 @@
 	    value: function makeHttpClient() {
 	      var _this = this;
 
-	      var options = {
-	        baseURL: Config$1.get('path')
-	      };
 	      var tokenHandler = Config$1.get('tokenHandler');
 	      var token = tokenHandler.get('token');
+	      var options = {};
 
 	      if (token) {
 	        options.headers = {
@@ -2082,16 +2080,17 @@
 	              case 18:
 	                _context6.prev = 18;
 	                method = 'post';
+	                path = Config$1.get('handler');
 
 	                if (Array.isArray(action)) {
 	                  method = action[0];
 	                  path = action[1];
 	                }
 
-	                _context6.next = 23;
-	                return this.parent.http[method](path || Config$1.get('handler'), payload instanceof FormData ? payload : [action, payload], this._configAction(options.progress, action));
+	                _context6.next = 24;
+	                return this.parent.http[method](path, typeof window !== 'undefined' && payload instanceof FormData ? payload : [action, payload], this._configAction(options.progress, action));
 
-	              case 23:
+	              case 24:
 	                _ref7 = _context6.sent;
 	                data = _ref7.data;
 
@@ -2107,31 +2106,32 @@
 	                  }
 	                }
 
-	                _context6.next = 34;
+	                _context6.next = 35;
 	                break;
 
-	              case 28:
-	                _context6.prev = 28;
+	              case 29:
+	                _context6.prev = 29;
 	                _context6.t0 = _context6["catch"](18);
 	                debug = get(_context6.t0, 'response.data.debug', false);
 	                _errors2 = get(_context6.t0, 'response.data.errors', false);
 	                result.errors = _errors2 ? _errors2 : {
-	                  message: [_context6.t0.response]
+	                  message: [_context6.t0.response ? _context6.t0.response : _context6.t0]
 	                };
 
 	                if (debug) {
 	                  result.debug = debug;
 	                }
 
-	              case 34:
+	              case 35:
+	                action = Array.isArray(action) ? action[1] : action;
 	                return _context6.abrupt("return", this.finishTransaction(options, action, result, payload, start));
 
-	              case 35:
+	              case 37:
 	              case "end":
 	                return _context6.stop();
 	            }
 	          }
-	        }, _callee6, this, [[18, 28]]);
+	        }, _callee6, this, [[18, 29]]);
 	      }));
 
 	      function _call(_x5) {
@@ -2884,18 +2884,12 @@
 	var Serpent =
 	/*#__PURE__*/
 	function () {
-	  function Serpent(path) {
-	    var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	  function Serpent() {
+	    var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
 	    classCallCheck(this, Serpent);
 
-	    if (!path) {
-	      throw new Error('Missing required parameter `path`.');
-	    }
-
-	    this.opts = objectSpread({}, defaults, opts, {
-	      path: path
-	    });
+	    this.opts = objectSpread({}, defaults, opts);
 	    Config$1.store(this.opts);
 	    this.onReady = false;
 
