@@ -51,6 +51,7 @@ export default class Serpent {
           this.onReady = false;
 
           if (this.opts.debug) {
+               window.client = this;
                Utils.debugPanel();
           }
      }
