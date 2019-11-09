@@ -900,10 +900,47 @@
 	  return typeof value !== 'undefined' ? value : defaultValue;
 	};
 	/**
+	 * Returns size of an object
+	 * @param object
+	 * @param breakSize
+	 * @returns {number}
+	 */
+
+	var sizeOf = function sizeOf(object, breakSize) {
+	  var objectList = [];
+	  var stack = [object];
+	  var bytes = 0;
+
+	  while (stack.length) {
+	    var value = stack.pop();
+
+	    if (typeof value === 'boolean') {
+	      bytes += 4;
+	    } else if (typeof value === 'string') {
+	      bytes += value.length * 2;
+	    } else if (typeof value === 'number') {
+	      bytes += 8;
+	    } else if (_typeof_1(value) === 'object' && objectList.indexOf(value) === -1) {
+	      objectList.push(value);
+
+	      for (var i in value) {
+	        stack.push(value[i]);
+	      }
+	    }
+
+	    if (breakSize && bytes > breakSize) {
+	      break;
+	    }
+	  }
+
+	  return bytes;
+	};
+	/**
 	 * Debug helper
 	 * @param type
 	 * @param args
 	 */
+
 
 	var loggers = {};
 	var d = function d(type) {
@@ -1138,7 +1175,7 @@
 	    },
 	    onFinish: function onFinish() {
 	      var inner = panel.el.querySelector('.inner');
-	      var version = '1.9.5';
+	      var version = '2.0.0';
 	      inner.innerHTML += ['<pre class="welcome-message">', "\n                 \n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>debug: <span>".concat(Config$1.get('debug'), "</span>"), "endpoint: <span>".concat(Config$1.get('handler'), "</span>"), "version: <span>".concat(version, "</span></div>"), '', '</pre>'].join('\n');
 	    },
 	    hookLoggers: function hookLoggers() {
@@ -1163,6 +1200,10 @@
 	          try {
 	            for (var _iterator = clonedArgs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 	              var arg = _step.value;
+
+	              if (sizeOf(arg, 2000) > 2000) {
+	                continue;
+	              }
 
 	              if (_typeof_1(arg) === 'object' || Array.isArray(arg)) {
 	                message += '<span class="object">';
@@ -1408,59 +1449,86 @@
 
 	      var client = this.httpClient.create(options);
 
-	      var onAuthFailed = function onAuthFailed() {
-	        _this.parent.auth.logout();
+	      var onAuthFailed =
+	      /*#__PURE__*/
+	      function () {
+	        var _ref = asyncToGenerator(
+	        /*#__PURE__*/
+	        regenerator.mark(function _callee() {
+	          var fn;
+	          return regenerator.wrap(function _callee$(_context) {
+	            while (1) {
+	              switch (_context.prev = _context.next) {
+	                case 0:
+	                  _context.next = 2;
+	                  return _this.parent.auth.logout();
 
-	        var fn = Config$1.get('authFailed');
-	        typeof fn === 'function' && fn();
-	      };
+	                case 2:
+	                  fn = Config$1.get('authFailed');
+	                  typeof fn === 'function' && fn();
+
+	                case 4:
+	                case "end":
+	                  return _context.stop();
+	              }
+	            }
+	          }, _callee);
+	        }));
+
+	        return function onAuthFailed() {
+	          return _ref.apply(this, arguments);
+	        };
+	      }();
 
 	      client.interceptors.response.use(function (response) {
 	        return response;
 	      },
 	      /*#__PURE__*/
 	      function () {
-	        var _ref = asyncToGenerator(
+	        var _ref2 = asyncToGenerator(
 	        /*#__PURE__*/
-	        regenerator.mark(function _callee(error) {
-	          var refreshToken, _ref2, data, errors;
+	        regenerator.mark(function _callee2(error) {
+	          var refreshToken, _ref3, data, errors;
 
-	          return regenerator.wrap(function _callee$(_context) {
+	          return regenerator.wrap(function _callee2$(_context2) {
 	            while (1) {
-	              switch (_context.prev = _context.next) {
+	              switch (_context2.prev = _context2.next) {
 	                case 0:
 	                  if (!(error.response && error.response.status === 401 && !_this._isLogout(error.config))) {
-	                    _context.next = 19;
+	                    _context2.next = 21;
 	                    break;
 	                  }
 
 	                  refreshToken = tokenHandler.get('refresh');
 
 	                  if (!refreshToken) {
-	                    _context.next = 18;
+	                    _context2.next = 19;
 	                    break;
 	                  }
 
 	                  d('info', '+ token refresh');
-	                  _context.next = 6;
+	                  _context2.next = 6;
 	                  return _this.parent.refreshToken({
 	                    token: refreshToken
 	                  });
 
 	                case 6:
-	                  _ref2 = _context.sent;
-	                  data = _ref2.data;
-	                  errors = _ref2.errors;
+	                  _ref3 = _context2.sent;
+	                  data = _ref3.data;
+	                  errors = _ref3.errors;
 
 	                  if (!errors) {
-	                    _context.next = 12;
+	                    _context2.next = 13;
 	                    break;
 	                  }
 
-	                  onAuthFailed();
-	                  return _context.abrupt("return", error);
+	                  _context2.next = 12;
+	                  return onAuthFailed();
 
 	                case 12:
+	                  return _context2.abrupt("return", error);
+
+	                case 13:
 	                  /**
 	                   * Update the tokens
 	                   */
@@ -1473,24 +1541,25 @@
 	                   */
 
 	                  error.config.headers.Authorization = data.token;
-	                  return _context.abrupt("return", client.request(error.config));
-
-	                case 18:
-	                  onAuthFailed();
+	                  return _context2.abrupt("return", client.request(error.config));
 
 	                case 19:
-	                  return _context.abrupt("return", Promise.reject(error));
+	                  _context2.next = 21;
+	                  return onAuthFailed();
 
-	                case 20:
+	                case 21:
+	                  return _context2.abrupt("return", Promise.reject(error));
+
+	                case 22:
 	                case "end":
-	                  return _context.stop();
+	                  return _context2.stop();
 	              }
 	            }
-	          }, _callee);
+	          }, _callee2);
 	        }));
 
 	        return function (_x) {
-	          return _ref.apply(this, arguments);
+	          return _ref2.apply(this, arguments);
 	        };
 	      }());
 	      return client;
@@ -1505,61 +1574,61 @@
 	    value: function () {
 	      var _setup = asyncToGenerator(
 	      /*#__PURE__*/
-	      regenerator.mark(function _callee3() {
+	      regenerator.mark(function _callee4() {
 	        var _this2 = this;
 
 	        var actions,
 	            http,
 	            data,
-	            _ref3,
+	            _ref4,
 	            _actions,
 	            _loop,
 	            key,
 	            _ret,
-	            _args3 = arguments;
+	            _args4 = arguments;
 
-	        return regenerator.wrap(function _callee3$(_context3) {
+	        return regenerator.wrap(function _callee4$(_context4) {
 	          while (1) {
-	            switch (_context3.prev = _context3.next) {
+	            switch (_context4.prev = _context4.next) {
 	              case 0:
-	                actions = _args3.length > 0 && _args3[0] !== undefined ? _args3[0] : {};
+	                actions = _args4.length > 0 && _args4[0] !== undefined ? _args4[0] : {};
 	                http = this.parent.http = this.makeHttpClient();
 
 	                if (Config$1.get('actions')) {
-	                  _context3.next = 4;
+	                  _context4.next = 4;
 	                  break;
 	                }
 
-	                return _context3.abrupt("return");
+	                return _context4.abrupt("return");
 
 	              case 4:
 	                data = {};
 
 	                if (Object.keys(actions).length) {
-	                  _context3.next = 21;
+	                  _context4.next = 21;
 	                  break;
 	                }
 
 	                d('info', '+ actions');
-	                _context3.prev = 7;
-	                _context3.next = 10;
+	                _context4.prev = 7;
+	                _context4.next = 10;
 	                return http.get(Config$1.get('actions'));
 
 	              case 10:
-	                _ref3 = _context3.sent;
-	                _actions = _ref3.data;
+	                _ref4 = _context4.sent;
+	                _actions = _ref4.data;
 	                data = _actions;
-	                _context3.next = 19;
+	                _context4.next = 19;
 	                break;
 
 	              case 15:
-	                _context3.prev = 15;
-	                _context3.t0 = _context3["catch"](7);
-	                d('error', '(err) failed loading actions list', _context3.t0);
-	                this.parent.events.emit(ACTION_ERROR, ['init', _context3.t0]);
+	                _context4.prev = 15;
+	                _context4.t0 = _context4["catch"](7);
+	                d('error', '(err) failed loading actions list', _context4.t0);
+	                this.parent.events.emit(ACTION_ERROR, ['init', _context4.t0]);
 
 	              case 19:
-	                _context3.next = 22;
+	                _context4.next = 22;
 	                break;
 
 	              case 21:
@@ -1581,36 +1650,36 @@
 	                  _this2.parent[key] =
 	                  /*#__PURE__*/
 	                  function () {
-	                    var _ref4 = asyncToGenerator(
+	                    var _ref5 = asyncToGenerator(
 	                    /*#__PURE__*/
-	                    regenerator.mark(function _callee2(payload) {
+	                    regenerator.mark(function _callee3(payload) {
 	                      var options,
 	                          tokenHandler,
-	                          _ref5,
+	                          _ref6,
 	                          data,
 	                          errors,
-	                          _args2 = arguments;
+	                          _args3 = arguments;
 
-	                      return regenerator.wrap(function _callee2$(_context2) {
+	                      return regenerator.wrap(function _callee3$(_context3) {
 	                        while (1) {
-	                          switch (_context2.prev = _context2.next) {
+	                          switch (_context3.prev = _context3.next) {
 	                            case 0:
-	                              options = _args2.length > 1 && _args2[1] !== undefined ? _args2[1] : {};
+	                              options = _args3.length > 1 && _args3[1] !== undefined ? _args3[1] : {};
 	                              tokenHandler = Config$1.get('tokenHandler');
-	                              _context2.next = 4;
+	                              _context3.next = 4;
 	                              return _this2._call(key, payload, options);
 
 	                            case 4:
-	                              _ref5 = _context2.sent;
-	                              data = _ref5.data;
-	                              errors = _ref5.errors;
+	                              _ref6 = _context3.sent;
+	                              data = _ref6.data;
+	                              errors = _ref6.errors;
 
 	                              if (!errors) {
-	                                _context2.next = 9;
+	                                _context3.next = 9;
 	                                break;
 	                              }
 
-	                              return _context2.abrupt("return", {
+	                              return _context3.abrupt("return", {
 	                                data: data,
 	                                errors: errors
 	                              });
@@ -1639,53 +1708,53 @@
 	                                }
 	                              }
 
-	                              return _context2.abrupt("return", {
+	                              return _context3.abrupt("return", {
 	                                data: data,
 	                                errors: errors
 	                              });
 
 	                            case 12:
 	                            case "end":
-	                              return _context2.stop();
+	                              return _context3.stop();
 	                          }
 	                        }
-	                      }, _callee2);
+	                      }, _callee3);
 	                    }));
 
 	                    return function (_x2) {
-	                      return _ref4.apply(this, arguments);
+	                      return _ref5.apply(this, arguments);
 	                    };
 	                  }();
 	                };
 
-	                _context3.t1 = regenerator.keys(data);
+	                _context4.t1 = regenerator.keys(data);
 
 	              case 25:
-	                if ((_context3.t2 = _context3.t1()).done) {
-	                  _context3.next = 32;
+	                if ((_context4.t2 = _context4.t1()).done) {
+	                  _context4.next = 32;
 	                  break;
 	                }
 
-	                key = _context3.t2.value;
+	                key = _context4.t2.value;
 	                _ret = _loop(key);
 
 	                if (!(_ret === "continue")) {
-	                  _context3.next = 30;
+	                  _context4.next = 30;
 	                  break;
 	                }
 
-	                return _context3.abrupt("continue", 25);
+	                return _context4.abrupt("continue", 25);
 
 	              case 30:
-	                _context3.next = 25;
+	                _context4.next = 25;
 	                break;
 
 	              case 32:
 	              case "end":
-	                return _context3.stop();
+	                return _context4.stop();
 	            }
 	          }
-	        }, _callee3, this, [[7, 15]]);
+	        }, _callee4, this, [[7, 15]]);
 	      }));
 
 	      function setup() {
@@ -1724,24 +1793,24 @@
 	    value: function () {
 	      var _validateAction2 = asyncToGenerator(
 	      /*#__PURE__*/
-	      regenerator.mark(function _callee4(action, payload) {
+	      regenerator.mark(function _callee5(action, payload) {
 	        var result, errors;
-	        return regenerator.wrap(function _callee4$(_context4) {
+	        return regenerator.wrap(function _callee5$(_context5) {
 	          while (1) {
-	            switch (_context4.prev = _context4.next) {
+	            switch (_context5.prev = _context5.next) {
 	              case 0:
 	                result = false;
 
 	                if (!(this.list[action] && Object.keys(this.list[action]).length)) {
-	                  _context4.next = 6;
+	                  _context5.next = 6;
 	                  break;
 	                }
 
-	                _context4.next = 4;
+	                _context5.next = 4;
 	                return this.parent.validator.validate(payload, this.list[action]);
 
 	              case 4:
-	                errors = _context4.sent;
+	                errors = _context5.sent;
 
 	                if (Object.keys(errors).length) {
 	                  result = errors;
@@ -1749,14 +1818,14 @@
 	                }
 
 	              case 6:
-	                return _context4.abrupt("return", result);
+	                return _context5.abrupt("return", result);
 
 	              case 7:
 	              case "end":
-	                return _context4.stop();
+	                return _context5.stop();
 	            }
 	          }
-	        }, _callee4, this);
+	        }, _callee5, this);
 	      }));
 
 	      function _validateAction(_x3, _x4) {
@@ -1774,7 +1843,7 @@
 	    value: function () {
 	      var _batch = asyncToGenerator(
 	      /*#__PURE__*/
-	      regenerator.mark(function _callee5() {
+	      regenerator.mark(function _callee6() {
 	        var actions,
 	            options,
 	            result,
@@ -1784,7 +1853,7 @@
 	            action,
 	            payload,
 	            errors,
-	            _ref6,
+	            _ref7,
 	            actionResults,
 	            _iteratorNormalCompletion,
 	            _didIteratorError,
@@ -1795,14 +1864,14 @@
 	            _action,
 	            data,
 	            _errors,
-	            _args5 = arguments;
+	            _args6 = arguments;
 
-	        return regenerator.wrap(function _callee5$(_context5) {
+	        return regenerator.wrap(function _callee6$(_context6) {
 	          while (1) {
-	            switch (_context5.prev = _context5.next) {
+	            switch (_context6.prev = _context6.next) {
 	              case 0:
-	                actions = _args5.length > 0 && _args5[0] !== undefined ? _args5[0] : {};
-	                options = _args5.length > 1 && _args5[1] !== undefined ? _args5[1] : {
+	                actions = _args6.length > 0 && _args6[0] !== undefined ? _args6[0] : {};
+	                options = _args6.length > 1 && _args6[1] !== undefined ? _args6[1] : {
 	                  validate: true
 	                };
 	                result = {
@@ -1813,30 +1882,30 @@
 	                start = +new Date();
 	                d('info', "+ running (".concat(names, ")"));
 	                form = [];
-	                _context5.t0 = regenerator.keys(actions);
+	                _context6.t0 = regenerator.keys(actions);
 
 	              case 8:
-	                if ((_context5.t1 = _context5.t0()).done) {
-	                  _context5.next = 22;
+	                if ((_context6.t1 = _context6.t0()).done) {
+	                  _context6.next = 22;
 	                  break;
 	                }
 
-	                action = _context5.t1.value;
+	                action = _context6.t1.value;
 	                payload = actions[action];
 
 	                if (!options.validate) {
-	                  _context5.next = 19;
+	                  _context6.next = 19;
 	                  break;
 	                }
 
-	                _context5.next = 14;
+	                _context6.next = 14;
 	                return this._validateAction(action, payload);
 
 	              case 14:
-	                errors = _context5.sent;
+	                errors = _context6.sent;
 
 	                if (!errors) {
-	                  _context5.next = 19;
+	                  _context6.next = 19;
 	                  break;
 	                }
 
@@ -1845,32 +1914,32 @@
 	                }
 
 	                result.errors[action] = errors;
-	                return _context5.abrupt("continue", 8);
+	                return _context6.abrupt("continue", 8);
 
 	              case 19:
 	                form.push([action, payload]);
-	                _context5.next = 8;
+	                _context6.next = 8;
 	                break;
 
 	              case 22:
 	                if (form.length) {
-	                  _context5.next = 24;
+	                  _context6.next = 24;
 	                  break;
 	                }
 
-	                return _context5.abrupt("return", this.finishTransaction(options, null, result, actions, start));
+	                return _context6.abrupt("return", this.finishTransaction(options, null, result, actions, start));
 
 	              case 24:
-	                _context5.prev = 24;
-	                _context5.next = 27;
+	                _context6.prev = 24;
+	                _context6.next = 27;
 	                return this.parent.http.post(Config$1.get('handler'), form, this._configAction(options.progress, names));
 
 	              case 27:
-	                _ref6 = _context5.sent;
-	                actionResults = _ref6.data;
+	                _ref7 = _context6.sent;
+	                actionResults = _ref7.data;
 
 	                if (Array.isArray(actionResults)) {
-	                  _context5.next = 33;
+	                  _context6.next = 33;
 	                  break;
 	                }
 
@@ -1879,19 +1948,19 @@
 	                    message: ['Unexpected API response']
 	                  }
 	                };
-	                _context5.next = 65;
+	                _context6.next = 65;
 	                break;
 
 	              case 33:
 	                _iteratorNormalCompletion = true;
 	                _didIteratorError = false;
 	                _iteratorError = undefined;
-	                _context5.prev = 36;
+	                _context6.prev = 36;
 	                _iterator = actionResults[Symbol.iterator]();
 
 	              case 38:
 	                if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-	                  _context5.next = 51;
+	                  _context6.next = 51;
 	                  break;
 	                }
 
@@ -1900,7 +1969,7 @@
 	                data = actionResult[_action];
 
 	                if (!actionResult[_action].errors) {
-	                  _context5.next = 46;
+	                  _context6.next = 46;
 	                  break;
 	                }
 
@@ -1909,7 +1978,7 @@
 	                }
 
 	                result.errors[_action] = actionResult[_action].errors;
-	                return _context5.abrupt("continue", 48);
+	                return _context6.abrupt("continue", 48);
 
 	              case 46:
 	                if (!result.data) {
@@ -1920,66 +1989,66 @@
 
 	              case 48:
 	                _iteratorNormalCompletion = true;
-	                _context5.next = 38;
+	                _context6.next = 38;
 	                break;
 
 	              case 51:
-	                _context5.next = 57;
+	                _context6.next = 57;
 	                break;
 
 	              case 53:
-	                _context5.prev = 53;
-	                _context5.t2 = _context5["catch"](36);
+	                _context6.prev = 53;
+	                _context6.t2 = _context6["catch"](36);
 	                _didIteratorError = true;
-	                _iteratorError = _context5.t2;
+	                _iteratorError = _context6.t2;
 
 	              case 57:
-	                _context5.prev = 57;
-	                _context5.prev = 58;
+	                _context6.prev = 57;
+	                _context6.prev = 58;
 
 	                if (!_iteratorNormalCompletion && _iterator["return"] != null) {
 	                  _iterator["return"]();
 	                }
 
 	              case 60:
-	                _context5.prev = 60;
+	                _context6.prev = 60;
 
 	                if (!_didIteratorError) {
-	                  _context5.next = 63;
+	                  _context6.next = 63;
 	                  break;
 	                }
 
 	                throw _iteratorError;
 
 	              case 63:
-	                return _context5.finish(60);
+	                return _context6.finish(60);
 
 	              case 64:
-	                return _context5.finish(57);
+	                return _context6.finish(57);
 
 	              case 65:
-	                _context5.next = 71;
+	                _context6.next = 71;
 	                break;
 
 	              case 67:
-	                _context5.prev = 67;
-	                _context5.t3 = _context5["catch"](24);
-	                _errors = get(_context5.t3, 'response.data.errors', false);
+	                _context6.prev = 67;
+	                _context6.t3 = _context6["catch"](24);
+	                _errors = get(_context6.t3, 'response.data.errors', false);
 	                result.errors = {
 	                  other: _errors ? _errors : {
-	                    message: [_context5.t3.response]
+	                    message: [_context6.t3.response]
 	                  }
 	                };
 
 	              case 71:
-	                return _context5.abrupt("return", this.finishTransaction(options, null, result, actions, start));
+	                return _context6.abrupt("return", this.finishTransaction(options, null, result, actions, start));
 
 	              case 72:
 	              case "end":
-	                return _context5.stop();
+	                return _context6.stop();
 	            }
 	          }
-	        }, _callee5, this, [[24, 67], [36, 53, 57, 65], [58,, 60, 64]]);
+	        }, _callee6, this, [[24, 67], [36, 53, 57, 65], [58,, 60, 64]]);
 	      }));
 
 	      function batch() {
@@ -2028,7 +2097,7 @@
 	    value: function () {
 	      var _call2 = asyncToGenerator(
 	      /*#__PURE__*/
-	      regenerator.mark(function _callee6(action) {
+	      regenerator.mark(function _callee7(action) {
 	        var payload,
 	            options,
 	            result,
@@ -2036,18 +2105,18 @@
 	            errors,
 	            method,
 	            path,
-	            _ref7,
+	            _ref8,
 	            data,
 	            debug,
 	            _errors2,
-	            _args6 = arguments;
+	            _args7 = arguments;
 
-	        return regenerator.wrap(function _callee6$(_context6) {
+	        return regenerator.wrap(function _callee7$(_context7) {
 	          while (1) {
-	            switch (_context6.prev = _context6.next) {
+	            switch (_context7.prev = _context7.next) {
 	              case 0:
-	                payload = _args6.length > 1 && _args6[1] !== undefined ? _args6[1] : {};
-	                options = _args6.length > 2 && _args6[2] !== undefined ? _args6[2] : {
+	                payload = _args7.length > 1 && _args7[1] !== undefined ? _args7[1] : {};
+	                options = _args7.length > 2 && _args7[2] !== undefined ? _args7[2] : {
 	                  validate: true,
 	                  cache: false,
 	                  shouldInvalidate: false
@@ -2072,36 +2141,36 @@
 	                }
 
 	                if (!(Actions.cache[action] && Actions.cache[action].data)) {
-	                  _context6.next = 11;
+	                  _context7.next = 11;
 	                  break;
 	                }
 
 	                d('info', "+ cache (".concat(action, ") is cached"));
 	                result = Actions.cache[action];
-	                return _context6.abrupt("return", this.finishTransaction(options, action, result, payload, start));
+	                return _context7.abrupt("return", this.finishTransaction(options, action, result, payload, start));
 
 	              case 11:
 	                if (!options.validate) {
-	                  _context6.next = 18;
+	                  _context7.next = 18;
 	                  break;
 	                }
 
-	                _context6.next = 14;
+	                _context7.next = 14;
 	                return this._validateAction(action, payload);
 
 	              case 14:
-	                errors = _context6.sent;
+	                errors = _context7.sent;
 
 	                if (!errors) {
-	                  _context6.next = 18;
+	                  _context7.next = 18;
 	                  break;
 	                }
 
 	                result.errors = errors;
-	                return _context6.abrupt("return", this.finishTransaction(options, action, result, payload, start));
+	                return _context7.abrupt("return", this.finishTransaction(options, action, result, payload, start));
 
 	              case 18:
-	                _context6.prev = 18;
+	                _context7.prev = 18;
 	                method = 'post';
 	                path = Config$1.get('handler');
 
@@ -2110,12 +2179,12 @@
 	                  path = action[1];
 	                }
 
-	                _context6.next = 24;
+	                _context7.next = 24;
 	                return this.parent.http[method](path, typeof window !== 'undefined' && payload instanceof FormData ? payload : [action, payload], this._configAction(options.progress, action));
 
 	              case 24:
-	                _ref7 = _context6.sent;
-	                data = _ref7.data;
+	                _ref8 = _context7.sent;
+	                data = _ref8.data;
 
 	                if (data && data.errors) {
 	                  result.errors = data.errors;
@@ -2129,16 +2198,16 @@
 	                  }
 	                }
 
-	                _context6.next = 35;
+	                _context7.next = 35;
 	                break;
 
 	              case 29:
-	                _context6.prev = 29;
-	                _context6.t0 = _context6["catch"](18);
-	                debug = get(_context6.t0, 'response.data.debug', false);
-	                _errors2 = get(_context6.t0, 'response.data.errors', false);
+	                _context7.prev = 29;
+	                _context7.t0 = _context7["catch"](18);
+	                debug = get(_context7.t0, 'response.data.debug', false);
+	                _errors2 = get(_context7.t0, 'response.data.errors', false);
 	                result.errors = _errors2 ? _errors2 : {
-	                  message: [_context6.t0.response ? _context6.t0.response : _context6.t0]
+	                  message: [_context7.t0.response ? _context7.t0.response : _context7.t0]
 	                };
 
 	                if (debug) {
@@ -2147,14 +2216,14 @@
 
 	              case 35:
 	                action = Array.isArray(action) ? action[1] : action;
-	                return _context6.abrupt("return", this.finishTransaction(options, action, result, payload, start));
+	                return _context7.abrupt("return", this.finishTransaction(options, action, result, payload, start));
 
 	              case 37:
 	              case "end":
-	                return _context6.stop();
+	                return _context7.stop();
 	            }
 	          }
-	        }, _callee6, this, [[18, 29]]);
+	        }, _callee7, this, [[18, 29]]);
 	      }));
 
 	      function _call(_x5) {
