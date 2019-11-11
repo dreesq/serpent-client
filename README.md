@@ -1,5 +1,5 @@
 <p align="center"> 
-  <img src="https://user-images.githubusercontent.com/7228512/56692610-3ee42e80-66eb-11e9-9ca7-ae5062581be6.png">
+  <img src="https://user-images.githubusercontent.com/7228512/68618432-f72fc380-04d1-11ea-85af-5565c37ea947.png" width="190">
 </p>
 
 Client component of the Serpent ecosystem. You may read more in our [documentation](https://dreesq.github.io/serpent/#/client/introduction).
