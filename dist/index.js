@@ -2,14 +2,13 @@
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
 	(global = global || self, global.Serpent = factory());
-}(this, function () { 'use strict';
+}(this, (function () { 'use strict';
 
 	function createCommonjsModule(fn, module) {
 		return module = { exports: {} }, fn(module, module.exports), module.exports;
 	}
 
 	var _typeof_1 = createCommonjsModule(function (module) {
-
 	  function _typeof(obj) {
 	    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
 	      module.exports = _typeof = function _typeof(obj) {
@@ -716,7 +715,7 @@
 	  // as the regeneratorRuntime namespace. Otherwise create a new empty
 	  // object. Either way, the resulting object will be used to initialize
 	  // the regeneratorRuntime variable at the top of this file.
-	  module.exports);
+	   module.exports );
 
 	  try {
 	    regeneratorRuntime = runtime;
@@ -791,27 +790,6 @@
 
 	var defineProperty = _defineProperty;
 
-	function _objectSpread(target) {
-	  for (var i = 1; i < arguments.length; i++) {
-	    var source = arguments[i] != null ? arguments[i] : {};
-	    var ownKeys = Object.keys(source);
-
-	    if (typeof Object.getOwnPropertySymbols === 'function') {
-	      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-	        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-	      }));
-	    }
-
-	    ownKeys.forEach(function (key) {
-	      defineProperty(target, key, source[key]);
-	    });
-	  }
-
-	  return target;
-	}
-
-	var objectSpread = _objectSpread;
-
 	function _classCallCheck(instance, Constructor) {
 	  if (!(instance instanceof Constructor)) {
 	    throw new TypeError("Cannot call a class as a function");
@@ -845,6 +823,10 @@
 	var arrayWithHoles = _arrayWithHoles;
 
 	function _iterableToArrayLimit(arr, i) {
+	  if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) {
+	    return;
+	  }
+
 	  var _arr = [];
 	  var _n = true;
 	  var _d = false;
@@ -1175,7 +1157,7 @@
 	    },
 	    onFinish: function onFinish() {
 	      var inner = panel.el.querySelector('.inner');
-	      var version = '2.0.0';
+	      var version = '2.1.0';
 	      inner.innerHTML += ['<pre class="welcome-message">', "\n                 \n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>debug: <span>".concat(Config$1.get('debug'), "</span>"), "endpoint: <span>".concat(Config$1.get('handler'), "</span>"), "version: <span>".concat(version, "</span></div>"), '', '</pre>'].join('\n');
 	    },
 	    hookLoggers: function hookLoggers() {
@@ -1263,6 +1245,7 @@
 	};
 
 	var Utils = /*#__PURE__*/Object.freeze({
+		__proto__: null,
 		get: get,
 		d: d,
 		parseTemplate: parseTemplate,
@@ -1315,6 +1298,7 @@
 	var SOCKET_AUTHENTICATED = 'socket:authenticated';
 
 	var Constants = /*#__PURE__*/Object.freeze({
+		__proto__: null,
 		LOADING_START: LOADING_START,
 		LOADING_END: LOADING_END,
 		ACTION_SUCCESS: ACTION_SUCCESS,
@@ -1568,6 +1552,11 @@
 	    key: "getAction",
 	    value: function getAction(action) {
 	      return this.list[action];
+	    }
+	  }, {
+	    key: "getCache",
+	    value: function getCache() {
+	      return Actions.cache;
 	    }
 	  }, {
 	    key: "setup",
@@ -1862,7 +1851,7 @@
 	            _step,
 	            actionResult,
 	            _action,
-	            data,
+	            _data,
 	            _errors,
 	            _args6 = arguments;
 
@@ -1966,7 +1955,7 @@
 
 	                actionResult = _step.value;
 	                _action = Object.keys(actionResult)[0];
-	                data = actionResult[_action];
+	                _data = actionResult[_action];
 
 	                if (!actionResult[_action].errors) {
 	                  _context6.next = 46;
@@ -1985,7 +1974,7 @@
 	                  result.data = {};
 	                }
 
-	                result.data[_action] = data;
+	                result.data[_action] = _data;
 
 	              case 48:
 	                _iteratorNormalCompletion = true;
@@ -2106,7 +2095,7 @@
 	            method,
 	            path,
 	            _ref8,
-	            data,
+	            _data2,
 	            debug,
 	            _errors2,
 	            _args7 = arguments;
@@ -2184,12 +2173,12 @@
 
 	              case 24:
 	                _ref8 = _context7.sent;
-	                data = _ref8.data;
+	                _data2 = _ref8.data;
 
-	                if (data && data.errors) {
-	                  result.errors = data.errors;
+	                if (_data2 && _data2.errors) {
+	                  result.errors = _data2.errors;
 	                } else {
-	                  result.data = data;
+	                  result.data = _data2;
 
 	                  if (options.cache) {
 	                    d('info', "+ cache Adding data to cache for (".concat(action, ")"));
@@ -2374,7 +2363,7 @@
 	      var _logout = asyncToGenerator(
 	      /*#__PURE__*/
 	      regenerator.mark(function _callee3() {
-	        var tokenHandler, _ref3, errors, data;
+	        var tokenHandler, _ref3, errors, data, cache;
 
 	        return regenerator.wrap(function _callee3$(_context3) {
 	          while (1) {
@@ -2404,6 +2393,12 @@
 	                errors = _ref3.errors;
 	                data = _ref3.data;
 	                this.user = false;
+	                cache = this.parent.getCache();
+
+	                if (cache.getUser) {
+	                  delete cache.getUser;
+	                }
+
 	                tokenHandler.remove('token');
 	                tokenHandler.remove('refresh');
 	                d('info', '(ok) logout');
@@ -2412,7 +2407,7 @@
 	                  data: data
 	                });
 
-	              case 14:
+	              case 16:
 	              case "end":
 	                return _context3.stop();
 	            }
@@ -2937,11 +2932,78 @@
 
 	      return getTranslations;
 	    }()
+	    /**
+	     * Updates localStorage locales and calls the setLocale action
+	     * @param locale
+	     * @returns {Promise<void>}
+	     */
+
+	  }, {
+	    key: "setLocale",
+	    value: function () {
+	      var _setLocale = asyncToGenerator(
+	      /*#__PURE__*/
+	      regenerator.mark(function _callee3() {
+	        var locale,
+	            _ref2,
+	            data,
+	            errors,
+	            _Config$get3,
+	            load,
+	            _args3 = arguments;
+
+	        return regenerator.wrap(function _callee3$(_context3) {
+	          while (1) {
+	            switch (_context3.prev = _context3.next) {
+	              case 0:
+	                locale = _args3.length > 0 && _args3[0] !== undefined ? _args3[0] : 'en';
+	                _context3.next = 3;
+	                return this.parent.call('setLocale', {
+	                  locale: locale
+	                });
+
+	              case 3:
+	                _ref2 = _context3.sent;
+	                data = _ref2.data;
+	                errors = _ref2.errors;
+
+	                if (!errors) {
+	                  _context3.next = 8;
+	                  break;
+	                }
+
+	                return _context3.abrupt("return", Promise.reject(errors));
+
+	              case 8:
+	                _Config$get3 = Config$1.get('i18n'), load = _Config$get3.load;
+	                _context3.next = 11;
+	                return this.getTranslations(load, locale);
+
+	              case 11:
+	                return _context3.abrupt("return", Promise.resolve());
+
+	              case 12:
+	              case "end":
+	                return _context3.stop();
+	            }
+	          }
+	        }, _callee3, this);
+	      }));
+
+	      function setLocale() {
+	        return _setLocale.apply(this, arguments);
+	      }
+
+	      return setLocale;
+	    }()
 	  }]);
 
 	  return I18n;
 	}();
 
+	function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+	function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 	/**
 	 * Default options
 	 * @type {{}}
@@ -2981,7 +3043,7 @@
 
 	    classCallCheck(this, Serpent);
 
-	    this.opts = objectSpread({}, defaults, opts);
+	    this.opts = _objectSpread({}, defaults, {}, opts);
 	    Config$1.store(this.opts);
 	    this.onReady = false;
 
@@ -3071,4 +3133,4 @@
 
 	return Serpent;
 
-}));
+})));
