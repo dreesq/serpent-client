@@ -989,6 +989,7 @@
 	    return;
 	  }
 
+	  var search = '';
 	  var panel = {
 	    el: null,
 	    state: {},
@@ -1056,14 +1057,14 @@
 	    },
 	    initStyle: function initStyle() {
 	      var style = document.createElement('style');
-	      style.innerHTML = "\n                #debugPanel {\n                    z-index: 9203021;\n                    position: fixed;\n                    min-width: 460px;\n                    word-wrap: normal;\n                    border-radius: 4px;\n                    color: #fff;\n                    resize: both;\n                    left: ".concat(panel.state.left || '20px', ";\n                    top: ").concat(panel.state.top || '20px', ";\n                    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n                }\n                \n                #debugPanel .drag-handle {\n                    cursor: grab;\n                }\n                \n                #debugPanel .welcome-message {\n                    font-size: 12px;\n                    display: flex;\n                    align-items: center;\n                    color: #f9243d;\n                    font-family: Verdana;\n                    display: lex;\n                }\n                \n                #debugPanel .welcome-message div {\n                    color: #4a4545;\n                }\n                \n                #debugPanel .welcome-message span {\n                    color: #30bf58;\n                }\n                \n                #debugPanel .resize-handle {\n                    cursor: se-resize;\n                }\n                \n                #debugPanel button {\n                    cursor: pointer;\n                    outline: none;\n                }\n                \n                #debugPanel .inner {\n                    background: rgba(23, 22, 22, 0.92);\n                    min-height: 120px;\n                    overflow-y: auto;\n                    overflow-x: hidden;\n                    padding: 20px 20px 0 20px;\n                    ").concat(panel.state.width ? 'width: ' + panel.state.width + ';' : '', "\n                    ").concat(panel.state.width ? 'max-width: ' + panel.state.width + ';' : '', "\n                    ").concat(panel.state.height ? 'height: ' + panel.state.height + ';' : '', "\n                    max-height: 600px;\n                    border-top-left-radius: 4px;\n                    border-top-right-radius: 4px;\n                    box-shadow: 0px 20px 14px 1px rgba(0, 0, 0, 0.61);\n                }\n                \n                #debugPanel .toggle-minimize {\n                    margin-left: auto;\n                }\n                \n                #debugPanel .controls {\n                    height: 36px;\n                    display: flex;\n                    align-items: center;\n                    background: #212021;\n                    border-radius: 4px;\n                    border-top-left-radius: 0;\n                    border-top-right-radius: 0;\n                    position: relative;\n                }\n                \n                #debugPanel .debug-input {\n                    height: 35px;\n                    padding: 8px 14px;\n                    width: 70%;\n                    border: none;\n                    border-bottom-left-radius: 4px;\n                    background: #1c1a1a;\n                    box-sizing: border-box;\n                    font-size: 13px;\n                    outline: none;\n                    color: #a2a2a2;\n                }\n               \n                #debugPanel .controls button {\n                    background: #1b1a1a;\n                    border: none;\n                    border-radius: 4px;\n                    color: #fff;\n                    padding: 6px 11px;\n                    font-weight: bold;\n                    margin-right: 6px;  \n                }\n               \n                #debugPanel .number {\n                    color:#b66bb2\n                }\n                \n                #debugPanel .key {\n                    color: #619bab;\n                }\n                \n                #debugPanel .string {\n                    color:#55c149\n                }\n                \n                #debugPanel .boolean {\n                    color:#ff82a4;\n                }\n                \n                #debugPanel .null {\n                    color:#ff7477;\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar {\n                  width: 5px;\n                  height: 12px;\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar-track {\n                  background: rgba(0, 0, 0, 0.1);\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar-thumb {\n                  background: #ffd457;\n                }\n                \n                #debugPanel .message {\n                    display: block;\n                    padding: 2px 0;\n                    white-space: pre-wrap;\n                    font-size: 13px;\n                    background: #171717;\n                    margin-bottom: 10px;\n                    padding: 10px;\n                    border-radius: 4px;\n                }\n                \n                #debugPanel .info {\n                    color: #00a7c5;\n                }\n                \n                #debugPanel .error {\n                    color: #ff6b6b;\n                }\n                \n                #debugPanel .warn {\n                    color: #ecc54d;\n                }\n                \n                #debugPanel .log {\n                    color: #4cff85;\n                }\n                \n                #debugPanel .object {\n                    color: #619bab;\n                    font-size: 12px;\n                    padding: 10px;\n                    display: block;\n                    background: #1b1a1a;\n                    margin: 6px 0;\n                    border-radius: 4px;\n                    max-height: 160px;\n                    overflow-y: scroll;\n                }\n                \n                #debugPanel .entity {\n                    display: block;\n                    word-break: break-word;\n                }\n                \n                #debugPanel .entity + .object {\n                    margin-top: 10px;\n                }\n            ");
+	      style.innerHTML = "\n                #debugPanel {\n                    z-index: 9203021;\n                    position: fixed;\n                    min-width: 460px;\n                    word-wrap: normal;\n                    border-radius: 4px;\n                    color: #fff;\n                    resize: both;\n                    left: ".concat(panel.state.left || '20px', ";\n                    top: ").concat(panel.state.top || '20px', ";\n                    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n                }\n                \n                #debugPanel .drag-handle {\n                    cursor: grab;\n                }\n                \n                #debugPanel .welcome-message {\n                    font-size: 12px;\n                    display: flex;\n                    align-items: center;\n                    color: #f9243d;\n                    font-family: Verdana;\n                    display: lex;\n                }\n                \n                #debugPanel .welcome-message div {\n                    color: #4a4545;\n                }\n                \n                #debugPanel .welcome-message span {\n                    color: #30bf58;\n                }\n                \n                #debugPanel .resize-handle {\n                    cursor: se-resize;\n                }\n                \n                #debugPanel button {\n                    cursor: pointer;\n                    outline: none;\n                }\n                \n                #debugPanel .inner {\n                    background: rgba(23, 22, 22, 0.92);\n                    min-height: 120px;\n                    overflow-y: auto;\n                    overflow-x: hidden;\n                    padding: 20px 20px 0 20px;\n                    ").concat(panel.state.width ? 'width: ' + panel.state.width + ';' : '', "\n                    ").concat(panel.state.width ? 'max-width: ' + panel.state.width + ';' : '', "\n                    ").concat(panel.state.height ? 'height: ' + panel.state.height + ';' : '', "\n                    max-height: 600px;\n                    border-top-left-radius: 4px;\n                    border-top-right-radius: 4px;\n                    box-shadow: 0px 20px 14px 1px rgba(0, 0, 0, 0.61);\n                    position: relative;\n                }\n                \n                #debugPanel .toggle-minimize {\n                    margin-left: auto;\n                }\n                \n                #debugPanel .controls {\n                    height: 36px;\n                    display: flex;\n                    align-items: center;\n                    background: #212021;\n                    border-radius: 4px;\n                    border-top-left-radius: 0;\n                    border-top-right-radius: 0;\n                    position: relative;\n                }\n                \n                #debugPanel .debug-input {\n                    height: 35px;\n                    padding: 8px 14px;\n                    width: 70%;\n                    border: none;\n                    border-bottom-left-radius: 4px;\n                    background: #1c1a1a;\n                    box-sizing: border-box;\n                    font-size: 13px;\n                    outline: none;\n                    color: #a2a2a2;\n                }\n                \n                #debugPanel .search {\n                    position: fixed;\n                }\n                \n                #debugPanel .search input {\n                    display: block;\n                    background: rgba(255, 212, 87, 0.05);\n                    border: none;\n                    padding: 10px;\n                    color: #fff;\n                    border-bottom: 1px solid #ffd457;\n                }\n                \n                #debugPanel .search input:focus {\n                    outline: none;\n                }\n               \n                #debugPanel .controls button {\n                    background: #1b1a1a;\n                    border: none;\n                    border-radius: 4px;\n                    color: #fff;\n                    padding: 6px 11px;\n                    font-weight: bold;\n                    margin-right: 6px;  \n                }\n               \n                #debugPanel .number {\n                    color:#b66bb2\n                }\n                \n                #debugPanel .key {\n                    color: #619bab;\n                }\n                \n                #debugPanel .string {\n                    color:#55c149\n                }\n                \n                #debugPanel .boolean {\n                    color:#ff82a4;\n                }\n                \n                #debugPanel .null {\n                    color:#ff7477;\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar {\n                  width: 5px;\n                  height: 12px;\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar-track {\n                  background: rgba(0, 0, 0, 0.1);\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar-thumb {\n                  background: #ffd457;\n                }\n                \n                #debugPanel .message {\n                    display: block;\n                    padding: 2px 0;\n                    white-space: pre-wrap;\n                    font-size: 13px;\n                    background: #171717;\n                    margin-bottom: 10px;\n                    padding: 10px;\n                    border-radius: 4px;\n                }\n                \n                #debugPanel .message.hidden {\n                    display: none;\n                }\n                \n                #debugPanel .info {\n                    color: #00a7c5;\n                }\n                \n                #debugPanel .error {\n                    color: #ff6b6b;\n                }\n                \n                #debugPanel .warn {\n                    color: #ecc54d;\n                }\n                \n                #debugPanel .log {\n                    color: #4cff85;\n                }\n                \n                #debugPanel .object {\n                    color: #619bab;\n                    font-size: 12px;\n                    padding: 10px;\n                    display: block;\n                    background: #1b1a1a;\n                    margin: 6px 0;\n                    border-radius: 4px;\n                    max-height: 160px;\n                    overflow-y: scroll;\n                }\n                \n                #debugPanel .entity {\n                    display: block;\n                    word-break: break-word;\n                }\n                \n                #debugPanel .entity + .object {\n                    margin-top: 10px;\n                }\n            ");
 	      document.head.append(style);
 	    },
 	    initHtml: function initHtml() {
 	      panel.el = document.createElement('div');
 	      panel.el.id = 'debugPanel';
 	      document.body.appendChild(panel.el);
-	      panel.el.innerHTML = "\n                <div class=\"inner\">\n                \n                </div>\n                <div class=\"controls\">\n                    <input type=\"text\" class=\"debug-input\" placeholder=\"Execute javascript or run client actions\" />\n                    <button class=\"toggle-minimize\">\n                        &#128469;\n                    </button>\n                    <button class=\"clear-panel\">\n                        &#128465;\n                    </button>\n                    <button class=\"drag-handle\">\n                        &#10021;\n                    </button>\n                    <button class=\"resize-handle\">\n                        &searr;\n                     </button>\n                </div>\n            ";
+	      panel.el.innerHTML = "\n                <div class=\"inner\">\n                    <div class=\"search\">\n                        <input type=\"text\" class=\"search-input\" placeholder=\"Search\" />\n                    </div>\n                </div>\n                <div class=\"controls\">\n                    <input type=\"text\" class=\"debug-input\" placeholder=\"Execute javascript or run client actions\" />\n                    <button class=\"toggle-minimize\">\n                        &#128469;\n                    </button>\n                    <button class=\"clear-panel\">\n                        &#128465;\n                    </button>\n                    <button class=\"drag-handle\">\n                        &#10021;\n                    </button>\n                    <button class=\"resize-handle\">\n                        &searr;\n                     </button>\n                </div>\n            ";
 	    },
 	    onLoad: function onLoad() {
 	      var offset, mousePosition;
@@ -1076,13 +1077,29 @@
 	      var debugInput = panel.el.querySelector('.debug-input');
 
 	      if (panel.state.minimized) {
-	        panel.el.querySelector('.inner').style.visibility = 'hidden';
+	        panel.el.querySelector('.inner').style.display = 'none';
 	      }
 
 	      minimizeToggle.addEventListener('click', function () {
 	        panel.state.minimized = !panel.state.minimized;
+	        var height = panel.el.querySelector('.inner').clientHeight;
+	        panel.el.querySelector('.inner').style.display = panel.state.minimized ? 'none' : 'block';
+
+	        if (height === 0) {
+	          height = panel.el.querySelector('.inner').clientHeight;
+	        }
+
+	        var top;
+
+	        if (panel.state.minimized) {
+	          top = parseInt(panel.el.offsetTop || 20) + height;
+	        } else {
+	          top = parseInt(panel.el.offsetTop || 20) - height;
+	        }
+
+	        panel.el.style.top = "".concat(top, "px");
+	        panel.state.top = panel.el.style.top;
 	        panel.saveState();
-	        panel.el.querySelector('.inner').style.visibility = panel.state.minimized ? 'hidden' : 'visible';
 	      });
 	      var lastCommand = '';
 	      debugInput.addEventListener('keyup', function (e) {
@@ -1102,8 +1119,25 @@
 	          debugInput.value = '';
 	        }
 	      });
+	      document.addEventListener('keyup', function (e) {
+	        if (e.target.classList.contains('search-input')) {
+	          search = panel.el.querySelector('.search-input').value.toLowerCase();
+	          Array.from(panel.el.querySelectorAll('.message')).map(function (el) {
+	            if (el.innerText.toLowerCase().indexOf(search) === -1) {
+	              el.classList.add('hidden');
+	            } else {
+	              el.classList.remove('hidden');
+	            }
+	          });
+	          var inner = panel.el.querySelector('.inner');
+	          inner.scrollTop = inner.scrollHeight;
+	        }
+	      });
 	      clearButton.addEventListener('click', function () {
-	        panel.el.querySelector('.inner').innerHTML = '';
+	        var inner = panel.el.querySelector('.inner');
+	        var search = panel.el.querySelector('.search');
+	        inner.innerHTML = '';
+	        inner.appendChild(search);
 	      });
 	      resizeButton.addEventListener('mousedown', function (e) {
 	        isResizeDown = true;
@@ -1157,7 +1191,7 @@
 	    },
 	    onFinish: function onFinish() {
 	      var inner = panel.el.querySelector('.inner');
-	      var version = '2.1.0';
+	      var version = '2.2.0';
 	      inner.innerHTML += ['<pre class="welcome-message">', "\n                 \n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>debug: <span>".concat(Config$1.get('debug'), "</span>"), "endpoint: <span>".concat(Config$1.get('handler'), "</span>"), "version: <span>".concat(version, "</span></div>"), '', '</pre>'].join('\n');
 	    },
 	    hookLoggers: function hookLoggers() {
@@ -1212,7 +1246,14 @@
 	          }
 
 	          message += "</span>";
-	          inner.innerHTML += message;
+	          var e = document.createElement('span');
+	          e.innerHTML = message;
+
+	          if (search && e.innerText.toLowerCase().indexOf(search) === -1) {
+	            e.querySelector('message').classList.add('hidden');
+	          }
+
+	          inner.appendChild(e);
 	          inner.scrollTop = inner.scrollHeight;
 	        };
 
@@ -1613,7 +1654,7 @@
 	              case 15:
 	                _context4.prev = 15;
 	                _context4.t0 = _context4["catch"](7);
-	                d('error', '(err) failed loading actions list', _context4.t0);
+	                d('error', '(error) failed loading actions list', _context4.t0);
 	                this.parent.events.emit(ACTION_ERROR, ['init', _context4.t0]);
 
 	              case 19:
