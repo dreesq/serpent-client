@@ -1224,7 +1224,7 @@
 	    },
 	    onFinish: function onFinish() {
 	      var inner = panel.el.querySelector('.inner');
-	      var version = '2.2.2';
+	      var version = '2.2.3';
 	      inner.innerHTML += ['<pre class="welcome-message">', "\n                 \n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>dev: <span>".concat(Config$1.get('dev'), "</span>"), "endpoint: <span>".concat(Config$1.get('handler'), "</span>"), "version: <span>".concat(version, "</span></div>"), '', '</pre>'].join('\n');
 	    },
 	    hookLoggers: function hookLoggers() {
