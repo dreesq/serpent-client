@@ -1,5 +1,3 @@
-
-(function(l, r) { if (l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (window.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.head.appendChild(r) })(window.document);
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -1134,13 +1132,16 @@
 
 	        if (e.keyCode === 13 && debugInput.value && debugInput.value.trim().length) {
 	          try {
-	            commands.push(debugInput.value);
+	            if (commands[commands.length - 1] !== debugInput.value) {
+	              commands.push(debugInput.value);
 
-	            if (commands.length > 50) {
-	              commands.splice(0, 1);
+	              if (commands.length > 50) {
+	                commands.splice(0, 1);
+	              }
+
+	              localStorage.setItem('lastCommands', JSON.stringify(commands));
 	            }
 
-	            localStorage.setItem('lastCommands', JSON.stringify(commands));
 	            var res = eval(debugInput.value);
 	            console.log(res);
 	          } catch (error) {
@@ -1223,7 +1224,7 @@
 	    },
 	    onFinish: function onFinish() {
 	      var inner = panel.el.querySelector('.inner');
-	      var version = '2.2.1';
+	      var version = '2.2.2';
 	      inner.innerHTML += ['<pre class="welcome-message">', "\n                 \n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>dev: <span>".concat(Config$1.get('dev'), "</span>"), "endpoint: <span>".concat(Config$1.get('handler'), "</span>"), "version: <span>".concat(version, "</span></div>"), '', '</pre>'].join('\n');
 	    },
 	    hookLoggers: function hookLoggers() {
@@ -2387,14 +2388,17 @@
 	              case 35:
 	                if (this.parent.config.get('debug') && typeof window !== 'undefined') {
 	                  commands = JSON.parse(localStorage.getItem('commands') || '[]');
-	                  cmd = "\n                client.call('".concat(action, "', ").concat(JSON.stringify(payload), ", ").concat(JSON.stringify(options), ");\n            ");
-	                  commands.push(cmd);
+	                  cmd = "client.call('".concat(action, "', ").concat(JSON.stringify(payload), ", ").concat(JSON.stringify(options), ");");
 
-	                  if (commands.length > 50) {
-	                    commands.splice(0, 1);
+	                  if (commands[commands.length - 1] !== cmd) {
+	                    commands.push(cmd);
+
+	                    if (commands.length > 50) {
+	                      commands.splice(0, 1);
+	                    }
+
+	                    localStorage.setItem('lastCommands', JSON.stringify(commands));
 	                  }
-
-	                  localStorage.setItem('lastCommands', JSON.stringify(commands));
 	                }
 
 	                action = Array.isArray(action) ? action[1] : action;
