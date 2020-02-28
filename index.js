@@ -50,7 +50,7 @@ export default class Serpent {
           Config.store(this.opts);
           this.onReady = false;
 
-          if (this.opts.dev) {
+          if (this.opts.dev && typeof window !== 'undefined') {
                window.client = this;
                Utils.debugPanel();
           }

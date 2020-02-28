@@ -8,6 +8,7 @@ export const LOADING_END = 'loading:end';
 export const ACTION_SUCCESS = 'success';
 export const ACTION_ERROR = 'error';
 export const ACTION_PROGRESS = 'progress';
+export const ACTIONS_LOADED = 'actions:loaded';
 
 /**
  * Socket events

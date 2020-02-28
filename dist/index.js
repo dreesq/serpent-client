@@ -1364,6 +1364,7 @@
 	var ACTION_SUCCESS = 'success';
 	var ACTION_ERROR = 'error';
 	var ACTION_PROGRESS = 'progress';
+	var ACTIONS_LOADED = 'actions:loaded';
 	/**
 	 * Socket events
 	 * @type {string}
@@ -1381,6 +1382,7 @@
 		ACTION_SUCCESS: ACTION_SUCCESS,
 		ACTION_ERROR: ACTION_ERROR,
 		ACTION_PROGRESS: ACTION_PROGRESS,
+		ACTIONS_LOADED: ACTIONS_LOADED,
 		SOCKET_CONNECTED: SOCKET_CONNECTED,
 		SOCKET_DISCONNECTED: SOCKET_DISCONNECTED,
 		SOCKET_RECONNECTED: SOCKET_RECONNECTED,
@@ -1511,7 +1513,7 @@
 	              case 0:
 	                config = this.parent.config;
 
-	                if (config.get('dev')) {
+	                if (!(!config.get('dev') || typeof window === 'undefined')) {
 	                  _context3.next = 3;
 	                  break;
 	                }
@@ -1554,6 +1556,9 @@
 	                          return _this.setup();
 
 	                        case 2:
+	                          client;
+
+	                        case 3:
 	                        case "end":
 	                          return _context.stop();
 	                      }
@@ -1580,7 +1585,7 @@
 	                      }
 	                    }
 	                  }, _callee2);
-	                })), failed ? 3000 : 0);
+	                })), failed ? 2000 : 0);
 
 	              case 18:
 	              case "end":
@@ -1919,6 +1924,9 @@
 	                break;
 
 	              case 32:
+	                this.parent.events.emit(ACTIONS_LOADED);
+
+	              case 33:
 	              case "end":
 	                return _context7.stop();
 	            }
@@ -3244,7 +3252,7 @@
 	    Config$1.store(this.opts);
 	    this.onReady = false;
 
-	    if (this.opts.dev) {
+	    if (this.opts.dev && typeof window !== 'undefined') {
 	      window.client = this;
 	      debugPanel();
 	    }
