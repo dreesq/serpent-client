@@ -882,6 +882,14 @@
 	  return typeof value !== 'undefined' ? value : defaultValue;
 	};
 	/**
+	 * Helper for generating random id
+	 * @returns {string}
+	 */
+
+	var randomId = function randomId() {
+	  return Math.random().toString(36).substring(7);
+	};
+	/**
 	 * Returns size of an object
 	 * @param object
 	 * @param breakSize
@@ -926,7 +934,7 @@
 
 	var loggers = {};
 	var d = function d(type) {
-	  if (!Config$1.get('debug') || typeof window === 'undefined') {
+	  if (!Config$1.get('dev') || typeof window === 'undefined') {
 	    return;
 	  }
 
@@ -1057,14 +1065,14 @@
 	    },
 	    initStyle: function initStyle() {
 	      var style = document.createElement('style');
-	      style.innerHTML = "\n                #debugPanel {\n                    z-index: 9203021;\n                    position: fixed;\n                    min-width: 460px;\n                    word-wrap: normal;\n                    border-radius: 4px;\n                    color: #fff;\n                    resize: both;\n                    left: ".concat(panel.state.left || '20px', ";\n                    top: ").concat(panel.state.top || '20px', ";\n                    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n                }\n                \n                #debugPanel .drag-handle {\n                    cursor: grab;\n                }\n                \n                #debugPanel .welcome-message {\n                    font-size: 12px;\n                    display: flex;\n                    align-items: center;\n                    color: #f9243d;\n                    font-family: Verdana;\n                    display: lex;\n                }\n                \n                #debugPanel .welcome-message div {\n                    color: #4a4545;\n                }\n                \n                #debugPanel .welcome-message span {\n                    color: #30bf58;\n                }\n                \n                #debugPanel .resize-handle {\n                    cursor: se-resize;\n                }\n                \n                #debugPanel button {\n                    cursor: pointer;\n                    outline: none;\n                }\n                \n                #debugPanel .inner {\n                    background: rgba(23, 22, 22, 0.92);\n                    min-height: 120px;\n                    overflow-y: auto;\n                    overflow-x: hidden;\n                    padding: 20px 20px 0 20px;\n                    ").concat(panel.state.width ? 'width: ' + panel.state.width + ';' : '', "\n                    ").concat(panel.state.width ? 'max-width: ' + panel.state.width + ';' : '', "\n                    ").concat(panel.state.height ? 'height: ' + panel.state.height + ';' : '', "\n                    max-height: 600px;\n                    border-top-left-radius: 4px;\n                    border-top-right-radius: 4px;\n                    box-shadow: 0px 20px 14px 1px rgba(0, 0, 0, 0.61);\n                    position: relative;\n                }\n                \n                #debugPanel .toggle-minimize {\n                    margin-left: auto;\n                }\n                \n                #debugPanel .controls {\n                    height: 36px;\n                    display: flex;\n                    align-items: center;\n                    background: #212021;\n                    border-radius: 4px;\n                    border-top-left-radius: 0;\n                    border-top-right-radius: 0;\n                    position: relative;\n                }\n                \n                #debugPanel .debug-input {\n                    height: 35px;\n                    padding: 8px 14px;\n                    width: 70%;\n                    border: none;\n                    border-bottom-left-radius: 4px;\n                    background: #1c1a1a;\n                    box-sizing: border-box;\n                    font-size: 13px;\n                    outline: none;\n                    color: #a2a2a2;\n                }\n                \n                #debugPanel .search {\n                    position: fixed;\n                }\n                \n                #debugPanel .search input {\n                    display: block;\n                    background: rgba(255, 212, 87, 0.05);\n                    border: none;\n                    padding: 10px;\n                    color: #fff;\n                    border-bottom: 1px solid #ffd457;\n                }\n                \n                #debugPanel .search input:focus {\n                    outline: none;\n                }\n               \n                #debugPanel .controls button {\n                    background: #1b1a1a;\n                    border: none;\n                    border-radius: 4px;\n                    color: #fff;\n                    padding: 6px 11px;\n                    font-weight: bold;\n                    margin-right: 6px;  \n                }\n               \n                #debugPanel .number {\n                    color:#b66bb2\n                }\n                \n                #debugPanel .key {\n                    color: #619bab;\n                }\n                \n                #debugPanel .string {\n                    color:#55c149\n                }\n                \n                #debugPanel .boolean {\n                    color:#ff82a4;\n                }\n                \n                #debugPanel .null {\n                    color:#ff7477;\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar {\n                  width: 5px;\n                  height: 12px;\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar-track {\n                  background: rgba(0, 0, 0, 0.1);\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar-thumb {\n                  background: #ffd457;\n                }\n                \n                #debugPanel .message {\n                    display: block;\n                    padding: 2px 0;\n                    white-space: pre-wrap;\n                    font-size: 13px;\n                    background: #171717;\n                    margin-bottom: 10px;\n                    padding: 10px;\n                    border-radius: 4px;\n                }\n                \n                #debugPanel .message.hidden {\n                    display: none;\n                }\n                \n                #debugPanel .info {\n                    color: #00a7c5;\n                }\n                \n                #debugPanel .error {\n                    color: #ff6b6b;\n                }\n                \n                #debugPanel .warn {\n                    color: #ecc54d;\n                }\n                \n                #debugPanel .log {\n                    color: #4cff85;\n                }\n                \n                #debugPanel .object {\n                    color: #619bab;\n                    font-size: 12px;\n                    padding: 10px;\n                    display: block;\n                    background: #1b1a1a;\n                    margin: 6px 0;\n                    border-radius: 4px;\n                    max-height: 160px;\n                    overflow-y: scroll;\n                }\n                \n                #debugPanel .entity {\n                    display: block;\n                    word-break: break-word;\n                }\n                \n                #debugPanel .entity + .object {\n                    margin-top: 10px;\n                }\n            ");
+	      style.innerHTML = "\n                #debugPanel {\n                    z-index: 9203021;\n                    position: fixed;\n                    min-width: 460px;\n                    word-wrap: normal;\n                    border-radius: 4px;\n                    color: #fff;\n                    resize: both;\n                    left: ".concat(panel.state.left || '20px', ";\n                    top: ").concat(panel.state.top || '20px', ";\n                    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n                }\n                \n                #debugPanel .drag-handle {\n                    cursor: grab;\n                }\n                \n                #debugPanel .welcome-message {\n                    font-size: 12px;\n                    display: flex;\n                    align-items: center;\n                    color: #000000;\n                    font-family: Verdana;\n                    display: flex;\n                    margin-top: 43px;\n                    background: #fff;\n                    border-radius: 4px;\n                    height: 73px;\n                    overflow: hidden;\n                }\n                \n                #debugPanel .welcome-message div {\n                    color: #4a4545;\n                }\n                \n                #debugPanel .welcome-message span {\n                    color: #30bf58;\n                }\n                \n                #debugPanel .resize-handle {\n                    cursor: se-resize;\n                }\n                \n                #debugPanel button {\n                    cursor: pointer;\n                    outline: none;\n                }\n                \n                #debugPanel .inner {\n                    background: rgba(23, 22, 22, 0.92);\n                    min-height: 120px;\n                    overflow-y: auto;\n                    overflow-x: hidden;\n                    padding: 20px 20px 0 20px;\n                    ").concat(panel.state.width ? 'width: ' + panel.state.width + ';' : '', "\n                    ").concat(panel.state.width ? 'max-width: ' + panel.state.width + ';' : '', "\n                    ").concat(panel.state.height ? 'height: ' + panel.state.height + ';' : '', "\n                    max-height: 600px;\n                    border-radius: 4px;\n                    position: relative;\n                }\n                \n                #debugPanel .toggle-minimize {\n                    margin-left: auto;\n                }\n                \n                #debugPanel .controls {\n                    height: 45px;\n                    display: flex;\n                    align-items: center;\n                    background: #212021;\n                    border-radius: 4px;\n                    position: relative;\n                    overflow: hidden;\n                    margin-top: 3px;\n                }\n                \n                #debugPanel .debug-input {\n                    height: 45px;\n                    padding: 8px 14px;\n                    border: none;\n                    border-bottom-left-radius: 4px;\n                    background: #1c1a1a;\n                    box-sizing: border-box;\n                    font-size: 13px;\n                    outline: none;\n                    color: #ebebeb;\n                    flex-grow: 1;\n                    margin-right: 7px;\n                }\n                \n                #debugPanel .search {\n                    position: fixed;\n                }\n                \n                #debugPanel .search input {\n                    display: block;\n                    background: rgb(41, 40, 40);\n                    border: none;\n                    padding: 10px;\n                    color: #fff;\n                    border-bottom: 1px solid #fff;\n                }\n                \n                #debugPanel .search input:focus {\n                    outline: none;\n                }\n               \n                #debugPanel .controls button {\n                    background: #1b1a1a;\n                    color: #fff;\n                    padding: 6px 11px;\n                    font-weight: bold;\n                    height: 32px;\n                    border-radius: 4px;\n                    border: 1px solid #484848;\n                    width: 37px;\n                }\n                \n                #debugPanel .controls > div {\n                    margin-left: auto;\n                }\n                \n                #debugPanel .controls button:hover {\n                    background: #272525;\n                }\n               \n                #debugPanel .number {\n                    color:#b66bb2\n                }\n                \n                #debugPanel .key {\n                    color: #619bab;\n                }\n                \n                #debugPanel .string {\n                    color:#55c149\n                }\n                \n                #debugPanel .controls .resize-handle {\n                    margin-right: 7px;\n                }\n                \n                #debugPanel .boolean {\n                    color:#ff82a4;\n                }\n                \n                #debugPanel .null {\n                    color:#ff7477;\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar {\n                  width: 5px;\n                  height: 12px;\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar-track {\n                  background: rgba(0, 0, 0, 0.1);\n                }\n                \n                #debugPanel .inner::-webkit-scrollbar-thumb {\n                  background: #00a7c5;\n                  border-radius: 10px;\n                }\n                \n                #debugPanel .message {\n                    display: block;\n                    padding: 2px 0;\n                    white-space: pre-wrap;\n                    font-size: 13px;\n                    background: rgba(23, 23, 23, 0.44);\n                    margin-bottom: 7px;\n                    padding: 10px;\n                    border-radius: 4px;\n                }\n                \n                #debugPanel .message.hidden {\n                    display: none;\n                }\n                \n                #debugPanel .info {\n                    color: #00a7c5;\n                }\n                \n                #debugPanel .error {\n                    color: #ff6b6b;\n                }\n                \n                #debugPanel .warn {\n                    color: #ecc54d;\n                }\n                \n                #debugPanel .log {\n                    color: #4cff85;\n                }\n                \n                #debugPanel .object {\n                    color: #619bab;\n                    font-size: 12px;\n                    padding: 10px;\n                    display: block;\n                    background: #1b1a1a;\n                    margin: 6px 0;\n                    border-radius: 4px;\n                    max-height: 160px;\n                    overflow-y: scroll;\n                }\n                \n                #debugPanel .entity {\n                    display: block;\n                    word-break: break-word;\n                }\n                \n                #debugPanel .entity + .object {\n                    margin-top: 10px;\n                }\n            ");
 	      document.head.append(style);
 	    },
 	    initHtml: function initHtml() {
 	      panel.el = document.createElement('div');
 	      panel.el.id = 'debugPanel';
 	      document.body.appendChild(panel.el);
-	      panel.el.innerHTML = "\n                <div class=\"inner\">\n                    <div class=\"search\">\n                        <input type=\"text\" class=\"search-input\" placeholder=\"Search\" />\n                    </div>\n                </div>\n                <div class=\"controls\">\n                    <input type=\"text\" class=\"debug-input\" placeholder=\"Execute javascript or run client actions\" />\n                    <button class=\"toggle-minimize\">\n                        &#128469;\n                    </button>\n                    <button class=\"clear-panel\">\n                        &#128465;\n                    </button>\n                    <button class=\"drag-handle\">\n                        &#10021;\n                    </button>\n                    <button class=\"resize-handle\">\n                        &searr;\n                     </button>\n                </div>\n            ";
+	      panel.el.innerHTML = "\n                <div class=\"inner\">\n                    <div class=\"search\">\n                        <input type=\"text\" class=\"search-input\" placeholder=\"Search\" />\n                    </div>\n                </div>\n                <div class=\"controls\">\n                    <input type=\"text\" class=\"debug-input\" placeholder=\"Execute javascript or run client actions\" />\n                    <div>\n                        <button class=\"toggle-minimize\">&#128469;</button>\n                        <button class=\"clear-panel\">&#128465;</button>\n                        <button class=\"drag-handle\">&#10021;</button>\n                        <button class=\"resize-handle\">&searr;</button>\n                    </div>\n                </div>\n            ";
 	    },
 	    onLoad: function onLoad() {
 	      var offset, mousePosition;
@@ -1101,21 +1109,52 @@
 	        panel.state.top = panel.el.style.top;
 	        panel.saveState();
 	      });
-	      var lastCommand = '';
+	      var cmdIndex = 0;
 	      debugInput.addEventListener('keyup', function (e) {
+	        var commands = JSON.parse(localStorage.getItem('lastCommands') || '[]');
+
 	        if (e.keyCode === 38) {
-	          debugInput.value = lastCommand;
+	          var cmd = commands[commands.length - cmdIndex - 1];
+
+	          if (typeof cmd !== 'undefined') {
+	            cmdIndex += 1;
+	            debugInput.value = cmd;
+	            debugInput.setSelectionRange(cmd.length, cmd.length);
+	          }
 	        }
 
-	        if (e.keyCode === 13) {
+	        if (e.keyCode === 40) {
+	          var _cmd = commands[commands.length - cmdIndex + 1];
+
+	          if (typeof _cmd !== 'undefined') {
+	            cmdIndex -= 1;
+	            debugInput.value = _cmd;
+	            debugInput.setSelectionRange(_cmd.length, _cmd.length);
+	            return;
+	          }
+
+	          debugInput.value = '';
+	        }
+
+	        if (e.keyCode === 13 && debugInput.value && debugInput.value.trim().length) {
 	          try {
-	            lastCommand = debugInput.value;
+	            if (commands[commands.length - 1] !== debugInput.value) {
+	              commands.push(debugInput.value);
+
+	              if (commands.length > 50) {
+	                commands.splice(0, 1);
+	              }
+
+	              localStorage.setItem('lastCommands', JSON.stringify(commands));
+	            }
+
 	            var res = eval(debugInput.value);
 	            console.log(res);
 	          } catch (error) {
 	            console.error(error.stack);
 	          }
 
+	          cmdIndex = 0;
 	          debugInput.value = '';
 	        }
 	      });
@@ -1191,8 +1230,8 @@
 	    },
 	    onFinish: function onFinish() {
 	      var inner = panel.el.querySelector('.inner');
-	      var version = '2.2.0';
-	      inner.innerHTML += ['<pre class="welcome-message">', "\n                 \n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>debug: <span>".concat(Config$1.get('debug'), "</span>"), "endpoint: <span>".concat(Config$1.get('handler'), "</span>"), "version: <span>".concat(version, "</span></div>"), '', '</pre>'].join('\n');
+	      var version = '2.2.5';
+	      inner.innerHTML += ['<pre class="welcome-message">', "\n                 \n           `/+-                          \n         .+++/-                         \n         +++.        `.-:-.`            \n        `++-        -++++//+:`          \n         /+.      `/+++:`  `//`         \n         `//.   `-+++/.     .+/         \n          `://::/+++:`      :++         \n            `.::::-`     `-/++/         \n                         .://-` \n                ", "<div>dev: <span>".concat(Config$1.get('dev'), "</span>"), "endpoint: <span>".concat(Config$1.get('handler'), "</span>"), "version: <span>".concat(version, "</span></div>"), '', '</pre>'].join('\n');
 	    },
 	    hookLoggers: function hookLoggers() {
 	      var hooks = ['log', 'error', 'info', 'warn'];
@@ -1209,6 +1248,7 @@
 
 	          var clonedArgs = [].concat(args);
 	          var message = "<span class=\"message ".concat(hook, "\">");
+	          var print = false;
 	          var _iteratorNormalCompletion = true;
 	          var _didIteratorError = false;
 	          var _iteratorError = undefined;
@@ -1216,8 +1256,9 @@
 	          try {
 	            for (var _iterator = clonedArgs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 	              var arg = _step.value;
+	              var size = sizeOf(arg, 2000);
 
-	              if (sizeOf(arg, 2000) > 2000) {
+	              if (size > 2000 || arg === undefined || arg === '' || arg === null) {
 	                continue;
 	              }
 
@@ -1229,6 +1270,7 @@
 	              }
 
 	              message += "<span class=\"entity\">".concat(arg, "</span>");
+	              print = true;
 	            }
 	          } catch (err) {
 	            _didIteratorError = true;
@@ -1245,6 +1287,10 @@
 	            }
 	          }
 
+	          if (!print) {
+	            return;
+	          }
+
 	          message += "</span>";
 	          var e = document.createElement('span');
 	          e.innerHTML = message;
@@ -1258,12 +1304,8 @@
 	        };
 
 	        console[hook] = function () {
-	          for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-	            args[_key3] = arguments[_key3];
-	          }
-
-	          consoleLogger.apply(void 0, args);
-	          loggers[hook].apply(loggers, ['(console)', ' '].concat(args));
+	          consoleLogger.apply(void 0, arguments);
+	          loggers[hook].apply(loggers, arguments);
 	        };
 	      };
 
@@ -1288,6 +1330,7 @@
 	var Utils = /*#__PURE__*/Object.freeze({
 		__proto__: null,
 		get: get,
+		randomId: randomId,
 		d: d,
 		parseTemplate: parseTemplate,
 		debugPanel: debugPanel
@@ -1328,6 +1371,9 @@
 	var ACTION_SUCCESS = 'success';
 	var ACTION_ERROR = 'error';
 	var ACTION_PROGRESS = 'progress';
+	var ACTION_CONFIRM = 'confirm';
+	var ACTION_CONFIRM_RESOLVE = 'confirm:resolve';
+	var ACTIONS_LOADED = 'actions:loaded';
 	/**
 	 * Socket events
 	 * @type {string}
@@ -1345,6 +1391,9 @@
 		ACTION_SUCCESS: ACTION_SUCCESS,
 		ACTION_ERROR: ACTION_ERROR,
 		ACTION_PROGRESS: ACTION_PROGRESS,
+		ACTION_CONFIRM: ACTION_CONFIRM,
+		ACTION_CONFIRM_RESOLVE: ACTION_CONFIRM_RESOLVE,
+		ACTIONS_LOADED: ACTIONS_LOADED,
 		SOCKET_CONNECTED: SOCKET_CONNECTED,
 		SOCKET_DISCONNECTED: SOCKET_DISCONNECTED,
 		SOCKET_RECONNECTED: SOCKET_RECONNECTED,
@@ -1437,6 +1486,8 @@
 	    this.list = {};
 	    this.parent = parent;
 	    this.httpClient = client;
+	    this.parent.http = this.makeHttpClient();
+	    this.useDevGateway();
 	  }
 
 	  createClass(Actions, [{
@@ -1458,9 +1509,113 @@
 	      return isLogout;
 	    }
 	  }, {
+	    key: "useDevGateway",
+	    value: function () {
+	      var _useDevGateway = asyncToGenerator(
+	      /*#__PURE__*/
+	      regenerator.mark(function _callee3() {
+	        var _this = this;
+
+	        var config, failed, url, _ref, data;
+
+	        return regenerator.wrap(function _callee3$(_context3) {
+	          while (1) {
+	            switch (_context3.prev = _context3.next) {
+	              case 0:
+	                config = this.parent.config;
+
+	                if (!(!config.get('dev') || typeof window === 'undefined')) {
+	                  _context3.next = 3;
+	                  break;
+	                }
+
+	                return _context3.abrupt("return");
+
+	              case 3:
+	                /**
+	                 * Reload action definitions
+	                 * on server restart and log
+	                 * gateway responses
+	                 */
+	                failed = false;
+	                _context3.prev = 4;
+	                url = config.get('devGateway') ? config.get('devGateway') : "".concat(config.get('handler'), "/_dev_gateway");
+	                _context3.next = 8;
+	                return this.parent.http.get(url);
+
+	              case 8:
+	                _ref = _context3.sent;
+	                data = _ref.data;
+	                d('info', '(s)', data);
+	                _context3.next = 17;
+	                break;
+
+	              case 13:
+	                _context3.prev = 13;
+	                _context3.t0 = _context3["catch"](4);
+	                failed = true;
+	                setTimeout(
+	                /*#__PURE__*/
+	                asyncToGenerator(
+	                /*#__PURE__*/
+	                regenerator.mark(function _callee() {
+	                  return regenerator.wrap(function _callee$(_context) {
+	                    while (1) {
+	                      switch (_context.prev = _context.next) {
+	                        case 0:
+	                          _context.next = 2;
+	                          return _this.setup();
+
+	                        case 2:
+	                          client;
+
+	                        case 3:
+	                        case "end":
+	                          return _context.stop();
+	                      }
+	                    }
+	                  }, _callee);
+	                })), 1000);
+
+	              case 17:
+	                setTimeout(
+	                /*#__PURE__*/
+	                asyncToGenerator(
+	                /*#__PURE__*/
+	                regenerator.mark(function _callee2() {
+	                  return regenerator.wrap(function _callee2$(_context2) {
+	                    while (1) {
+	                      switch (_context2.prev = _context2.next) {
+	                        case 0:
+	                          _context2.next = 2;
+	                          return _this.useDevGateway();
+
+	                        case 2:
+	                        case "end":
+	                          return _context2.stop();
+	                      }
+	                    }
+	                  }, _callee2);
+	                })), failed ? 2000 : 0);
+
+	              case 18:
+	              case "end":
+	                return _context3.stop();
+	            }
+	          }
+	        }, _callee3, this, [[4, 13]]);
+	      }));
+
+	      function useDevGateway() {
+	        return _useDevGateway.apply(this, arguments);
+	      }
+
+	      return useDevGateway;
+	    }()
+	  }, {
 	    key: "makeHttpClient",
 	    value: function makeHttpClient() {
-	      var _this = this;
+	      var _this2 = this;
 
 	      var tokenHandler = Config$1.get('tokenHandler');
 	      var token = tokenHandler.get('token');
@@ -1477,16 +1632,16 @@
 	      var onAuthFailed =
 	      /*#__PURE__*/
 	      function () {
-	        var _ref = asyncToGenerator(
+	        var _ref4 = asyncToGenerator(
 	        /*#__PURE__*/
-	        regenerator.mark(function _callee() {
+	        regenerator.mark(function _callee4() {
 	          var fn;
-	          return regenerator.wrap(function _callee$(_context) {
+	          return regenerator.wrap(function _callee4$(_context4) {
 	            while (1) {
-	              switch (_context.prev = _context.next) {
+	              switch (_context4.prev = _context4.next) {
 	                case 0:
-	                  _context.next = 2;
-	                  return _this.parent.auth.logout();
+	                  _context4.next = 2;
+	                  return _this2.parent.auth.logout();
 
 	                case 2:
 	                  fn = Config$1.get('authFailed');
@@ -1494,14 +1649,14 @@
 
 	                case 4:
 	                case "end":
-	                  return _context.stop();
+	                  return _context4.stop();
 	              }
 	            }
-	          }, _callee);
+	          }, _callee4);
 	        }));
 
 	        return function onAuthFailed() {
-	          return _ref.apply(this, arguments);
+	          return _ref4.apply(this, arguments);
 	        };
 	      }();
 
@@ -1510,48 +1665,48 @@
 	      },
 	      /*#__PURE__*/
 	      function () {
-	        var _ref2 = asyncToGenerator(
+	        var _ref5 = asyncToGenerator(
 	        /*#__PURE__*/
-	        regenerator.mark(function _callee2(error) {
-	          var refreshToken, _ref3, data, errors;
+	        regenerator.mark(function _callee5(error) {
+	          var refreshToken, _ref6, data, errors;
 
-	          return regenerator.wrap(function _callee2$(_context2) {
+	          return regenerator.wrap(function _callee5$(_context5) {
 	            while (1) {
-	              switch (_context2.prev = _context2.next) {
+	              switch (_context5.prev = _context5.next) {
 	                case 0:
-	                  if (!(error.response && error.response.status === 401 && !_this._isLogout(error.config))) {
-	                    _context2.next = 21;
+	                  if (!(error.response && error.response.status === 401 && !_this2._isLogout(error.config))) {
+	                    _context5.next = 21;
 	                    break;
 	                  }
 
 	                  refreshToken = tokenHandler.get('refresh');
 
 	                  if (!refreshToken) {
-	                    _context2.next = 19;
+	                    _context5.next = 19;
 	                    break;
 	                  }
 
 	                  d('info', '+ token refresh');
-	                  _context2.next = 6;
-	                  return _this.parent.refreshToken({
+	                  _context5.next = 6;
+	                  return _this2.parent.refreshToken({
 	                    token: refreshToken
 	                  });
 
 	                case 6:
-	                  _ref3 = _context2.sent;
-	                  data = _ref3.data;
-	                  errors = _ref3.errors;
+	                  _ref6 = _context5.sent;
+	                  data = _ref6.data;
+	                  errors = _ref6.errors;
 
 	                  if (!errors) {
-	                    _context2.next = 13;
+	                    _context5.next = 13;
 	                    break;
 	                  }
 
-	                  _context2.next = 12;
+	                  _context5.next = 12;
 	                  return onAuthFailed();
 
 	                case 12:
-	                  return _context2.abrupt("return", error);
+	                  return _context5.abrupt("return", error);
 
 	                case 13:
 	                  /**
@@ -1560,31 +1715,31 @@
 	                  d('info', '(ok) refreshed token');
 	                  tokenHandler.set('token', data.token);
 	                  tokenHandler.set('refresh', data.refresh);
-	                  _this.parent.http.defaults.headers.Authorization = data.token;
+	                  _this2.parent.http.defaults.headers.Authorization = data.token;
 	                  /**
 	                   * Retry the request
 	                   */
 
 	                  error.config.headers.Authorization = data.token;
-	                  return _context2.abrupt("return", client.request(error.config));
+	                  return _context5.abrupt("return", client.request(error.config));
 
 	                case 19:
-	                  _context2.next = 21;
+	                  _context5.next = 21;
 	                  return onAuthFailed();
 
 	                case 21:
-	                  return _context2.abrupt("return", Promise.reject(error));
+	                  return _context5.abrupt("return", Promise.reject(error));
 
 	                case 22:
 	                case "end":
-	                  return _context2.stop();
+	                  return _context5.stop();
 	              }
 	            }
-	          }, _callee2);
+	          }, _callee5);
 	        }));
 
 	        return function (_x) {
-	          return _ref2.apply(this, arguments);
+	          return _ref5.apply(this, arguments);
 	        };
 	      }());
 	      return client;
@@ -1604,61 +1759,61 @@
 	    value: function () {
 	      var _setup = asyncToGenerator(
 	      /*#__PURE__*/
-	      regenerator.mark(function _callee4() {
-	        var _this2 = this;
+	      regenerator.mark(function _callee7() {
+	        var _this3 = this;
 
 	        var actions,
 	            http,
 	            data,
-	            _ref4,
+	            _ref7,
 	            _actions,
 	            _loop,
 	            key,
 	            _ret,
-	            _args4 = arguments;
+	            _args7 = arguments;
 
-	        return regenerator.wrap(function _callee4$(_context4) {
+	        return regenerator.wrap(function _callee7$(_context7) {
 	          while (1) {
-	            switch (_context4.prev = _context4.next) {
+	            switch (_context7.prev = _context7.next) {
 	              case 0:
-	                actions = _args4.length > 0 && _args4[0] !== undefined ? _args4[0] : {};
-	                http = this.parent.http = this.makeHttpClient();
+	                actions = _args7.length > 0 && _args7[0] !== undefined ? _args7[0] : {};
+	                http = this.parent.http;
 
 	                if (Config$1.get('actions')) {
-	                  _context4.next = 4;
+	                  _context7.next = 4;
 	                  break;
 	                }
 
-	                return _context4.abrupt("return");
+	                return _context7.abrupt("return");
 
 	              case 4:
 	                data = {};
 
 	                if (Object.keys(actions).length) {
-	                  _context4.next = 21;
+	                  _context7.next = 21;
 	                  break;
 	                }
 
 	                d('info', '+ actions');
-	                _context4.prev = 7;
-	                _context4.next = 10;
+	                _context7.prev = 7;
+	                _context7.next = 10;
 	                return http.get(Config$1.get('actions'));
 
 	              case 10:
-	                _ref4 = _context4.sent;
-	                _actions = _ref4.data;
+	                _ref7 = _context7.sent;
+	                _actions = _ref7.data;
 	                data = _actions;
-	                _context4.next = 19;
+	                _context7.next = 19;
 	                break;
 
 	              case 15:
-	                _context4.prev = 15;
-	                _context4.t0 = _context4["catch"](7);
-	                d('error', '(error) failed loading actions list', _context4.t0);
-	                this.parent.events.emit(ACTION_ERROR, ['init', _context4.t0]);
+	                _context7.prev = 15;
+	                _context7.t0 = _context7["catch"](7);
+	                d('error', '(error) failed loading actions list', _context7.t0);
+	                this.parent.events.emit(ACTION_ERROR, ['init', _context7.t0]);
 
 	              case 19:
-	                _context4.next = 22;
+	                _context7.next = 22;
 	                break;
 
 	              case 21:
@@ -1672,44 +1827,44 @@
 	                    return "continue";
 	                  }
 
-	                  if (_this2.hasOwnProperty(key)) {
+	                  if (_this3.hasOwnProperty(key)) {
 	                    d('warn', "(err) (".concat(key, ") already registered"));
 	                    return "continue";
 	                  }
 
-	                  _this2.parent[key] =
+	                  _this3.parent[key] =
 	                  /*#__PURE__*/
 	                  function () {
-	                    var _ref5 = asyncToGenerator(
+	                    var _ref8 = asyncToGenerator(
 	                    /*#__PURE__*/
-	                    regenerator.mark(function _callee3(payload) {
+	                    regenerator.mark(function _callee6(payload) {
 	                      var options,
 	                          tokenHandler,
-	                          _ref6,
+	                          _ref9,
 	                          data,
 	                          errors,
-	                          _args3 = arguments;
+	                          _args6 = arguments;
 
-	                      return regenerator.wrap(function _callee3$(_context3) {
+	                      return regenerator.wrap(function _callee6$(_context6) {
 	                        while (1) {
-	                          switch (_context3.prev = _context3.next) {
+	                          switch (_context6.prev = _context6.next) {
 	                            case 0:
-	                              options = _args3.length > 1 && _args3[1] !== undefined ? _args3[1] : {};
+	                              options = _args6.length > 1 && _args6[1] !== undefined ? _args6[1] : {};
 	                              tokenHandler = Config$1.get('tokenHandler');
-	                              _context3.next = 4;
-	                              return _this2._call(key, payload, options);
+	                              _context6.next = 4;
+	                              return _this3._call(key, payload, options);
 
 	                            case 4:
-	                              _ref6 = _context3.sent;
-	                              data = _ref6.data;
-	                              errors = _ref6.errors;
+	                              _ref9 = _context6.sent;
+	                              data = _ref9.data;
+	                              errors = _ref9.errors;
 
 	                              if (!errors) {
-	                                _context3.next = 9;
+	                                _context6.next = 9;
 	                                break;
 	                              }
 
-	                              return _context3.abrupt("return", {
+	                              return _context6.abrupt("return", {
 	                                data: data,
 	                                errors: errors
 	                              });
@@ -1717,74 +1872,77 @@
 	                            case 9:
 	                              if ((key === 'login' || key === 'setPassword') && data.token) {
 	                                tokenHandler.set('token', data.token);
-	                                _this2.parent.http.defaults.headers.Authorization = data.token;
+	                                _this3.parent.http.defaults.headers.Authorization = data.token;
 
 	                                if (Config$1.get('refresh') && data.refresh) {
 	                                  tokenHandler.set('refresh', data.refresh);
 	                                }
 
 	                                if (Config$1.get('socket')) {
-	                                  _this2.parent.socket.emit('login', data.token);
+	                                  _this3.parent.socket.emit('login', data.token);
 	                                }
 	                              }
 
 	                              if (key === 'logout') {
 	                                tokenHandler.remove('token');
 	                                tokenHandler.remove('refresh');
-	                                _this2.parent.http.defaults.headers.Authorization = null;
+	                                _this3.parent.http.defaults.headers.Authorization = null;
 
 	                                if (Config$1.get('socket')) {
-	                                  _this2.parent.socket.emit('logout');
+	                                  _this3.parent.socket.emit('logout');
 	                                }
 	                              }
 
-	                              return _context3.abrupt("return", {
+	                              return _context6.abrupt("return", {
 	                                data: data,
 	                                errors: errors
 	                              });
 
 	                            case 12:
 	                            case "end":
-	                              return _context3.stop();
+	                              return _context6.stop();
 	                          }
 	                        }
-	                      }, _callee3);
+	                      }, _callee6);
 	                    }));
 
 	                    return function (_x2) {
-	                      return _ref5.apply(this, arguments);
+	                      return _ref8.apply(this, arguments);
 	                    };
 	                  }();
 	                };
 
-	                _context4.t1 = regenerator.keys(data);
+	                _context7.t1 = regenerator.keys(data);
 
 	              case 25:
-	                if ((_context4.t2 = _context4.t1()).done) {
-	                  _context4.next = 32;
+	                if ((_context7.t2 = _context7.t1()).done) {
+	                  _context7.next = 32;
 	                  break;
 	                }
 
-	                key = _context4.t2.value;
+	                key = _context7.t2.value;
 	                _ret = _loop(key);
 
 	                if (!(_ret === "continue")) {
-	                  _context4.next = 30;
+	                  _context7.next = 30;
 	                  break;
 	                }
 
-	                return _context4.abrupt("continue", 25);
+	                return _context7.abrupt("continue", 25);
 
 	              case 30:
-	                _context4.next = 25;
+	                _context7.next = 25;
 	                break;
 
 	              case 32:
+	                this.parent.events.emit(ACTIONS_LOADED);
+
+	              case 33:
 	              case "end":
-	                return _context4.stop();
+	                return _context7.stop();
 	            }
 	          }
-	        }, _callee4, this, [[7, 15]]);
+	        }, _callee7, this, [[7, 15]]);
 	      }));
 
 	      function setup() {
@@ -1796,7 +1954,7 @@
 	  }, {
 	    key: "_configAction",
 	    value: function _configAction() {
-	      var _this3 = this;
+	      var _this4 = this;
 
 	      var withProgress = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 	      var name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
@@ -1806,13 +1964,13 @@
 	        config.onUploadProgress = function (e) {
 	          var percent = Math.floor(e.loaded * 100 / e.total);
 
-	          _this3.parent.events.emit(ACTION_PROGRESS, [name, percent]);
+	          _this4.parent.events.emit(ACTION_PROGRESS, [name, percent]);
 	        };
 
 	        config.onDownloadProgress = function (e) {
 	          var percent = Math.floor(e.loaded * 100 / e.total);
 
-	          _this3.parent.events.emit(ACTION_PROGRESS, [name, percent]);
+	          _this4.parent.events.emit(ACTION_PROGRESS, [name, percent]);
 	        };
 	      }
 
@@ -1823,24 +1981,24 @@
 	    value: function () {
 	      var _validateAction2 = asyncToGenerator(
 	      /*#__PURE__*/
-	      regenerator.mark(function _callee5(action, payload) {
+	      regenerator.mark(function _callee8(action, payload) {
 	        var result, errors;
-	        return regenerator.wrap(function _callee5$(_context5) {
+	        return regenerator.wrap(function _callee8$(_context8) {
 	          while (1) {
-	            switch (_context5.prev = _context5.next) {
+	            switch (_context8.prev = _context8.next) {
 	              case 0:
 	                result = false;
 
 	                if (!(this.list[action] && Object.keys(this.list[action]).length)) {
-	                  _context5.next = 6;
+	                  _context8.next = 6;
 	                  break;
 	                }
 
-	                _context5.next = 4;
+	                _context8.next = 4;
 	                return this.parent.validator.validate(payload, this.list[action]);
 
 	              case 4:
-	                errors = _context5.sent;
+	                errors = _context8.sent;
 
 	                if (Object.keys(errors).length) {
 	                  result = errors;
@@ -1848,14 +2006,14 @@
 	                }
 
 	              case 6:
-	                return _context5.abrupt("return", result);
+	                return _context8.abrupt("return", result);
 
 	              case 7:
 	              case "end":
-	                return _context5.stop();
+	                return _context8.stop();
 	            }
 	          }
-	        }, _callee5, this);
+	        }, _callee8, this);
 	      }));
 
 	      function _validateAction(_x3, _x4) {
@@ -1873,7 +2031,7 @@
 	    value: function () {
 	      var _batch = asyncToGenerator(
 	      /*#__PURE__*/
-	      regenerator.mark(function _callee6() {
+	      regenerator.mark(function _callee9() {
 	        var actions,
 	            options,
 	            result,
@@ -1883,7 +2041,7 @@
 	            action,
 	            payload,
 	            errors,
-	            _ref7,
+	            _ref10,
 	            actionResults,
 	            _iteratorNormalCompletion,
 	            _didIteratorError,
@@ -1894,14 +2052,14 @@
 	            _action,
 	            _data,
 	            _errors,
-	            _args6 = arguments;
+	            _args9 = arguments;
 
-	        return regenerator.wrap(function _callee6$(_context6) {
+	        return regenerator.wrap(function _callee9$(_context9) {
 	          while (1) {
-	            switch (_context6.prev = _context6.next) {
+	            switch (_context9.prev = _context9.next) {
 	              case 0:
-	                actions = _args6.length > 0 && _args6[0] !== undefined ? _args6[0] : {};
-	                options = _args6.length > 1 && _args6[1] !== undefined ? _args6[1] : {
+	                actions = _args9.length > 0 && _args9[0] !== undefined ? _args9[0] : {};
+	                options = _args9.length > 1 && _args9[1] !== undefined ? _args9[1] : {
 	                  validate: true
 	                };
 	                result = {
@@ -1912,30 +2070,30 @@
 	                start = +new Date();
 	                d('info', "+ running (".concat(names, ")"));
 	                form = [];
-	                _context6.t0 = regenerator.keys(actions);
+	                _context9.t0 = regenerator.keys(actions);
 
 	              case 8:
-	                if ((_context6.t1 = _context6.t0()).done) {
-	                  _context6.next = 22;
+	                if ((_context9.t1 = _context9.t0()).done) {
+	                  _context9.next = 22;
 	                  break;
 	                }
 
-	                action = _context6.t1.value;
+	                action = _context9.t1.value;
 	                payload = actions[action];
 
 	                if (!options.validate) {
-	                  _context6.next = 19;
+	                  _context9.next = 19;
 	                  break;
 	                }
 
-	                _context6.next = 14;
+	                _context9.next = 14;
 	                return this._validateAction(action, payload);
 
 	              case 14:
-	                errors = _context6.sent;
+	                errors = _context9.sent;
 
 	                if (!errors) {
-	                  _context6.next = 19;
+	                  _context9.next = 19;
 	                  break;
 	                }
 
@@ -1944,32 +2102,32 @@
 	                }
 
 	                result.errors[action] = errors;
-	                return _context6.abrupt("continue", 8);
+	                return _context9.abrupt("continue", 8);
 
 	              case 19:
 	                form.push([action, payload]);
-	                _context6.next = 8;
+	                _context9.next = 8;
 	                break;
 
 	              case 22:
 	                if (form.length) {
-	                  _context6.next = 24;
+	                  _context9.next = 24;
 	                  break;
 	                }
 
-	                return _context6.abrupt("return", this.finishTransaction(options, null, result, actions, start));
+	                return _context9.abrupt("return", this.finishTransaction(options, null, result, actions, start));
 
 	              case 24:
-	                _context6.prev = 24;
-	                _context6.next = 27;
+	                _context9.prev = 24;
+	                _context9.next = 27;
 	                return this.parent.http.post(Config$1.get('handler'), form, this._configAction(options.progress, names));
 
 	              case 27:
-	                _ref7 = _context6.sent;
-	                actionResults = _ref7.data;
+	                _ref10 = _context9.sent;
+	                actionResults = _ref10.data;
 
 	                if (Array.isArray(actionResults)) {
-	                  _context6.next = 33;
+	                  _context9.next = 33;
 	                  break;
 	                }
 
@@ -1978,19 +2136,19 @@
 	                    message: ['Unexpected API response']
 	                  }
 	                };
-	                _context6.next = 65;
+	                _context9.next = 65;
 	                break;
 
 	              case 33:
 	                _iteratorNormalCompletion = true;
 	                _didIteratorError = false;
 	                _iteratorError = undefined;
-	                _context6.prev = 36;
+	                _context9.prev = 36;
 	                _iterator = actionResults[Symbol.iterator]();
 
 	              case 38:
 	                if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-	                  _context6.next = 51;
+	                  _context9.next = 51;
 	                  break;
 	                }
 
@@ -1999,7 +2157,7 @@
 	                _data = actionResult[_action];
 
 	                if (!actionResult[_action].errors) {
-	                  _context6.next = 46;
+	                  _context9.next = 46;
 	                  break;
 	                }
 
@@ -2008,7 +2166,7 @@
 	                }
 
 	                result.errors[_action] = actionResult[_action].errors;
-	                return _context6.abrupt("continue", 48);
+	                return _context9.abrupt("continue", 48);
 
 	              case 46:
 	                if (!result.data) {
@@ -2019,66 +2177,66 @@
 
 	              case 48:
 	                _iteratorNormalCompletion = true;
-	                _context6.next = 38;
+	                _context9.next = 38;
 	                break;
 
 	              case 51:
-	                _context6.next = 57;
+	                _context9.next = 57;
 	                break;
 
 	              case 53:
-	                _context6.prev = 53;
-	                _context6.t2 = _context6["catch"](36);
+	                _context9.prev = 53;
+	                _context9.t2 = _context9["catch"](36);
 	                _didIteratorError = true;
-	                _iteratorError = _context6.t2;
+	                _iteratorError = _context9.t2;
 
 	              case 57:
-	                _context6.prev = 57;
-	                _context6.prev = 58;
+	                _context9.prev = 57;
+	                _context9.prev = 58;
 
 	                if (!_iteratorNormalCompletion && _iterator["return"] != null) {
 	                  _iterator["return"]();
 	                }
 
 	              case 60:
-	                _context6.prev = 60;
+	                _context9.prev = 60;
 
 	                if (!_didIteratorError) {
-	                  _context6.next = 63;
+	                  _context9.next = 63;
 	                  break;
 	                }
 
 	                throw _iteratorError;
 
 	              case 63:
-	                return _context6.finish(60);
+	                return _context9.finish(60);
 
 	              case 64:
-	                return _context6.finish(57);
+	                return _context9.finish(57);
 
 	              case 65:
-	                _context6.next = 71;
+	                _context9.next = 71;
 	                break;
 
 	              case 67:
-	                _context6.prev = 67;
-	                _context6.t3 = _context6["catch"](24);
-	                _errors = get(_context6.t3, 'response.data.errors', false);
+	                _context9.prev = 67;
+	                _context9.t3 = _context9["catch"](24);
+	                _errors = get(_context9.t3, 'response.data.errors', false);
 	                result.errors = {
 	                  other: _errors ? _errors : {
-	                    message: [_context6.t3.response]
+	                    message: [_context9.t3.response]
 	                  }
 	                };
 
 	              case 71:
-	                return _context6.abrupt("return", this.finishTransaction(options, null, result, actions, start));
+	                return _context9.abrupt("return", this.finishTransaction(options, null, result, actions, start));
 
 	              case 72:
 	              case "end":
-	                return _context6.stop();
+	                return _context9.stop();
 	            }
 	          }
-	        }, _callee6, this, [[24, 67], [36, 53, 57, 65], [58,, 60, 64]]);
+	        }, _callee9, this, [[24, 67], [36, 53, 57, 65], [58,, 60, 64]]);
 	      }));
 
 	      function batch() {
@@ -2117,45 +2275,100 @@
 	      return result;
 	    }
 	    /**
+	     * Confirm event prevents action
+	     * from being called unless resolved
+	     * @param action
+	     * @param payload
+	     * @returns {Promise<any>}
+	     */
+
+	  }, {
+	    key: "confirm",
+	    value: function confirm(action, payload) {
+	      var _this5 = this;
+
+	      return new Promise(function (resolve) {
+	        var id = randomId();
+
+	        _this5.parent.events.once(ACTION_CONFIRM_RESOLVE, function (_ref11) {
+	          var _ref12 = slicedToArray(_ref11, 2),
+	              entry = _ref12[0],
+	              result = _ref12[1];
+
+	          if (id === entry) {
+	            resolve(result);
+	          }
+	        });
+
+	        _this5.parent.events.emit(ACTION_CONFIRM, [id, action, payload]);
+	      });
+	    }
+	  }, {
+	    key: "_call",
+
+	    /**
 	     * Call an action
 	     * @returns
 	     * @private
 	     */
-
-	  }, {
-	    key: "_call",
 	    value: function () {
 	      var _call2 = asyncToGenerator(
 	      /*#__PURE__*/
-	      regenerator.mark(function _callee7(action) {
+	      regenerator.mark(function _callee10(action) {
 	        var payload,
 	            options,
 	            result,
+	            passed,
 	            start,
 	            errors,
 	            method,
 	            path,
-	            _ref8,
+	            _ref13,
 	            _data2,
 	            debug,
 	            _errors2,
-	            _args7 = arguments;
+	            commands,
+	            cmd,
+	            _args10 = arguments;
 
-	        return regenerator.wrap(function _callee7$(_context7) {
+	        return regenerator.wrap(function _callee10$(_context10) {
 	          while (1) {
-	            switch (_context7.prev = _context7.next) {
+	            switch (_context10.prev = _context10.next) {
 	              case 0:
-	                payload = _args7.length > 1 && _args7[1] !== undefined ? _args7[1] : {};
-	                options = _args7.length > 2 && _args7[2] !== undefined ? _args7[2] : {
+	                payload = _args10.length > 1 && _args10[1] !== undefined ? _args10[1] : {};
+	                options = _args10.length > 2 && _args10[2] !== undefined ? _args10[2] : {
 	                  validate: true,
 	                  cache: false,
-	                  shouldInvalidate: false
+	                  shouldInvalidate: false,
+	                  confirm: false
 	                };
 	                result = {
 	                  errors: false,
 	                  data: false
 	                };
 
+	                if (!options.confirm) {
+	                  _context10.next = 9;
+	                  break;
+	                }
+
+	                _context10.next = 6;
+	                return this.confirm(action, payload);
+
+	              case 6:
+	                passed = _context10.sent;
+
+	                if (passed) {
+	                  _context10.next = 9;
+	                  break;
+	                }
+
+	                return _context10.abrupt("return", {
+	                  errors: 'NOT_CONFIRMED',
+	                  data: false
+	                });
+
+	              case 9:
 	                if (options.loading) {
 	                  this.parent.events.emit(LOADING_START, [action, payload]);
 	                }
@@ -2171,36 +2384,36 @@
 	                }
 
 	                if (!(Actions.cache[action] && Actions.cache[action].data)) {
-	                  _context7.next = 11;
+	                  _context10.next = 17;
 	                  break;
 	                }
 
 	                d('info', "+ cache (".concat(action, ") is cached"));
 	                result = Actions.cache[action];
-	                return _context7.abrupt("return", this.finishTransaction(options, action, result, payload, start));
+	                return _context10.abrupt("return", this.finishTransaction(options, action, result, payload, start));
 
-	              case 11:
+	              case 17:
 	                if (!options.validate) {
-	                  _context7.next = 18;
+	                  _context10.next = 24;
 	                  break;
 	                }
 
-	                _context7.next = 14;
+	                _context10.next = 20;
 	                return this._validateAction(action, payload);
 
-	              case 14:
-	                errors = _context7.sent;
+	              case 20:
+	                errors = _context10.sent;
 
 	                if (!errors) {
-	                  _context7.next = 18;
+	                  _context10.next = 24;
 	                  break;
 	                }
 
 	                result.errors = errors;
-	                return _context7.abrupt("return", this.finishTransaction(options, action, result, payload, start));
+	                return _context10.abrupt("return", this.finishTransaction(options, action, result, payload, start));
 
-	              case 18:
-	                _context7.prev = 18;
+	              case 24:
+	                _context10.prev = 24;
 	                method = 'post';
 	                path = Config$1.get('handler');
 
@@ -2209,12 +2422,12 @@
 	                  path = action[1];
 	                }
 
-	                _context7.next = 24;
+	                _context10.next = 30;
 	                return this.parent.http[method](path, typeof window !== 'undefined' && payload instanceof FormData ? payload : [action, payload], this._configAction(options.progress, action));
 
-	              case 24:
-	                _ref8 = _context7.sent;
-	                _data2 = _ref8.data;
+	              case 30:
+	                _ref13 = _context10.sent;
+	                _data2 = _ref13.data;
 
 	                if (_data2 && _data2.errors) {
 	                  result.errors = _data2.errors;
@@ -2228,32 +2441,47 @@
 	                  }
 	                }
 
-	                _context7.next = 35;
+	                _context10.next = 41;
 	                break;
 
-	              case 29:
-	                _context7.prev = 29;
-	                _context7.t0 = _context7["catch"](18);
-	                debug = get(_context7.t0, 'response.data.debug', false);
-	                _errors2 = get(_context7.t0, 'response.data.errors', false);
+	              case 35:
+	                _context10.prev = 35;
+	                _context10.t0 = _context10["catch"](24);
+	                debug = get(_context10.t0, 'response.data.debug', false);
+	                _errors2 = get(_context10.t0, 'response.data.errors', false);
 	                result.errors = _errors2 ? _errors2 : {
-	                  message: [_context7.t0.response ? _context7.t0.response : _context7.t0]
+	                  message: [_context10.t0.response ? _context10.t0.response : _context10.t0]
 	                };
 
 	                if (debug) {
 	                  result.debug = debug;
 	                }
 
-	              case 35:
-	                action = Array.isArray(action) ? action[1] : action;
-	                return _context7.abrupt("return", this.finishTransaction(options, action, result, payload, start));
+	              case 41:
+	                if (this.parent.config.get('debug') && typeof window !== 'undefined') {
+	                  commands = JSON.parse(localStorage.getItem('commands') || '[]');
+	                  cmd = "client.call('".concat(action, "', ").concat(JSON.stringify(payload), ", ").concat(JSON.stringify(options), ");");
 
-	              case 37:
+	                  if (commands[commands.length - 1] !== cmd) {
+	                    commands.push(cmd);
+
+	                    if (commands.length > 50) {
+	                      commands.splice(0, 1);
+	                    }
+
+	                    localStorage.setItem('lastCommands', JSON.stringify(commands));
+	                  }
+	                }
+
+	                action = Array.isArray(action) ? action[1] : action;
+	                return _context10.abrupt("return", this.finishTransaction(options, action, result, payload, start));
+
+	              case 44:
 	              case "end":
-	                return _context7.stop();
+	                return _context10.stop();
 	            }
 	          }
-	        }, _callee7, this, [[18, 29]]);
+	        }, _callee10, this, [[24, 35]]);
 	      }));
 
 	      function _call(_x5) {
@@ -2268,6 +2496,7 @@
 	}();
 
 	Actions.cache = {};
+	Actions.confirmQueue = {};
 
 	var Auth =
 	/*#__PURE__*/
@@ -3051,7 +3280,7 @@
 	 */
 
 	var defaults = {
-	  debug: false,
+	  dev: false,
 	  socket: false,
 	  actions: '/',
 	  handler: '/',
@@ -3088,7 +3317,7 @@
 	    Config$1.store(this.opts);
 	    this.onReady = false;
 
-	    if (this.opts.debug) {
+	    if (this.opts.dev && typeof window !== 'undefined') {
 	      window.client = this;
 	      debugPanel();
 	    }
@@ -3113,6 +3342,7 @@
 	              case 0:
 	                actions = _args.length > 0 && _args[0] !== undefined ? _args[0] : {};
 	                this.events = new Event();
+	                this.config = Config$1;
 	                this.auth = new Auth(this);
 	                this.actions = new Actions(this, Config$1.get('axios'));
 	                this.socket = new Socket(this, Config$1.get('sio'));
@@ -3120,17 +3350,17 @@
 	                this.validator = new Validator(this);
 	                this.utils = Utils;
 	                this.config = Config$1;
-	                _context.next = 11;
+	                _context.next = 12;
 	                return this.actions.setup(actions);
 
-	              case 11:
-	                _context.next = 13;
+	              case 12:
+	                _context.next = 14;
 	                return this.i18n.setup();
 
-	              case 13:
+	              case 14:
 	                typeof this.onReady === 'function' && this.onReady();
 
-	              case 14:
+	              case 15:
 	              case "end":
 	                return _context.stop();
 	            }

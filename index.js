@@ -14,7 +14,7 @@ import * as Constants from './constants';
  */
 
 const defaults = {
-     debug: false,
+     dev: false,
      socket: false,
      actions: '/',
      handler: '/',
@@ -50,7 +50,7 @@ export default class Serpent {
           Config.store(this.opts);
           this.onReady = false;
 
-          if (this.opts.debug) {
+          if (this.opts.dev && typeof window !== 'undefined') {
                window.client = this;
                Utils.debugPanel();
           }
@@ -63,6 +63,7 @@ export default class Serpent {
 
      async setup(actions = {}) {
           this.events = new Event();
+          this.config = Config;
           this.auth = new Auth(this);
           this.actions = new Actions(this, Config.get('axios'));
           this.socket = new Socket(this, Config.get('sio'));
